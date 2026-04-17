@@ -172,12 +172,15 @@
     const tc_onsager = data.exact.Tc;
     const fit = data.fit;
 
-    // Empirical model fitted to THIS simulation (weighted nonlinear
-    // least squares via scipy.optimize.curve_fit):
+    // Asymmetric sigmoid fitted to THIS simulation via
+    // scipy.optimize.curve_fit (weighted nonlinear least squares):
     //     M(T) = A/2 · [1 − tanh((T − Tc)/w)] + c
-    // Parameters (A, Tc, w, c) come from the portfolio JSON.
+    //     w    = wL if T < Tc else wR
+    // The left/right widths differ because the transition in a finite
+    // Ising lattice is steeper on the disordered side.
     function M_fitted(T) {
-      return fit.A * 0.5 * (1 - Math.tanh((T - fit.Tc) / fit.w)) + fit.c;
+      const w = T < fit.Tc ? fit.wL : fit.wR;
+      return fit.A * 0.5 * (1 - Math.tanh((T - fit.Tc) / w)) + fit.c;
     }
 
     const T_fine = linspace(1.5, 3.5, 400);
@@ -244,10 +247,12 @@
           xanchor: "left", yanchor: "top", align: "left",
           text:
             "<b>M(T) = A/2 · [1 − tanh((T − T<sub>c</sub>)/w)] + c</b><br>" +
-            "<span style='opacity:0.85'>" +
+            "<span style='opacity:0.75'>(w = w<sub>L</sub> if T &lt; T<sub>c</sub>, else w<sub>R</sub>)</span><br>" +
+            "<span style='opacity:0.9'>" +
             "A = " + fit.A.toFixed(3) + " ± " + fit.A_err.toFixed(3) + "<br>" +
             "T<sub>c</sub> = " + fit.Tc.toFixed(3) + " ± " + fit.Tc_err.toFixed(3) + "<br>" +
-            "w = " + fit.w.toFixed(3) + " ± " + fit.w_err.toFixed(3) + "<br>" +
+            "w<sub>L</sub> = " + fit.wL.toFixed(3) + " ± " + fit.wL_err.toFixed(3) + "<br>" +
+            "w<sub>R</sub> = " + fit.wR.toFixed(3) + " ± " + fit.wR_err.toFixed(3) + "<br>" +
             "c = " + fit.c.toFixed(3) + " ± " + fit.c_err.toFixed(3) + "<br>" +
             "χ²/dof = " + fit.chi2_reduced +
             "</span>",

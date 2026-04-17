@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>03 · Anomaly Detection API · Portfolio</title>
+<link rel="stylesheet" href="../assets/styles.css" />
+</head>
+<body>
+
+<div class="bg-stage"></div>
+<div class="bg-grid"></div>
+<div class="bg-noise"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<nav class="topnav">
+  <a href="../index.html" class="brand">// PORTFOLIO</a>
+  <ul>
+    <li><a class="menu" href="../index.html#projects">Projects</a></li>
+    <li><a class="menu" href="../index.html#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<header class="detail-hero">
+  <div class="container">
+    <a href="../index.html#projects" class="back-link reveal">← Volver a proyectos</a>
+    <div class="badges reveal" style="margin-top: 28px;">
+      <span class="badge">03 / 05</span>
+      <span class="badge domain">Deep learning · MLOps</span>
+      <span class="badge status-planned">Planeado</span>
+    </div>
+    <h1 class="reveal"><span class="grad">Anomaly Detection API</span><br /><span class="grad">Autoencoder + FastAPI + Docker</span></h1>
+    <p class="tagline reveal">Un autoencoder LSTM aprende a reconstruir series multivariadas "sanas" de sensores (NASA Turbofan CMAPSS). Cuando recibe datos anómalos, el error de reconstrucción dispara la alerta. Todo expuesto como API REST con demo Streamlit y contenedorizado con Docker.</p>
+    <div class="cta-row reveal">
+      <a href="https://github.com/crozol/03-anomaly-detection-api" class="btn btn-primary" target="_blank" rel="noopener">Código en GitHub →</a>
+      <a href="#" class="btn btn-ghost">Demo (pendiente)</a>
+    </div>
+  </div>
+</header>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Resumen</div>
+    <h2 class="reveal">¿De qué se trata este proyecto?</h2>
+    <div class="two-col">
+      <div class="reveal">
+        <p>Este es el <strong style="color:var(--fg-0)">proyecto pivote de ingeniería</strong> del portafolio. Mientras los otros proyectos demuestran profundidad matemática, este demuestra que puedo deployar algo real: dataset público, modelo entrenado, API documentada, contenedor reproducible, demo interactiva.</p>
+        <p>La técnica es <strong style="color:var(--fg-0)">detección de anomalías por reconstrucción</strong>: entrenas un autoencoder solo con series normales. Cuando recibe una serie anómala, falla al reconstruirla y el error pico sube. Simple, efectivo y ampliamente usado en industria.</p>
+        <p>Dataset: NASA Turbofan CMAPSS — series temporales de ~20 sensores de motores a reacción, con etiquetas de vida útil restante. Benchmark público, con métricas reproducibles.</p>
+      </div>
+      <div class="theory-card reveal">
+        <h3>Pipeline de inferencia</h3>
+        <p>Entrenamiento (solo datos normales):</p>
+        <div class="formula">min<sub>θ</sub> E [‖x − AE<sub>θ</sub>(x)‖²]</div>
+        <p>Umbral de anomalía:</p>
+        <div class="formula">τ = percentil<sub>99</sub>(errores<sub>val</sub>)</div>
+        <p>Decisión en producción:</p>
+        <div class="formula">anomaly = (‖x − AE<sub>θ</sub>(x)‖² &gt; τ)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Skills demostrados</div>
+    <h2 class="reveal">Qué habilidades certifica</h2>
+
+    <div class="skill-matrix reveal" style="margin-bottom: 32px;">
+      <div class="skill-name">Deep learning aplicado</div>
+      <div class="skill-how">Autoencoder LSTM / 1D-CNN sobre series temporales multivariadas con ventanas deslizantes.</div>
+      <div class="skill-name">Feature engineering</div>
+      <div class="skill-how">Normalización por sensor, windowing, filtrado de ruido, manejo de missing values.</div>
+      <div class="skill-name">Ingeniería de software</div>
+      <div class="skill-how">FastAPI con endpoints tipados vía Pydantic, validación de input, tests unitarios con pytest.</div>
+      <div class="skill-name">Contenedorización</div>
+      <div class="skill-how">Dockerfile multi-stage + docker-compose para orquestar API y demo Streamlit.</div>
+      <div class="skill-name">UX / demos</div>
+      <div class="skill-how">Streamlit: el usuario sube un CSV, el modelo corre, se visualiza la serie con ventanas marcadas.</div>
+      <div class="skill-name">Métricas de clasificación</div>
+      <div class="skill-how">Precision, recall, F1, ROC-AUC contra labels reales del benchmark CMAPSS.</div>
+      <div class="skill-name">Documentación</div>
+      <div class="skill-how">OpenAPI (autogenerada por FastAPI), README con curl examples y screenshot de la demo.</div>
+    </div>
+
+    <div class="skill-chip-row reveal">
+      <span class="skill-chip">PyTorch</span>
+      <span class="skill-chip">FastAPI</span>
+      <span class="skill-chip">Uvicorn</span>
+      <span class="skill-chip">Docker</span>
+      <span class="skill-chip">docker-compose</span>
+      <span class="skill-chip">Streamlit</span>
+      <span class="skill-chip">Pandas</span>
+      <span class="skill-chip">scikit-learn</span>
+      <span class="skill-chip">Pydantic</span>
+      <span class="skill-chip">pytest</span>
+    </div>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Estructura</div>
+    <h2 class="reveal">Organización del proyecto</h2>
+    <pre class="code-tree reveal"><span class="folder">03-anomaly-detection-api/</span>
+├── <span class="file">README.md</span>
+├── <span class="file">requirements.txt</span>
+├── <span class="file">Dockerfile</span>          <span class="comment"># Multi-stage: build + runtime slim</span>
+├── <span class="file">docker-compose.yml</span>  <span class="comment"># Orquesta API + Streamlit</span>
+├── <span class="folder">src/</span>
+│   ├── <span class="file">autoencoder.py</span>  <span class="comment"># Modelo LSTM autoencoder</span>
+│   ├── <span class="file">data.py</span>         <span class="comment"># Carga + preprocess CMAPSS</span>
+│   ├── <span class="file">train.py</span>        <span class="comment"># Training loop</span>
+│   ├── <span class="file">api.py</span>          <span class="comment"># FastAPI: POST /predict</span>
+│   └── <span class="file">app_streamlit.py</span> <span class="comment"># Demo visual</span>
+├── <span class="folder">tests/</span>
+└── <span class="folder">notebooks/</span></pre>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Roadmap</div>
+    <h2 class="reveal">Progreso del proyecto</h2>
+    <ul class="roadmap reveal">
+      <li>Descargar dataset CMAPSS y escribir pipeline de preprocesamiento</li>
+      <li>Implementar autoencoder LSTM y entrenar solo con series "sanas"</li>
+      <li>Determinar umbral de anomalía (percentil 99 del error en validación)</li>
+      <li>Evaluar contra labels reales: precision, recall, F1, ROC-AUC</li>
+      <li>Endpoint FastAPI <code>/predict</code> con validación Pydantic</li>
+      <li>Demo Streamlit con upload de CSV y visualización de anomalías</li>
+      <li>Dockerfile + docker-compose para despliegue de un comando</li>
+      <li>README con curl examples, screenshots y métricas finales</li>
+    </ul>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Resultado esperado</div>
+    <h2 class="reveal">Métricas de éxito</h2>
+    <div class="two-col">
+      <div class="info-card reveal">
+        <h3>Modelo</h3>
+        <p>ROC-AUC &gt; 0.9 en detección de fallas.</p>
+        <p style="margin-bottom:0;">Precision @ recall 0.9 &gt; 0.7 (pocas falsas alarmas).</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>Producto</h3>
+        <p>Un comando <code>docker-compose up</code> levanta API + demo.</p>
+        <p style="margin-bottom:0;">API documentada auto en <code>/docs</code>, latencia &lt; 200ms por predicción.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Resultados</div>
+    <h2 class="reveal">Outputs y métricas finales</h2>
+    <p class="section-intro reveal">Métricas del modelo, screenshot de la demo y artefactos del despliegue.</p>
+
+    <div class="result-empty reveal">
+      <div class="big">Pendiente</div>
+      <p>Aún no hay resultados publicados.</p>
+      <p class="hint">Aquí irán: screenshot de la demo Streamlit, curva ROC, matriz de confusión, métricas (precision / recall / AUC) y link a la API desplegada.</p>
+    </div>
+
+    <!-- Cuando tengas resultados, reemplazá el bloque .result-empty por:
+    <div class="results-grid">
+      <div class="result-figure">
+        <img src="../assets/results/03-streamlit-demo.png" alt="Demo Streamlit" />
+        <div class="caption">Fig 1 · Demo Streamlit con anomalías marcadas</div>
+      </div>
+      <div class="result-figure">
+        <img src="../assets/results/03-roc.png" alt="ROC" />
+        <div class="caption">Fig 2 · Curva ROC del detector</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">AUC = 0.92</div>
+        <div class="label">área bajo la curva ROC</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">&lt;200 ms</div>
+        <div class="label">latencia promedio por predicción</div>
+      </div>
+    </div>
+    -->
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <nav class="page-nav">
+      <a href="02-neural-odes.html">
+        <div class="dir">← Anterior</div>
+        <span class="title">02 · Neural ODEs</span>
+      </a>
+      <a href="04-pinns.html" class="next">
+        <div class="dir">Siguiente →</div>
+        <span class="title">04 · PINNs</span>
+      </a>
+    </nav>
+  </div>
+</section>
+
+<footer>
+  <div class="container" style="display:flex; justify-content: space-between; width: 100%; align-items: center; flex-wrap: wrap; gap: 12px;">
+    <span>&copy; <span id="year"></span> · Camilo. Construido con HTML + CSS.</span>
+    <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; color: var(--fg-1);">MADE WITH MATH ∙ PHYSICS ∙ CODE</span>
+  </div>
+</footer>
+
+<script src="../assets/portfolio.js"></script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>02 · Neural ODEs · Portfolio</title>
+<link rel="stylesheet" href="../assets/styles.css" />
+</head>
+<body>
+
+<div class="bg-stage"></div>
+<div class="bg-grid"></div>
+<div class="bg-noise"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<nav class="topnav">
+  <a href="../index.html" class="brand">// PORTFOLIO</a>
+  <ul>
+    <li><a class="menu" href="../index.html#projects">Projects</a></li>
+    <li><a class="menu" href="../index.html#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<header class="detail-hero">
+  <div class="container">
+    <a href="../index.html#projects" class="back-link reveal">← Volver a proyectos</a>
+    <div class="badges reveal" style="margin-top: 28px;">
+      <span class="badge">02 / 05</span>
+      <span class="badge domain">Deep learning · Sistemas dinámicos</span>
+      <span class="badge status-planned">Planeado</span>
+    </div>
+    <h1 class="reveal"><span class="grad">Neural ODEs para dinámica de sistemas</span></h1>
+    <p class="tagline reveal">Una red neuronal aprende el campo vectorial dy/dt = f(y, t) de un sistema dinámico (péndulo amortiguado, Lotka-Volterra) directamente desde trayectorias observadas, usando integradores numéricos diferenciables.</p>
+    <div class="cta-row reveal">
+      <a href="https://github.com/crozol/02-neural-odes" class="btn btn-primary" target="_blank" rel="noopener">Código en GitHub →</a>
+      <a href="#" class="btn btn-ghost">Demo (pendiente)</a>
+    </div>
+  </div>
+</header>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Resumen</div>
+    <h2 class="reveal">¿De qué se trata este proyecto?</h2>
+    <div class="two-col">
+      <div class="reveal">
+        <p>Las redes neuronales clásicas aprenden funciones directas <em>x → y</em>. Las <strong style="color:var(--fg-0)">Neural ODEs</strong> (Chen et al., NeurIPS 2018) aprenden la derivada <em>dy/dt = f<sub>θ</sub>(y, t)</em> y la integran con un solver numérico, haciendo el proceso diferenciable mediante el método del adjoint.</p>
+        <p>Este proyecto aprovecha la ventaja natural del perfil físico-matemático: si entendés EDOs bien, la arquitectura es intuitiva — una MLP que aproxima un campo vectorial, integrada con Runge-Kutta dentro del grafo de autograd.</p>
+        <p>Meta: entrenar con trayectorias cortas (ej. 5 segundos) y verificar que la red <strong style="color:var(--fg-0)">extrapola correctamente</strong> a horizontes más largos, algo que una red clásica no puede hacer porque no aprende la dinámica subyacente.</p>
+      </div>
+      <div class="theory-card reveal">
+        <h3>Conceptos clave</h3>
+        <p>Neural ODE:</p>
+        <div class="formula">dy/dt = f<sub>θ</sub>(y, t)</div>
+        <p>Integración y loss:</p>
+        <div class="formula">y(t<sub>i</sub>) = y₀ + ∫ f<sub>θ</sub> dt</div>
+        <div class="formula">L = Σᵢ ‖y(tᵢ) − yᵢ<sup>obs</sup>‖²</div>
+        <p>Sistema de referencia (péndulo amortiguado):</p>
+        <div class="formula">θ̈ + γθ̇ + ω₀² sin θ = 0</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Skills demostrados</div>
+    <h2 class="reveal">Qué habilidades certifica</h2>
+
+    <div class="skill-matrix reveal" style="margin-bottom: 32px;">
+      <div class="skill-name">PyTorch</div>
+      <div class="skill-how">Definir módulos <code>nn.Module</code>, training loop con Adam, uso correcto de autograd.</div>
+      <div class="skill-name">Integradores diferenciables</div>
+      <div class="skill-how">Uso de <code>torchdiffeq.odeint</code> con métodos Dormand-Prince y tolerancias adaptativas.</div>
+      <div class="skill-name">ML matemático</div>
+      <div class="skill-how">Regresión de campo vectorial en ℝ², no solo clasificación — el objetivo es estructura continua.</div>
+      <div class="skill-name">Generación de datos</div>
+      <div class="skill-how">Integrar el sistema real con <code>scipy.integrate.odeint</code> y añadir ruido gaussiano controlado.</div>
+      <div class="skill-name">Experimentación</div>
+      <div class="skill-how">Ablation: tamaño de red, profundidad, ruido, longitud de trayectoria de training.</div>
+      <div class="skill-name">Visualización</div>
+      <div class="skill-how">GIF animado comparando trayectoria real vs. predicha y campo vectorial aprendido en el plano de fase.</div>
+      <div class="skill-name">Validación física</div>
+      <div class="skill-how">Chequear conservación aproximada de energía y verificar extrapolación fuera del rango de entrenamiento.</div>
+    </div>
+
+    <div class="skill-chip-row reveal">
+      <span class="skill-chip">PyTorch</span>
+      <span class="skill-chip">torchdiffeq</span>
+      <span class="skill-chip">NumPy</span>
+      <span class="skill-chip">SciPy</span>
+      <span class="skill-chip">Matplotlib</span>
+      <span class="skill-chip">Autograd</span>
+      <span class="skill-chip">EDOs</span>
+      <span class="skill-chip">Jupyter</span>
+    </div>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Estructura</div>
+    <h2 class="reveal">Organización del proyecto</h2>
+    <pre class="code-tree reveal"><span class="folder">02-neural-odes/</span>
+├── <span class="file">README.md</span>
+├── <span class="file">requirements.txt</span>
+├── <span class="folder">src/</span>
+│   ├── <span class="file">systems.py</span>    <span class="comment"># Sistemas de referencia (péndulo, Lotka-Volterra) con scipy</span>
+│   ├── <span class="file">ode_net.py</span>    <span class="comment"># MLP que aproxima dy/dt = f(y, t) + wrapper para torchdiffeq</span>
+│   └── <span class="file">train.py</span>      <span class="comment"># Loop de entrenamiento con loss MSE sobre trayectorias</span>
+└── <span class="folder">notebooks/</span>    <span class="comment"># Experimentos y figuras</span></pre>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Roadmap</div>
+    <h2 class="reveal">Progreso del proyecto</h2>
+    <ul class="roadmap reveal">
+      <li>Implementar sistemas de referencia y generar trayectorias sintéticas con ruido</li>
+      <li>Definir <code>ODEFunc</code> como MLP de 3 capas con activación Tanh (suave para autograd)</li>
+      <li>Training loop con <code>odeint</code> de torchdiffeq (método Dormand-Prince adaptativo)</li>
+      <li>Ablation: profundidad, ruido, longitud de trayectoria</li>
+      <li>Evaluar extrapolación más allá del horizonte de entrenamiento</li>
+      <li>Generar GIF de comparación trayectoria real vs. predicha</li>
+      <li>README final con resultados y discusión</li>
+    </ul>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Resultado esperado</div>
+    <h2 class="reveal">Métricas de éxito</h2>
+    <div class="two-col">
+      <div class="info-card reveal">
+        <h3>Ajuste</h3>
+        <p style="margin-bottom:0;">Error MSE en región de training &lt; 10<sup>−3</sup>.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>Generalización</h3>
+        <p>Entrenada con 5 s, extrapola a 10+ s manteniendo la forma cualitativa de la trayectoria.</p>
+        <p style="margin-bottom:0;">Conservación aproximada de energía en el péndulo (desviación &lt; 5%).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Resultados</div>
+    <h2 class="reveal">Outputs y métricas finales</h2>
+    <p class="section-intro reveal">Trayectorias predichas, campo vectorial aprendido y comparación contra el sistema real.</p>
+
+    <div class="result-empty reveal">
+      <div class="big">Pendiente</div>
+      <p>Aún no hay resultados publicados.</p>
+      <p class="hint">Aquí irán: GIF de trayectoria predicha vs. real, visualización del campo vectorial aprendido en el plano de fase, y métricas de error/extrapolación.</p>
+    </div>
+
+    <!-- Cuando tengas resultados, reemplazá el bloque .result-empty por:
+    <div class="results-grid">
+      <div class="result-figure">
+        <img src="../assets/results/02-trajectory.gif" alt="Trayectoria" />
+        <div class="caption">Fig 1 · Trayectoria predicha vs. sistema real</div>
+      </div>
+      <div class="result-figure">
+        <img src="../assets/results/02-vector-field.png" alt="Campo" />
+        <div class="caption">Fig 2 · Campo vectorial aprendido</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">MSE = 1.2e-3</div>
+        <div class="label">error en región de entrenamiento</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">2× horizonte</div>
+        <div class="label">extrapolación con forma cualitativa correcta</div>
+      </div>
+    </div>
+    -->
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <nav class="page-nav">
+      <a href="01-ising-bayesian.html">
+        <div class="dir">← Anterior</div>
+        <span class="title">01 · Ising Bayesiano</span>
+      </a>
+      <a href="03-anomaly-detection-api.html" class="next">
+        <div class="dir">Siguiente →</div>
+        <span class="title">03 · Anomaly Detection API</span>
+      </a>
+    </nav>
+  </div>
+</section>
+
+<footer>
+  <div class="container" style="display:flex; justify-content: space-between; width: 100%; align-items: center; flex-wrap: wrap; gap: 12px;">
+    <span>&copy; <span id="year"></span> · Camilo. Construido con HTML + CSS.</span>
+    <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; color: var(--fg-1);">MADE WITH MATH ∙ PHYSICS ∙ CODE</span>
+  </div>
+</footer>
+
+<script src="../assets/portfolio.js"></script>
+</body>
+</html>

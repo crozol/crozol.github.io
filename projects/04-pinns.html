@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>04 · PINNs · Portfolio</title>
+<link rel="stylesheet" href="../assets/styles.css" />
+</head>
+<body>
+
+<div class="bg-stage"></div>
+<div class="bg-grid"></div>
+<div class="bg-noise"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<nav class="topnav">
+  <a href="../index.html" class="brand">// PORTFOLIO</a>
+  <ul>
+    <li><a class="menu" href="../index.html#projects">Projects</a></li>
+    <li><a class="menu" href="../index.html#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<header class="detail-hero">
+  <div class="container">
+    <a href="../index.html#projects" class="back-link reveal">← Volver a proyectos</a>
+    <div class="badges reveal" style="margin-top: 28px;">
+      <span class="badge">04 / 05</span>
+      <span class="badge domain">ML para ciencia · PDEs</span>
+      <span class="badge status-planned">Planeado</span>
+    </div>
+    <h1 class="reveal"><span class="grad">Physics-Informed Neural Networks (PINNs)</span></h1>
+    <p class="tagline reveal">Resolver ecuaciones en derivadas parciales (calor, Burgers) entrenando una red neuronal cuyo loss incluye el residual de la PDE, calculado con autograd. Implementación de la idea de Raissi, Perdikaris y Karniadakis (2019), validada contra soluciones analíticas.</p>
+    <div class="cta-row reveal">
+      <a href="https://github.com/crozol/04-pinns" class="btn btn-primary" target="_blank" rel="noopener">Código en GitHub →</a>
+      <a href="#" class="btn btn-ghost">Demo (pendiente)</a>
+    </div>
+  </div>
+</header>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Resumen</div>
+    <h2 class="reveal">¿De qué se trata este proyecto?</h2>
+    <div class="two-col">
+      <div class="reveal">
+        <p>Un PINN es una red neuronal <em>u<sub>θ</sub>(x, t)</em> cuyo loss combina tres piezas: las <strong style="color:var(--fg-0)">condiciones iniciales</strong>, las <strong style="color:var(--fg-0)">condiciones de frontera</strong>, y el <strong style="color:var(--fg-0)">residual de la PDE</strong> evaluado en puntos del dominio. Las derivadas parciales se calculan con <code>torch.autograd.grad</code> — sin diferencias finitas, sin malla.</p>
+        <p>Este proyecto implementa dos casos clásicos:</p>
+        <ul>
+          <li><strong style="color:var(--fg-0)">Ecuación del calor 1D</strong>: caso lineal con solución analítica conocida. Sirve como sanity check.</li>
+          <li><strong style="color:var(--fg-0)">Ecuación de Burgers 1D</strong>: caso no lineal con formación de discontinuidades (shock-like) que desafían a cualquier método numérico.</li>
+        </ul>
+        <p>Los PINNs están en la frontera activa de research (papers en Nature, AIAA, JCP). Un blog post técnico explicando la implementación genera visibilidad y contactos orgánicos.</p>
+      </div>
+      <div class="theory-card reveal">
+        <h3>Formulación matemática</h3>
+        <p>PDE genérica:</p>
+        <div class="formula">ℱ[u](x, t) = 0</div>
+        <p>Ecuación del calor:</p>
+        <div class="formula">u<sub>t</sub> − α u<sub>xx</sub> = 0</div>
+        <p>Ecuación de Burgers:</p>
+        <div class="formula">u<sub>t</sub> + u · u<sub>x</sub> − ν u<sub>xx</sub> = 0</div>
+        <p>Loss compuesto del PINN:</p>
+        <div class="formula">L = L<sub>PDE</sub> + λ<sub>B</sub> L<sub>borde</sub> + λ<sub>I</sub> L<sub>inicial</sub></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Skills demostrados</div>
+    <h2 class="reveal">Qué habilidades certifica</h2>
+
+    <div class="skill-matrix reveal" style="margin-bottom: 32px;">
+      <div class="skill-name">Autograd avanzado</div>
+      <div class="skill-how">Cálculo de derivadas parciales de orden 2 vía <code>torch.autograd.grad</code> con <code>create_graph=True</code>.</div>
+      <div class="skill-name">PDEs numéricas</div>
+      <div class="skill-how">Formular residuales en forma suave, convertir restricciones físicas en términos de loss.</div>
+      <div class="skill-name">Optimización</div>
+      <div class="skill-how">Balance de los pesos λ del loss compuesto, schedulers de learning rate, optimizador Adam → L-BFGS.</div>
+      <div class="skill-name">Implementación de papers</div>
+      <div class="skill-how">Traducir Raissi et al. (JCP 2019) directamente a código PyTorch limpio y testeable.</div>
+      <div class="skill-name">Validación</div>
+      <div class="skill-how">Error L² relativo contra solución analítica (heat) y solución numérica de referencia (Burgers).</div>
+      <div class="skill-name">Visualización 2D</div>
+      <div class="skill-how">Heatmaps espacio-tiempo, snapshots de u(x) en distintos t, comparación lado a lado con solver clásico.</div>
+      <div class="skill-name">Escritura técnica</div>
+      <div class="skill-how">Blog post explicando trade-offs: cuándo conviene un PINN vs. un solver clásico.</div>
+    </div>
+
+    <div class="skill-chip-row reveal">
+      <span class="skill-chip">PyTorch</span>
+      <span class="skill-chip">NumPy</span>
+      <span class="skill-chip">SciPy</span>
+      <span class="skill-chip">Matplotlib</span>
+      <span class="skill-chip">Autograd</span>
+      <span class="skill-chip">PDEs</span>
+      <span class="skill-chip">Research</span>
+      <span class="skill-chip">Jupyter</span>
+    </div>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Estructura</div>
+    <h2 class="reveal">Organización del proyecto</h2>
+    <pre class="code-tree reveal"><span class="folder">04-pinns/</span>
+├── <span class="file">README.md</span>
+├── <span class="file">requirements.txt</span>
+├── <span class="folder">src/</span>
+│   ├── <span class="file">pinn.py</span>        <span class="comment"># Red u_theta(x, t) con activación Tanh</span>
+│   ├── <span class="file">physics.py</span>     <span class="comment"># Residuales heat y Burgers via autograd</span>
+│   └── <span class="file">train.py</span>       <span class="comment"># Loop con loss compuesto (PDE + BC + IC)</span>
+└── <span class="folder">notebooks/</span>      <span class="comment"># Comparación con solución analítica/numérica</span></pre>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Roadmap</div>
+    <h2 class="reveal">Progreso del proyecto</h2>
+    <ul class="roadmap reveal">
+      <li>Implementar MLP con activación Tanh (diferenciable dos veces)</li>
+      <li>Función <code>heat_residual(u, x, t, α)</code> con <code>autograd.grad</code></li>
+      <li>Función <code>burgers_residual(u, x, t, ν)</code></li>
+      <li>Sampling de puntos de collocation, boundary e initial</li>
+      <li>Training loop con loss compuesto y pesos λ</li>
+      <li>Validación: heat vs. solución analítica, Burgers vs. solver espectral</li>
+      <li>Gráficas espacio-tiempo + blog post explicativo</li>
+    </ul>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Resultado esperado</div>
+    <h2 class="reveal">Métricas de éxito</h2>
+    <div class="two-col">
+      <div class="info-card reveal">
+        <h3>Ecuación del calor</h3>
+        <p style="margin-bottom:0;">Error L² relativo &lt; 1% contra la solución analítica en todo el dominio.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>Ecuación de Burgers</h3>
+        <p>Error L² relativo &lt; 5% contra solución de referencia numérica de alta resolución.</p>
+        <p style="margin-bottom:0;">Captura correcta del shock emergente sin oscilaciones patológicas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Resultados</div>
+    <h2 class="reveal">Outputs y métricas finales</h2>
+    <p class="section-intro reveal">Soluciones aprendidas, comparación con referencia analítica/numérica y errores L².</p>
+
+    <div class="result-empty reveal">
+      <div class="big">Pendiente</div>
+      <p>Aún no hay resultados publicados.</p>
+      <p class="hint">Aquí irán: heatmaps espacio-tiempo de u(x,t) aprendidos, comparación lado a lado con solución exacta/numérica, y errores L² relativos.</p>
+    </div>
+
+    <!-- Cuando tengas resultados, reemplazá el bloque .result-empty por:
+    <div class="results-grid">
+      <div class="result-figure">
+        <img src="../assets/results/04-heat-pinn.png" alt="Heat PINN" />
+        <div class="caption">Fig 1 · u(x,t) aprendida vs. solución analítica — calor</div>
+      </div>
+      <div class="result-figure">
+        <img src="../assets/results/04-burgers-pinn.png" alt="Burgers PINN" />
+        <div class="caption">Fig 2 · u(x,t) aprendida vs. solución numérica — Burgers</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">L² rel &lt; 1%</div>
+        <div class="label">ecuación del calor</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">L² rel ~ 3%</div>
+        <div class="label">ecuación de Burgers</div>
+      </div>
+    </div>
+    -->
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <nav class="page-nav">
+      <a href="03-anomaly-detection-api.html">
+        <div class="dir">← Anterior</div>
+        <span class="title">03 · Anomaly Detection API</span>
+      </a>
+      <a href="05-tda-finance.html" class="next">
+        <div class="dir">Siguiente →</div>
+        <span class="title">05 · TDA Finance</span>
+      </a>
+    </nav>
+  </div>
+</section>
+
+<footer>
+  <div class="container" style="display:flex; justify-content: space-between; width: 100%; align-items: center; flex-wrap: wrap; gap: 12px;">
+    <span>&copy; <span id="year"></span> · Camilo. Construido con HTML + CSS.</span>
+    <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; color: var(--fg-1);">MADE WITH MATH ∙ PHYSICS ∙ CODE</span>
+  </div>
+</footer>
+
+<script src="../assets/portfolio.js"></script>
+</body>
+</html>

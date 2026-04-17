@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Camilo · Machine Learning Engineer</title>
+<meta name="description" content="Portafolio de proyectos en Machine Learning con base en Física y Matemáticas." />
+<link rel="stylesheet" href="assets/styles.css" />
+<style>
+  .hero .inner .eyebrow, .hero .inner h1, .hero .inner p.lead, .hero .inner .cta-row { opacity: 0; }
+  .hero .inner .eyebrow { animation: fadeUp 0.9s 0.1s forwards ease-out; }
+  .hero .inner h1 { animation: fadeUp 0.9s 0.25s forwards ease-out; }
+  .hero .inner p.lead { animation: fadeUp 0.9s 0.45s forwards ease-out; }
+  .hero .inner .cta-row { animation: fadeUp 0.9s 0.65s forwards ease-out; }
+  .scroll-hint { animation: fadeUp 0.9s 1s forwards ease-out; opacity: 0; }
+</style>
+</head>
+<body>
+
+<!-- CONFIG: editar para personalizar -->
+<script>
+  window.PORTFOLIO = {
+    fullName: "Camilo",
+    title: "Machine Learning Engineer",
+    bio: "Matemática avanzada y física estadística aplicadas a modelos ML rigurosos, desde inferencia bayesiana hasta topología aplicada.",
+    github: "https://github.com/crozol",
+    linkedin: "https://www.linkedin.com/in/TU_USUARIO",
+    email: "juadsuarezsan@unal.edu.co"
+  };
+</script>
+
+<div class="bg-stage"></div>
+<div class="bg-grid"></div>
+<div class="bg-noise"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<nav class="topnav">
+  <a href="index.html" class="brand">// PORTFOLIO</a>
+  <ul>
+    <li><a class="menu" href="#about">About</a></li>
+    <li><a class="menu" href="#skills">Skills</a></li>
+    <li><a class="menu" href="#projects">Projects</a></li>
+    <li><a class="menu" href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<header class="hero">
+  <div class="container inner">
+    <div class="eyebrow">Physics · Math · ML</div>
+    <h1 class="display">
+      <span class="grad" id="heroName">Camilo</span><br />
+      <span class="grad">Machine Learning</span><br />
+      <span class="grad">Engineer</span>
+    </h1>
+    <p class="lead" id="heroBio">Uso matemática avanzada y física estadística para construir modelos ML rigurosos, desde inferencia bayesiana hasta topología aplicada.</p>
+    <div class="cta-row">
+      <a href="#projects" class="btn btn-primary">Ver proyectos →</a>
+      <a href="#contact" class="btn btn-ghost">Contactarme</a>
+    </div>
+  </div>
+  <div class="scroll-hint">scroll</div>
+</header>
+
+<section id="about">
+  <div class="container">
+    <div class="section-eyebrow reveal">01 · About</div>
+    <h2 class="reveal">Perfil</h2>
+    <p class="section-intro reveal">
+      Estudiante de doble titulación en Física y Matemáticas, en transición hacia roles de Machine Learning Engineer. Mi ventaja competitiva: la base matemática profunda que me permite entender <em>por qué</em> un modelo funciona, no solo cómo invocarlo.
+    </p>
+
+    <div class="about-grid">
+      <div class="about-card reveal">
+        <p style="margin: 0 0 16px; color: var(--fg-1); font-size: 15px;">
+          Mi trabajo combina tres pilares: <strong style="color:var(--fg-0)">física</strong> (mecánica estadística, PDEs, sistemas dinámicos), <strong style="color:var(--fg-0)">matemática</strong> (topología algebraica, análisis, probabilidad) e <strong style="color:var(--fg-0)">ingeniería</strong> (PyTorch, APIs, Docker). Cada uno de los proyectos de este portafolio explota explícitamente esa intersección.
+        </p>
+        <p style="margin: 0; color: var(--fg-1); font-size: 15px;">
+          Valido mis modelos contra resultados analíticos exactos, benchmarks públicos o métricas objetivas — porque un modelo sin validación rigurosa no es ciencia, es decoración.
+        </p>
+      </div>
+      <div class="stats">
+        <div class="stat reveal"><div class="n">5</div><div class="l">Proyectos en portafolio</div></div>
+        <div class="stat reveal"><div class="n">2</div><div class="l">Grados (Física + Matemáticas)</div></div>
+        <div class="stat reveal"><div class="n">∞</div><div class="l">Curiosidad por lo matemático</div></div>
+        <div class="stat reveal"><div class="n">ML</div><div class="l">+ Bayesian + TDA + PINNs</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="container">
+    <div class="section-eyebrow reveal">02 · Skills</div>
+    <h2 class="reveal">Stack y competencias</h2>
+    <p class="section-intro reveal">Lo que domino activamente y aparece en los proyectos del portafolio.</p>
+
+    <div class="skills-grid">
+      <div class="skill-card reveal">
+        <div class="icon">λ</div>
+        <h3>Machine Learning</h3>
+        <p>Deep learning, inferencia bayesiana, autoencoders, Neural ODEs, PINNs.</p>
+        <div class="skill-tags"><span class="tag">PyTorch</span><span class="tag">PyMC</span><span class="tag">scikit-learn</span><span class="tag">torchdiffeq</span></div>
+      </div>
+      <div class="skill-card reveal">
+        <div class="icon">∑</div>
+        <h3>Matemática aplicada</h3>
+        <p>Topología algebraica, probabilidad, análisis, optimización, EDOs/PDEs.</p>
+        <div class="skill-tags"><span class="tag">MCMC</span><span class="tag">Homología</span><span class="tag">Autograd</span><span class="tag">Bayes</span></div>
+      </div>
+      <div class="skill-card reveal">
+        <div class="icon">⚛</div>
+        <h3>Física</h3>
+        <p>Mecánica estadística, transiciones de fase, sistemas dinámicos, Monte Carlo.</p>
+        <div class="skill-tags"><span class="tag">Ising</span><span class="tag">Metropolis</span><span class="tag">PDEs</span><span class="tag">Hamiltonian</span></div>
+      </div>
+      <div class="skill-card reveal">
+        <div class="icon">&lt;/&gt;</div>
+        <h3>Ingeniería</h3>
+        <p>APIs, contenedores, testing, Git, deployment reproducible, demos interactivas.</p>
+        <div class="skill-tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">Docker</span><span class="tag">Streamlit</span><span class="tag">Git</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="container">
+    <div class="section-eyebrow reveal">03 · Projects</div>
+    <h2 class="reveal">Proyectos</h2>
+    <p class="section-intro reveal">Cinco proyectos ordenados por complejidad creciente. Click en cualquiera para ver el detalle completo.</p>
+
+    <div class="projects-grid">
+
+      <a class="project reveal" href="projects/01-ising-bayesian.html">
+        <span class="status in-progress">Código completo</span>
+        <div class="num">01</div>
+        <div class="domain">Mecánica estadística · Bayesiano</div>
+        <h3>Inferencia Bayesiana en el Modelo de Ising 2D</h3>
+        <p>Simulador Metropolis con Numba de una red de spines + modelo PyMC que infiere la temperatura crítica y el exponente crítico vía NUTS. Validación contra la solución exacta de Onsager (1944).</p>
+        <div class="project-tags">
+          <span class="tag">Python</span><span class="tag">PyMC</span><span class="tag">NumPy</span><span class="tag">ArviZ</span><span class="tag">Monte Carlo</span>
+        </div>
+        <span class="project-link-hint">Ver detalle →</span>
+      </a>
+
+      <a class="project reveal" href="projects/02-neural-odes.html">
+        <span class="status planned">Planeado</span>
+        <div class="num">02</div>
+        <div class="domain">Deep learning · Sistemas dinámicos</div>
+        <h3>Neural ODEs para dinámica de sistemas</h3>
+        <p>Red neuronal que aprende el campo vectorial de un péndulo amortiguado o un sistema Lotka-Volterra desde trayectorias observadas, usando integradores diferenciables.</p>
+        <div class="project-tags">
+          <span class="tag">PyTorch</span><span class="tag">torchdiffeq</span><span class="tag">EDOs</span><span class="tag">Autograd</span>
+        </div>
+        <span class="project-link-hint">Ver detalle →</span>
+      </a>
+
+      <a class="project reveal" href="projects/03-anomaly-detection-api.html">
+        <span class="status planned">Planeado</span>
+        <div class="num">03</div>
+        <div class="domain">Deep learning · MLOps</div>
+        <h3>Anomaly Detection API · Autoencoder + FastAPI + Docker</h3>
+        <p>Autoencoder LSTM que detecta fallas en sensores del dataset NASA Turbofan, expuesto como API REST con demo Streamlit. Contenedorizado con Docker para despliegue inmediato.</p>
+        <div class="project-tags">
+          <span class="tag">PyTorch</span><span class="tag">FastAPI</span><span class="tag">Docker</span><span class="tag">Streamlit</span><span class="tag">Pandas</span>
+        </div>
+        <span class="project-link-hint">Ver detalle →</span>
+      </a>
+
+      <a class="project reveal" href="projects/04-pinns.html">
+        <span class="status planned">Planeado</span>
+        <div class="num">04</div>
+        <div class="domain">ML para ciencia · PDEs</div>
+        <h3>Physics-Informed Neural Networks (PINNs)</h3>
+        <p>Implementación de PINNs (Raissi et al. 2019) para resolver la ecuación del calor y la ecuación de Burgers, validado contra soluciones analíticas y numéricas de referencia.</p>
+        <div class="project-tags">
+          <span class="tag">PyTorch</span><span class="tag">PDEs</span><span class="tag">Autograd</span><span class="tag">Research</span>
+        </div>
+        <span class="project-link-hint">Ver detalle →</span>
+      </a>
+
+      <a class="project reveal" href="projects/05-tda-finance.html" style="grid-column: 1 / -1;">
+        <span class="status planned">Planeado</span>
+        <div class="num">05</div>
+        <div class="domain">Topología aplicada · Finanzas</div>
+        <h3>TDA en series financieras — detección de cambios de régimen</h3>
+        <p>Homología persistente sobre ventanas deslizantes de retornos multi-activo para detectar transiciones entre régimen normal y crisis (2008, 2011, 2015, 2020). Features topológicos como input a un clasificador supervisado.</p>
+        <div class="project-tags">
+          <span class="tag">Giotto-TDA</span><span class="tag">Persistence Homology</span><span class="tag">scikit-learn</span><span class="tag">Pandas</span><span class="tag">yfinance</span>
+        </div>
+        <span class="project-link-hint">Ver detalle →</span>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="container">
+    <div class="section-eyebrow reveal">04 · Contact</div>
+    <h2 class="reveal">Conectemos</h2>
+    <p class="section-intro reveal">Abierto a roles MLE junior, data science y research engineering. Respondo rápido.</p>
+
+    <div class="contact-grid">
+      <a class="contact-card reveal" href="#" id="linkGithub">
+        <span class="label">GitHub</span>
+        <span class="value">@TU_USUARIO</span>
+        <span class="sub">Código y proyectos</span>
+      </a>
+      <a class="contact-card reveal" href="#" id="linkLinkedin">
+        <span class="label">LinkedIn</span>
+        <span class="value">/in/TU_USUARIO</span>
+        <span class="sub">Perfil profesional</span>
+      </a>
+      <a class="contact-card reveal" href="mailto:juadsuarezsan@unal.edu.co" id="linkEmail">
+        <span class="label">Email</span>
+        <span class="value">juadsuarezsan@unal.edu.co</span>
+        <span class="sub">Para oportunidades directas</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container" style="display:flex; justify-content: space-between; width: 100%; align-items: center; flex-wrap: wrap; gap: 12px;">
+    <span>&copy; <span id="year"></span> · <span id="footName">Camilo</span>. Construido con HTML + CSS.</span>
+    <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; color: var(--fg-1);">MADE WITH MATH ∙ PHYSICS ∙ CODE</span>
+  </div>
+</footer>
+
+<script src="assets/portfolio.js"></script>
+</body>
+</html>

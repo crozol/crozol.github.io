@@ -111,39 +111,28 @@
   function renderMagnetization(Plotly, data) {
     const m = data.magnetization;
     const tc_onsager = data.exact.Tc;
-    const tc_post = data.summary.Tc.mean;
-    const beta_post = data.summary.beta.mean;
-
-    // smooth theoretical fit built from posterior means
-    const T_fine = linspace(1.5, 3.5, 400);
-    const M_fit = T_fine.map(T => T < tc_post ? Math.pow(1 - T / tc_post, beta_post) : 0);
-
-    const fitTrace = {
-      x: T_fine, y: M_fit,
-      mode: "lines",
-      name: "posterior-mean fit",
-      line: { color: COLORS.purple, width: 3, shape: "spline", smoothing: 0.6 },
-      fill: "tozeroy",
-      fillcolor: "rgba(124,92,255,0.08)",
-      hovertemplate: "T = %{x:.3f}<br>fit ⟨|M|⟩ = %{y:.4f}<extra>fit</extra>",
-    };
 
     const dataTrace = {
       x: m.T, y: m.M_mean, customdata: m.M_std,
       error_y: {
         type: "data", array: m.M_std,
-        color: "rgba(244,114,182,0.55)", thickness: 1.2, width: 4,
+        color: "rgba(154,163,184,0.5)", thickness: 1.2, width: 4,
       },
-      mode: "markers",
-      name: "simulated ⟨|M|⟩",
+      mode: "lines+markers",
+      name: "⟨|M|⟩",
+      line: {
+        color: COLORS.purple, width: 2.5,
+        shape: "spline", smoothing: 1.0,
+      },
       marker: {
-        size: 9,
-        color: COLORS.pink,
+        size: 8, color: COLORS.purple,
         line: { color: "rgba(255,255,255,0.25)", width: 1 },
         symbol: "circle",
       },
+      fill: "tozeroy",
+      fillcolor: "rgba(124,92,255,0.06)",
       hovertemplate:
-        "T = %{x:.3f}<br>⟨|M|⟩ = %{y:.4f} ± %{customdata:.4f}<extra>simulated</extra>",
+        "T = %{x:.3f}<br>⟨|M|⟩ = %{y:.4f} ± %{customdata:.4f}<extra></extra>",
     };
 
     const layout = Object.assign({}, baseLayout, {
@@ -166,11 +155,6 @@
           x0: tc_onsager, x1: tc_onsager, y0: 0, y1: 1,
           line: { color: COLORS.amber, dash: "dash", width: 2 },
         },
-        {
-          type: "line", xref: "x", yref: "paper",
-          x0: tc_post, x1: tc_post, y0: 0, y1: 1,
-          line: { color: COLORS.cyan, dash: "dot", width: 1.5 },
-        },
       ],
       annotations: [
         {
@@ -180,19 +164,12 @@
           showarrow: false,
           font: { color: COLORS.amber, size: 11, family: MONO_FAMILY },
         },
-        {
-          x: tc_post, y: 0.84, xref: "x", yref: "paper",
-          xanchor: "left", yanchor: "top",
-          text: "  T<sub>c</sub><sup>posterior</sup> ≈ " + tc_post.toFixed(3),
-          showarrow: false,
-          font: { color: COLORS.cyan, size: 11, family: MONO_FAMILY },
-        },
       ],
-      hovermode: "x unified",
-      showlegend: true,
+      hovermode: "closest",
+      showlegend: false,
     });
 
-    Plotly.newPlot("chart-magnetization", [fitTrace, dataTrace], layout, plotlyConfig);
+    Plotly.newPlot("chart-magnetization", [dataTrace], layout, plotlyConfig);
   }
 
   // ---------- plot 2: posteriors ----------

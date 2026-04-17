@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="faviconTitle faviconDesc">
   <title id="faviconTitle">Camilo Rozo</title>
-  <desc id="faviconDesc">Camilo Rozo — Machine Learning Engineer (rozol.ca555@gmail.com)</desc>
+  <desc id="faviconDesc">Camilo Rozo — Machine Learning Engineer</desc>
   <rect width="64" height="64" rx="14" fill="#0a0e1c"/>
   <rect x="1" y="1" width="62" height="62" rx="13" fill="none" stroke="rgba(251,191,36,0.35)" stroke-width="1"/>
   <text x="50%" y="50%" text-anchor="middle" dy=".35em"

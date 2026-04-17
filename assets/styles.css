@@ -864,7 +864,7 @@ footer .footer-sub {
   position: relative; z-index: 1;
 }
 .action-btn {
-  display: flex; align-items: center; gap: 14px;
+  display: flex; align-items: center; justify-content: center; gap: 14px;
   padding: 16px 22px;
   border-radius: 14px;
   text-decoration: none;

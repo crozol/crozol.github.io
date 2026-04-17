@@ -171,23 +171,30 @@
     const m = data.magnetization;
     const tc_onsager = data.exact.Tc;
 
-    // Weighted polynomial regression on the simulated curve.
-    // Weights = 1/σ² give more influence to precisely measured points.
-    const POLY_DEGREE = 6;
-    const weights = m.M_std.map(s => 1 / (s * s + 1e-6));
-    const fit = polyfit(m.T, m.M_mean, POLY_DEGREE, weights);
+    // Closed-form Onsager (1944) magnetization for the 2D Ising model
+    // in the thermodynamic limit:
+    //     M(T) = [1 − sinh(2J/kT)^(−4)]^(1/8)    for T < Tc
+    //     M(T) = 0                                for T ≥ Tc
+    // J = 1, k_B = 1 in reduced units. No free parameters.
+    function onsagerM(T) {
+      if (T >= tc_onsager) return 0;
+      const s = Math.sinh(2 / T);
+      const inner = 1 - 1 / Math.pow(s, 4);
+      return inner <= 0 ? 0 : Math.pow(inner, 1 / 8);
+    }
 
-    const T_fine = linspace(1.5, 3.5, 400);
-    const M_fit = T_fine.map(T => polyeval(fit, T));
+    const T_fine = linspace(1.5, tc_onsager, 280)
+      .concat(linspace(tc_onsager, 3.5, 120));
+    const M_theory = T_fine.map(onsagerM);
 
     const fitTrace = {
-      x: T_fine, y: M_fit,
+      x: T_fine, y: M_theory,
       mode: "lines",
-      name: "polynomial fit (deg " + POLY_DEGREE + ")",
-      line: { color: COLORS.purple, width: 3, shape: "spline", smoothing: 0.3 },
+      name: "Onsager (1944) exact",
+      line: { color: COLORS.purple, width: 3, shape: "spline", smoothing: 0.1 },
       fill: "tozeroy",
       fillcolor: "rgba(124,92,255,0.08)",
-      hovertemplate: "T = %{x:.3f}<br>fit ⟨|M|⟩ = %{y:.4f}<extra>regression</extra>",
+      hovertemplate: "T = %{x:.3f}<br>M<sub>Onsager</sub>(T) = %{y:.4f}<extra>theory</extra>",
     };
 
     const dataTrace = {
@@ -232,13 +239,25 @@
         {
           x: tc_onsager, y: 0.96, xref: "x", yref: "paper",
           xanchor: "right", yanchor: "top",
-          text: "T<sub>c</sub><sup>Onsager</sup> ≈ " + tc_onsager.toFixed(4) + "  ",
+          text: "T<sub>c</sub> ≈ " + tc_onsager.toFixed(4) + "  ",
           showarrow: false,
           font: { color: COLORS.amber, size: 11, family: MONO_FAMILY },
         },
+        {
+          x: 1.55, y: 0.28, xref: "x", yref: "y",
+          xanchor: "left", yanchor: "top", align: "left",
+          text: "<b>M(T) = [1 − sinh(2J/kT)<sup>−4</sup>]<sup>1/8</sup></b><br>" +
+                "<span style='opacity:0.75'>Onsager (1944) · exact 2D Ising · no free params</span>",
+          showarrow: false,
+          bgcolor: "rgba(13,18,32,0.82)",
+          bordercolor: "rgba(124,92,255,0.55)",
+          borderwidth: 1,
+          borderpad: 10,
+          font: { color: "#e7ecf5", size: 12, family: MONO_FAMILY },
+        },
       ],
       hovermode: "closest",
-      showlegend: false,
+      showlegend: true,
     });
 
     Plotly.newPlot("chart-magnetization", [fitTrace, dataTrace], layout, plotlyConfig);

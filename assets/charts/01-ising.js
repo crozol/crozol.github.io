@@ -170,31 +170,27 @@
   function renderMagnetization(Plotly, data) {
     const m = data.magnetization;
     const tc_onsager = data.exact.Tc;
+    const fit = data.fit;
 
-    // Closed-form Onsager (1944) magnetization for the 2D Ising model
-    // in the thermodynamic limit:
-    //     M(T) = [1 − sinh(2J/kT)^(−4)]^(1/8)    for T < Tc
-    //     M(T) = 0                                for T ≥ Tc
-    // J = 1, k_B = 1 in reduced units. No free parameters.
-    function onsagerM(T) {
-      if (T >= tc_onsager) return 0;
-      const s = Math.sinh(2 / T);
-      const inner = 1 - 1 / Math.pow(s, 4);
-      return inner <= 0 ? 0 : Math.pow(inner, 1 / 8);
+    // Empirical model fitted to THIS simulation (weighted nonlinear
+    // least squares via scipy.optimize.curve_fit):
+    //     M(T) = A/2 · [1 − tanh((T − Tc)/w)] + c
+    // Parameters (A, Tc, w, c) come from the portfolio JSON.
+    function M_fitted(T) {
+      return fit.A * 0.5 * (1 - Math.tanh((T - fit.Tc) / fit.w)) + fit.c;
     }
 
-    const T_fine = linspace(1.5, tc_onsager, 280)
-      .concat(linspace(tc_onsager, 3.5, 120));
-    const M_theory = T_fine.map(onsagerM);
+    const T_fine = linspace(1.5, 3.5, 400);
+    const M_curve = T_fine.map(M_fitted);
 
     const fitTrace = {
-      x: T_fine, y: M_theory,
+      x: T_fine, y: M_curve,
       mode: "lines",
-      name: "Onsager (1944) exact",
+      name: "fit to simulated data",
       line: { color: COLORS.purple, width: 3, shape: "spline", smoothing: 0.1 },
       fill: "tozeroy",
       fillcolor: "rgba(124,92,255,0.08)",
-      hovertemplate: "T = %{x:.3f}<br>M<sub>Onsager</sub>(T) = %{y:.4f}<extra>theory</extra>",
+      hovertemplate: "T = %{x:.3f}<br>M<sub>fit</sub>(T) = %{y:.4f}<extra>fit</extra>",
     };
 
     const dataTrace = {
@@ -244,16 +240,23 @@
           font: { color: COLORS.amber, size: 11, family: MONO_FAMILY },
         },
         {
-          x: 1.55, y: 0.28, xref: "x", yref: "y",
+          x: 1.55, y: 0.35, xref: "x", yref: "y",
           xanchor: "left", yanchor: "top", align: "left",
-          text: "<b>M(T) = [1 − sinh(2J/kT)<sup>−4</sup>]<sup>1/8</sup></b><br>" +
-                "<span style='opacity:0.75'>Onsager (1944) · exact 2D Ising · no free params</span>",
+          text:
+            "<b>M(T) = A/2 · [1 − tanh((T − T<sub>c</sub>)/w)] + c</b><br>" +
+            "<span style='opacity:0.85'>" +
+            "A = " + fit.A.toFixed(3) + " ± " + fit.A_err.toFixed(3) + "<br>" +
+            "T<sub>c</sub> = " + fit.Tc.toFixed(3) + " ± " + fit.Tc_err.toFixed(3) + "<br>" +
+            "w = " + fit.w.toFixed(3) + " ± " + fit.w_err.toFixed(3) + "<br>" +
+            "c = " + fit.c.toFixed(3) + " ± " + fit.c_err.toFixed(3) + "<br>" +
+            "χ²/dof = " + fit.chi2_reduced +
+            "</span>",
           showarrow: false,
           bgcolor: "rgba(13,18,32,0.82)",
           bordercolor: "rgba(124,92,255,0.55)",
           borderwidth: 1,
-          borderpad: 10,
-          font: { color: "#e7ecf5", size: 12, family: MONO_FAMILY },
+          borderpad: 12,
+          font: { color: "#e7ecf5", size: 11, family: MONO_FAMILY },
         },
       ],
       hovermode: "closest",

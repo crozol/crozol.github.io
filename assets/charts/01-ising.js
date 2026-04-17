@@ -75,6 +75,65 @@
     return out;
   }
 
+  // Solve A · x = b via Gaussian elimination with partial pivoting.
+  function solveLinear(A, b) {
+    const n = A.length;
+    const M = A.map((row, i) => row.concat([b[i]]));
+    for (let i = 0; i < n; i++) {
+      let maxRow = i;
+      for (let k = i + 1; k < n; k++) {
+        if (Math.abs(M[k][i]) > Math.abs(M[maxRow][i])) maxRow = k;
+      }
+      [M[i], M[maxRow]] = [M[maxRow], M[i]];
+      for (let k = i + 1; k < n; k++) {
+        const factor = M[k][i] / M[i][i];
+        for (let j = i; j <= n; j++) M[k][j] -= factor * M[i][j];
+      }
+    }
+    const x = new Array(n).fill(0);
+    for (let i = n - 1; i >= 0; i--) {
+      let sum = M[i][n];
+      for (let j = i + 1; j < n; j++) sum -= M[i][j] * x[j];
+      x[i] = sum / M[i][i];
+    }
+    return x;
+  }
+
+  // Weighted polynomial regression. Returns a fit object whose domain is
+  // normalized to [-1, 1] for numerical conditioning.
+  function polyfit(x, y, degree, weights) {
+    const n = x.length;
+    const m = degree + 1;
+    const w = weights || new Array(n).fill(1);
+    const xMin = Math.min.apply(null, x);
+    const xMax = Math.max.apply(null, x);
+    const span = xMax - xMin;
+    const xn = x.map(v => 2 * (v - xMin) / span - 1);
+
+    const ATA = Array.from({ length: m }, () => new Array(m).fill(0));
+    const ATy = new Array(m).fill(0);
+    for (let i = 0; i < n; i++) {
+      const powers = new Array(m);
+      let p = 1;
+      for (let j = 0; j < m; j++) { powers[j] = p; p *= xn[i]; }
+      const wi = w[i];
+      for (let j = 0; j < m; j++) {
+        ATy[j] += wi * powers[j] * y[i];
+        for (let k = 0; k < m; k++) ATA[j][k] += wi * powers[j] * powers[k];
+      }
+    }
+    return { coef: solveLinear(ATA, ATy), xMin: xMin, xMax: xMax };
+  }
+
+  function polyeval(fit, x) {
+    const span = fit.xMax - fit.xMin;
+    const xn = 2 * (x - fit.xMin) / span - 1;
+    const c = fit.coef;
+    let y = 0, p = 1;
+    for (let i = 0; i < c.length; i++) { y += c[i] * p; p *= xn; }
+    return y;
+  }
+
   function kde(samples, n_grid) {
     n_grid = n_grid || 220;
     let min = Infinity, max = -Infinity;
@@ -112,27 +171,40 @@
     const m = data.magnetization;
     const tc_onsager = data.exact.Tc;
 
+    // Weighted polynomial regression on the simulated curve.
+    // Weights = 1/σ² give more influence to precisely measured points.
+    const POLY_DEGREE = 6;
+    const weights = m.M_std.map(s => 1 / (s * s + 1e-6));
+    const fit = polyfit(m.T, m.M_mean, POLY_DEGREE, weights);
+
+    const T_fine = linspace(1.5, 3.5, 400);
+    const M_fit = T_fine.map(T => polyeval(fit, T));
+
+    const fitTrace = {
+      x: T_fine, y: M_fit,
+      mode: "lines",
+      name: "polynomial fit (deg " + POLY_DEGREE + ")",
+      line: { color: COLORS.purple, width: 3, shape: "spline", smoothing: 0.3 },
+      fill: "tozeroy",
+      fillcolor: "rgba(124,92,255,0.08)",
+      hovertemplate: "T = %{x:.3f}<br>fit ⟨|M|⟩ = %{y:.4f}<extra>regression</extra>",
+    };
+
     const dataTrace = {
       x: m.T, y: m.M_mean, customdata: m.M_std,
       error_y: {
         type: "data", array: m.M_std,
-        color: "rgba(154,163,184,0.5)", thickness: 1.2, width: 4,
+        color: "rgba(244,114,182,0.55)", thickness: 1.2, width: 4,
       },
-      mode: "lines+markers",
-      name: "⟨|M|⟩",
-      line: {
-        color: COLORS.purple, width: 2.5,
-        shape: "spline", smoothing: 1.0,
-      },
+      mode: "markers",
+      name: "simulated ⟨|M|⟩",
       marker: {
-        size: 8, color: COLORS.purple,
+        size: 8, color: COLORS.pink,
         line: { color: "rgba(255,255,255,0.25)", width: 1 },
         symbol: "circle",
       },
-      fill: "tozeroy",
-      fillcolor: "rgba(124,92,255,0.06)",
       hovertemplate:
-        "T = %{x:.3f}<br>⟨|M|⟩ = %{y:.4f} ± %{customdata:.4f}<extra></extra>",
+        "T = %{x:.3f}<br>⟨|M|⟩ = %{y:.4f} ± %{customdata:.4f}<extra>simulated</extra>",
     };
 
     const layout = Object.assign({}, baseLayout, {
@@ -169,7 +241,7 @@
       showlegend: false,
     });
 
-    Plotly.newPlot("chart-magnetization", [dataTrace], layout, plotlyConfig);
+    Plotly.newPlot("chart-magnetization", [fitTrace, dataTrace], layout, plotlyConfig);
   }
 
   // ---------- plot 2: posteriors ----------

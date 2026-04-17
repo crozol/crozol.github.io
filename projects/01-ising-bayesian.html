@@ -377,10 +377,6 @@
       <p>All four chains reach R̂ ≤ 1.02 with ESS above 200. The trace plots (Fig 3) show no drift, no stuck regions, and good mixing across chains. Acceptance rates sit in the 31–35% band — right in the optimal range for random-walk Metropolis in 3 dimensions. If any of this failed, none of the posterior numbers above would be trustworthy.</p>
     </div>
 
-    <!-- Subsection: why not classification metrics -->
-    <h3 class="reveal" style="margin-top: 40px;">What about accuracy, precision, confusion matrix?</h3>
-    <p class="reveal" style="color: var(--fg-1); max-width: 820px;">Those metrics require discrete labels and a predicted class per example — the problem doesn't have either. The right parallel would be: <em>"given a snapshot of the spin lattice, classify whether it's in the ordered or disordered phase"</em>. That's a classifier and would indeed produce a confusion matrix and ROC curve. It's a different problem (and an interesting one), but not this one.</p>
-    <p class="reveal" style="color: var(--fg-1); max-width: 820px;">In this portfolio, <a href="03-anomaly-detection-api.html" style="color: var(--accent-2);">Project 03 · Anomaly Detection API</a> is the explicit classification problem — the confusion matrix and ROC-AUC belong there.</p>
   </div>
 </section>
 

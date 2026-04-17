@@ -14,23 +14,36 @@
     gray:   "rgba(154,163,184,0.55)",
   };
 
+  const FONT_FAMILY = "Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
+  const MONO_FAMILY = "ui-monospace, 'JetBrains Mono', 'SF Mono', Consolas, monospace";
+
+  const spikeStyle = {
+    showspikes: true,
+    spikemode: "across",
+    spikesnap: "cursor",
+    spikecolor: "rgba(124,92,255,0.5)",
+    spikethickness: 1,
+    spikedash: "dot",
+  };
+
+  const axisStyle = Object.assign({
+    gridcolor: "rgba(255,255,255,0.05)",
+    zerolinecolor: "rgba(255,255,255,0.12)",
+    linecolor: "rgba(255,255,255,0.2)",
+    tickfont: { color: "#9aa3b8", size: 11, family: MONO_FAMILY },
+    titlefont: { color: "#e7ecf5", size: 13, family: FONT_FAMILY },
+    mirror: true,
+  }, spikeStyle);
+
   const baseLayout = {
     paper_bgcolor: "rgba(0,0,0,0)",
-    plot_bgcolor:  "rgba(0,0,0,0)",
-    font: {
-      color: "#e7ecf5",
-      family: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif",
-      size: 12,
-    },
-    margin: { t: 52, r: 28, b: 52, l: 62 },
+    plot_bgcolor:  "rgba(12,16,28,0.35)",
+    font: { color: "#e7ecf5", family: FONT_FAMILY, size: 12 },
+    margin: { t: 60, r: 30, b: 55, l: 65 },
     hoverlabel: {
       bgcolor: "rgba(13,18,32,0.96)",
       bordercolor: "rgba(124,92,255,0.55)",
-      font: {
-        color: "#e7ecf5",
-        family: "ui-monospace, JetBrains Mono, Consolas, monospace",
-        size: 12,
-      },
+      font: { color: "#e7ecf5", family: MONO_FAMILY, size: 12 },
     },
     legend: {
       bgcolor: "rgba(255,255,255,0.04)",
@@ -38,18 +51,8 @@
       borderwidth: 1,
       font: { color: "#e7ecf5", size: 12 },
       orientation: "h",
-      y: -0.14,
-      x: 0.5,
-      xanchor: "center",
+      y: -0.18, x: 0.5, xanchor: "center",
     },
-  };
-
-  const axisStyle = {
-    gridcolor: "rgba(255,255,255,0.06)",
-    zerolinecolor: "rgba(255,255,255,0.12)",
-    linecolor: "rgba(255,255,255,0.2)",
-    tickfont: { color: "#9aa3b8", size: 11 },
-    titlefont: { color: "#e7ecf5", size: 13 },
   };
 
   const plotlyConfig = {
@@ -60,60 +63,98 @@
       "autoScale2d", "hoverClosestCartesian", "hoverCompareCartesian",
     ],
     toImageButtonOptions: {
-      format: "png",
-      filename: "camilo-rozo-ising",
-      scale: 2,
+      format: "png", filename: "camilo-rozo-ising", scale: 2,
     },
   };
 
-  function ensurePlotly() {
-    return new Promise((resolve, reject) => {
-      if (window.Plotly) return resolve(window.Plotly);
-      const deadline = Date.now() + 6000;
-      const poll = () => {
-        if (window.Plotly) resolve(window.Plotly);
-        else if (Date.now() > deadline) reject(new Error("Plotly failed to load"));
-        else setTimeout(poll, 80);
-      };
-      poll();
-    });
+  // ---------- math helpers ----------
+
+  function linspace(a, b, n) {
+    const out = new Array(n);
+    for (let i = 0; i < n; i++) out[i] = a + (b - a) * i / (n - 1);
+    return out;
   }
+
+  function kde(samples, n_grid) {
+    n_grid = n_grid || 220;
+    let min = Infinity, max = -Infinity;
+    for (const s of samples) { if (s < min) min = s; if (s > max) max = s; }
+    const span = max - min;
+    const pad = span * 0.12 || 0.05;
+    const grid = linspace(min - pad, max + pad, n_grid);
+
+    // Silverman's rule of thumb bandwidth
+    const n = samples.length;
+    let mean = 0;
+    for (const s of samples) mean += s; mean /= n;
+    let variance = 0;
+    for (const s of samples) variance += (s - mean) ** 2; variance /= n;
+    const sigma = Math.sqrt(Math.max(variance, 1e-12));
+    const h = Math.max(1.06 * sigma * Math.pow(n, -0.2), 1e-6);
+
+    const density = new Array(n_grid);
+    const norm = 1 / (n * h * Math.sqrt(2 * Math.PI));
+    for (let i = 0; i < n_grid; i++) {
+      let sum = 0;
+      const x = grid[i];
+      for (let j = 0; j < n; j++) {
+        const u = (x - samples[j]) / h;
+        sum += Math.exp(-0.5 * u * u);
+      }
+      density[i] = sum * norm;
+    }
+    return { x: grid, y: density };
+  }
+
+  // ---------- plot 1: magnetization ----------
 
   function renderMagnetization(Plotly, data) {
     const m = data.magnetization;
-    const tc = data.exact.Tc;
+    const tc_onsager = data.exact.Tc;
+    const tc_post = data.summary.Tc.mean;
+    const beta_post = data.summary.beta.mean;
 
-    const curve = {
-      x: m.T,
-      y: m.M_mean,
-      customdata: m.M_std,
+    // smooth theoretical fit built from posterior means
+    const T_fine = linspace(1.5, 3.5, 400);
+    const M_fit = T_fine.map(T => T < tc_post ? Math.pow(1 - T / tc_post, beta_post) : 0);
+
+    const fitTrace = {
+      x: T_fine, y: M_fit,
+      mode: "lines",
+      name: "posterior-mean fit",
+      line: { color: COLORS.purple, width: 3, shape: "spline", smoothing: 0.6 },
+      fill: "tozeroy",
+      fillcolor: "rgba(124,92,255,0.08)",
+      hovertemplate: "T = %{x:.3f}<br>fit ⟨|M|⟩ = %{y:.4f}<extra>fit</extra>",
+    };
+
+    const dataTrace = {
+      x: m.T, y: m.M_mean, customdata: m.M_std,
       error_y: {
-        type: "data",
-        array: m.M_std,
-        color: COLORS.gray,
-        thickness: 1.4,
-        width: 5,
+        type: "data", array: m.M_std,
+        color: "rgba(244,114,182,0.55)", thickness: 1.2, width: 4,
       },
-      mode: "markers+lines",
-      name: "⟨|M|⟩",
-      line: { color: COLORS.purple, width: 2.5, shape: "spline" },
+      mode: "markers",
+      name: "simulated ⟨|M|⟩",
       marker: {
         size: 9,
-        color: COLORS.purple,
+        color: COLORS.pink,
         line: { color: "rgba(255,255,255,0.25)", width: 1 },
+        symbol: "circle",
       },
       hovertemplate:
-        "<b>T = %{x:.3f}</b><br>⟨|M|⟩ = %{y:.4f} ± %{customdata:.4f}<extra></extra>",
+        "T = %{x:.3f}<br>⟨|M|⟩ = %{y:.4f} ± %{customdata:.4f}<extra>simulated</extra>",
     };
 
     const layout = Object.assign({}, baseLayout, {
       title: {
         text: "<b>Phase transition</b> · magnetization vs. temperature",
-        font: { size: 15, color: "#e7ecf5" },
-        x: 0.02, xanchor: "left",
+        font: { size: 15, color: "#e7ecf5", family: FONT_FAMILY },
+        x: 0.02, xanchor: "left", y: 0.98, yanchor: "top",
       },
       xaxis: Object.assign({}, axisStyle, {
         title: { text: "Temperature T (units of J/k<sub>B</sub>)", font: axisStyle.titlefont },
+        range: [1.45, 3.55],
       }),
       yaxis: Object.assign({}, axisStyle, {
         title: { text: "Magnetization ⟨|M|⟩", font: axisStyle.titlefont },
@@ -122,65 +163,76 @@
       shapes: [
         {
           type: "line", xref: "x", yref: "paper",
-          x0: tc, x1: tc, y0: 0, y1: 1,
-          line: { color: COLORS.pink, dash: "dash", width: 2 },
+          x0: tc_onsager, x1: tc_onsager, y0: 0, y1: 1,
+          line: { color: COLORS.amber, dash: "dash", width: 2 },
+        },
+        {
+          type: "line", xref: "x", yref: "paper",
+          x0: tc_post, x1: tc_post, y0: 0, y1: 1,
+          line: { color: COLORS.cyan, dash: "dot", width: 1.5 },
         },
       ],
       annotations: [
         {
-          x: tc, y: 0.96, xref: "x", yref: "paper",
-          xanchor: "left", yanchor: "top",
-          text: "  T<sub>c</sub><sup>Onsager</sup> ≈ " + tc.toFixed(4),
+          x: tc_onsager, y: 0.96, xref: "x", yref: "paper",
+          xanchor: "right", yanchor: "top",
+          text: "T<sub>c</sub><sup>Onsager</sup> ≈ " + tc_onsager.toFixed(4) + "  ",
           showarrow: false,
-          font: { color: COLORS.pink, size: 12, family: "ui-monospace, monospace" },
+          font: { color: COLORS.amber, size: 11, family: MONO_FAMILY },
+        },
+        {
+          x: tc_post, y: 0.84, xref: "x", yref: "paper",
+          xanchor: "left", yanchor: "top",
+          text: "  T<sub>c</sub><sup>posterior</sup> ≈ " + tc_post.toFixed(3),
+          showarrow: false,
+          font: { color: COLORS.cyan, size: 11, family: MONO_FAMILY },
         },
       ],
-      showlegend: false,
+      hovermode: "x unified",
+      showlegend: true,
     });
 
-    Plotly.newPlot("chart-magnetization", [curve], layout, plotlyConfig);
+    Plotly.newPlot("chart-magnetization", [fitTrace, dataTrace], layout, plotlyConfig);
   }
+
+  // ---------- plot 2: posteriors ----------
 
   function renderPosteriors(Plotly, data) {
     const post = data.posterior;
     const summary = data.summary;
 
-    // Flatten chains
     const flatTc = post.Tc.reduce((a, b) => a.concat(b), []);
     const flatBeta = post.beta.reduce((a, b) => a.concat(b), []);
 
-    const histTc = {
-      x: flatTc,
-      type: "histogram",
-      nbinsx: 60,
-      histnorm: "probability density",
+    const kdeTc = kde(flatTc);
+    const kdeBeta = kde(flatBeta);
+
+    const tcLine = {
+      x: kdeTc.x, y: kdeTc.y,
+      type: "scatter", mode: "lines",
       name: "P(Tc | data)",
-      marker: {
-        color: "rgba(124,92,255,0.7)",
-        line: { color: "rgba(124,92,255,1)", width: 1 },
-      },
+      line: { color: COLORS.purple, width: 3, shape: "spline", smoothing: 0.85 },
+      fill: "tozeroy",
+      fillcolor: "rgba(124,92,255,0.18)",
       xaxis: "x", yaxis: "y",
-      hovertemplate: "<b>Tc = %{x:.3f}</b><br>density = %{y:.2f}<extra></extra>",
+      hovertemplate: "Tc = %{x:.3f}<br>density = %{y:.2f}<extra></extra>",
     };
 
-    const histBeta = {
-      x: flatBeta,
-      type: "histogram",
-      nbinsx: 60,
-      histnorm: "probability density",
+    const betaLine = {
+      x: kdeBeta.x, y: kdeBeta.y,
+      type: "scatter", mode: "lines",
       name: "P(β | data)",
-      marker: {
-        color: "rgba(34,211,238,0.7)",
-        line: { color: "rgba(34,211,238,1)", width: 1 },
-      },
+      line: { color: COLORS.cyan, width: 3, shape: "spline", smoothing: 0.85 },
+      fill: "tozeroy",
+      fillcolor: "rgba(34,211,238,0.16)",
       xaxis: "x2", yaxis: "y2",
-      hovertemplate: "<b>β = %{x:.3f}</b><br>density = %{y:.2f}<extra></extra>",
+      hovertemplate: "β = %{x:.3f}<br>density = %{y:.2f}<extra></extra>",
     };
 
     const layout = Object.assign({}, baseLayout, {
       title: {
         text: "<b>Posterior distributions</b> · Tc and β",
-        font: { size: 15, color: "#e7ecf5" },
+        font: { size: 15, color: "#e7ecf5", family: FONT_FAMILY },
         x: 0.02, xanchor: "left",
       },
       grid: { rows: 1, columns: 2, pattern: "independent" },
@@ -189,7 +241,7 @@
         domain: [0, 0.46],
       }),
       yaxis: Object.assign({}, axisStyle, {
-        title: { text: "Density", font: axisStyle.titlefont },
+        title: { text: "density", font: axisStyle.titlefont },
       }),
       xaxis2: Object.assign({}, axisStyle, {
         title: { text: "β", font: axisStyle.titlefont },
@@ -197,92 +249,83 @@
         anchor: "y2",
       }),
       yaxis2: Object.assign({}, axisStyle, {
-        title: { text: "Density", font: axisStyle.titlefont },
+        title: { text: "density", font: axisStyle.titlefont },
         anchor: "x2",
       }),
       shapes: [
-        // Tc HDI
-        {
-          type: "rect", xref: "x", yref: "paper",
+        // Tc HDI band
+        { type: "rect", xref: "x", yref: "paper",
           x0: summary.Tc.hdi[0], x1: summary.Tc.hdi[1], y0: 0, y1: 1,
-          fillcolor: "rgba(124,92,255,0.14)", line: { width: 0 },
-        },
-        // Tc exact
-        {
-          type: "line", xref: "x", yref: "paper",
+          fillcolor: "rgba(124,92,255,0.10)", line: { width: 0 } },
+        // Tc exact (Onsager)
+        { type: "line", xref: "x", yref: "paper",
           x0: data.exact.Tc, x1: data.exact.Tc, y0: 0, y1: 1,
-          line: { color: COLORS.pink, dash: "dash", width: 2 },
-        },
+          line: { color: COLORS.amber, dash: "dash", width: 2 } },
         // Tc posterior mean
-        {
-          type: "line", xref: "x", yref: "paper",
+        { type: "line", xref: "x", yref: "paper",
           x0: summary.Tc.mean, x1: summary.Tc.mean, y0: 0, y1: 1,
-          line: { color: COLORS.amber, width: 2 },
-        },
-        // β HDI
-        {
-          type: "rect", xref: "x2", yref: "paper",
+          line: { color: COLORS.pink, width: 2 } },
+        // β HDI band
+        { type: "rect", xref: "x2", yref: "paper",
           x0: summary.beta.hdi[0], x1: summary.beta.hdi[1], y0: 0, y1: 1,
-          fillcolor: "rgba(34,211,238,0.14)", line: { width: 0 },
-        },
+          fillcolor: "rgba(34,211,238,0.10)", line: { width: 0 } },
         // β exact
-        {
-          type: "line", xref: "x2", yref: "paper",
+        { type: "line", xref: "x2", yref: "paper",
           x0: data.exact.beta, x1: data.exact.beta, y0: 0, y1: 1,
-          line: { color: COLORS.pink, dash: "dash", width: 2 },
-        },
+          line: { color: COLORS.amber, dash: "dash", width: 2 } },
         // β posterior mean
-        {
-          type: "line", xref: "x2", yref: "paper",
+        { type: "line", xref: "x2", yref: "paper",
           x0: summary.beta.mean, x1: summary.beta.mean, y0: 0, y1: 1,
-          line: { color: COLORS.amber, width: 2 },
-        },
+          line: { color: COLORS.pink, width: 2 } },
       ],
       annotations: [
         {
           x: data.exact.Tc, y: 0.96, xref: "x", yref: "paper",
-          xanchor: "left", text: "  exact " + data.exact.Tc.toFixed(4),
+          xanchor: "right", text: "exact " + data.exact.Tc.toFixed(4) + "  ",
           showarrow: false,
-          font: { color: COLORS.pink, size: 11, family: "ui-monospace, monospace" },
+          font: { color: COLORS.amber, size: 11, family: MONO_FAMILY },
         },
         {
           x: summary.Tc.mean, y: 0.88, xref: "x", yref: "paper",
           xanchor: "left", text: "  mean " + summary.Tc.mean,
           showarrow: false,
-          font: { color: COLORS.amber, size: 11, family: "ui-monospace, monospace" },
+          font: { color: COLORS.pink, size: 11, family: MONO_FAMILY },
         },
         {
           x: data.exact.beta, y: 0.96, xref: "x2", yref: "paper",
           xanchor: "left", text: "  exact " + data.exact.beta,
           showarrow: false,
-          font: { color: COLORS.pink, size: 11, family: "ui-monospace, monospace" },
+          font: { color: COLORS.amber, size: 11, family: MONO_FAMILY },
         },
         {
           x: summary.beta.mean, y: 0.88, xref: "x2", yref: "paper",
-          xanchor: "left", text: "  mean " + summary.beta.mean,
+          xanchor: "right", text: "mean " + summary.beta.mean + "  ",
           showarrow: false,
-          font: { color: COLORS.amber, size: 11, family: "ui-monospace, monospace" },
+          font: { color: COLORS.pink, size: 11, family: MONO_FAMILY },
         },
       ],
       showlegend: false,
-      bargap: 0.02,
+      hovermode: "x",
     });
 
-    Plotly.newPlot("chart-posteriors", [histTc, histBeta], layout, plotlyConfig);
+    Plotly.newPlot("chart-posteriors", [tcLine, betaLine], layout, plotlyConfig);
   }
+
+  // ---------- plot 3: trace ----------
 
   function renderTrace(Plotly, data) {
     const post = data.posterior;
     const chainColors = [COLORS.purple, COLORS.cyan, COLORS.pink, COLORS.amber];
     const params = [
-      { key: "Tc",    label: "T<sub>c</sub>", axis: "" },
-      { key: "beta",  label: "β",             axis: "2" },
-      { key: "sigma", label: "σ",             axis: "3" },
+      { key: "Tc",    label: "T<sub>c</sub>" },
+      { key: "beta",  label: "β" },
+      { key: "sigma", label: "σ" },
     ];
 
     const traces = [];
     params.forEach((p, pi) => {
       const chains = post[p.key];
+      const axSuffix = pi === 0 ? "" : String(pi + 1);
       chains.forEach((chain, ci) => {
         traces.push({
           x: chain.map((_, i) => i),
@@ -292,10 +335,10 @@
           name: "chain " + (ci + 1),
           legendgroup: "chain" + (ci + 1),
           showlegend: pi === 0,
-          line: { color: chainColors[ci], width: 0.9 },
-          opacity: 0.7,
-          xaxis: "x" + p.axis,
-          yaxis: "y" + p.axis,
+          line: { color: chainColors[ci], width: 0.8 },
+          opacity: 0.68,
+          xaxis: "x" + axSuffix,
+          yaxis: "y" + axSuffix,
           hovertemplate:
             "iter %{x}<br>" + p.key + " = %{y:.4f}<extra>chain " + (ci + 1) + "</extra>",
         });
@@ -307,7 +350,7 @@
     const layout = Object.assign({}, baseLayout, {
       title: {
         text: "<b>Trace plots</b> · MCMC chains over iterations",
-        font: { size: 15, color: "#e7ecf5" },
+        font: { size: 15, color: "#e7ecf5", family: FONT_FAMILY },
         x: 0.02, xanchor: "left",
       },
       grid: { rows: 3, columns: 1, pattern: "independent", roworder: "top to bottom" },
@@ -315,12 +358,28 @@
       yaxis:  mkAxis({ title: { text: params[0].label, font: axisStyle.titlefont } }),
       xaxis2: mkAxis({}),
       yaxis2: mkAxis({ title: { text: params[1].label, font: axisStyle.titlefont } }),
-      xaxis3: mkAxis({ title: { text: "Iteration", font: axisStyle.titlefont } }),
+      xaxis3: mkAxis({ title: { text: "iteration", font: axisStyle.titlefont } }),
       yaxis3: mkAxis({ title: { text: params[2].label, font: axisStyle.titlefont } }),
       showlegend: true,
+      hovermode: "closest",
     });
 
     Plotly.newPlot("chart-trace", traces, layout, plotlyConfig);
+  }
+
+  // ---------- orchestration ----------
+
+  function ensurePlotly() {
+    return new Promise((resolve, reject) => {
+      if (window.Plotly) return resolve(window.Plotly);
+      const deadline = Date.now() + 8000;
+      const poll = () => {
+        if (window.Plotly) resolve(window.Plotly);
+        else if (Date.now() > deadline) reject(new Error("Plotly failed to load"));
+        else setTimeout(poll, 80);
+      };
+      poll();
+    });
   }
 
   function showError(id, msg) {
@@ -345,7 +404,7 @@
     .catch((err) => {
       console.error("Ising charts:", err);
       ["chart-magnetization", "chart-posteriors", "chart-trace"].forEach((id) =>
-        showError(id, "Couldn't load chart: " + err.message)
+        showError(id, "Could not load chart: " + err.message)
       );
     });
 })();

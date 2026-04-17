@@ -294,6 +294,20 @@ footer {
   padding: 60px 0 40px; border-top: 1px solid var(--border); margin-top: 60px;
   color: var(--fg-1); font-size: 13px;
 }
+footer .container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+footer .footer-sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--fg-1);
+  opacity: 0.75;
+}
 
 /* ============ PROJECT DETAIL PAGES ============ */
 .back-link {

@@ -70,32 +70,41 @@
   <div class="container">
     <div class="section-eyebrow reveal">// Components</div>
     <h2 class="reveal">How it's built</h2>
-    <p class="section-intro reveal">Six pieces connected end-to-end. Each lives in an isolated module and exposes its own CLI.</p>
+    <p class="section-intro reveal">Six pieces connected end-to-end. Each lives in its own module with a dedicated CLI.</p>
 
     <div class="two-col">
       <div class="info-card reveal">
         <h3>1 · Metropolis simulator</h3>
-        <p>From-scratch implementation of the Metropolis-Hastings algorithm to sample configurations from the canonical ensemble of the spin lattice. Acceptance rule uses the local energy change ΔE when flipping a spin, with probability <code>min(1, exp(−ΔE/T))</code>. Each sweep performs N² flip attempts — one per site on average. The critical kernel is accelerated with <code>@numba.njit(cache=True)</code> for a ~50× speedup over pure NumPy, with transparent fallback if Numba is unavailable.</p>
+        <p><strong style="color:var(--fg-0)">Goal:</strong> sample equilibrium spin configurations at a given temperature T.</p>
+        <p><strong style="color:var(--fg-0)">How:</strong> each step picks a random site, proposes flipping its spin (s → −s) and accepts with probability <code>min(1, exp(−ΔE/T))</code>. A sweep = N² proposed flips. The hot kernel is JIT-compiled via <code>@numba.njit</code> (~50× faster than plain NumPy, with pure-Python fallback).</p>
       </div>
       <div class="info-card reveal">
         <h3>2 · Temperature sweep</h3>
-        <p>Sweep over 30 temperatures in <code>T ∈ [1.5, 3.5]</code>, comfortably covering the theoretical Tc. For each T: 2000 thermalization sweeps + 3000 measurement sweeps, recording mean and standard deviation of <code>⟨|M|⟩</code>. Output: a CSV with columns <code>T, M_mean, M_std</code> that serves as the dataset for inference.</p>
+        <p><strong style="color:var(--fg-0)">Input:</strong> 30 temperatures in <code>T ∈ [1.5, 3.5]</code>, covering both ordered and disordered regimes.</p>
+        <p><strong style="color:var(--fg-0)">Process:</strong> at each T, 2000 thermalization sweeps (discarded) + 3000 measurement sweeps (averaged). <strong style="color:var(--fg-0)">Output:</strong> a CSV <code>T, M_mean, M_std</code> — the "observed dataset" fed to the Bayesian model.</p>
       </div>
       <div class="info-card reveal">
-        <h3>3 · Probabilistic model</h3>
-        <p>Bayesian model in PyMC with physically motivated priors: <code>Tc ~ Normal(2.3, 0.3)</code>, <code>β ~ Normal(0.12, 0.05)</code>, <code>σ ~ HalfNormal(0.1)</code>. The prediction is the power law <code>(1 − T/Tc)^β</code> for <code>T &lt; Tc</code>, and 0 in the disordered regime. Likelihood is Gaussian with <code>σ</code> also inferred.</p>
+        <h3>3 · Probabilistic model (PyMC)</h3>
+        <p><strong style="color:var(--fg-0)">Priors:</strong> <code>Tc ~ Normal(2.3, 0.3)</code>, <code>β ~ Normal(0.12, 0.05)</code>, <code>σ ~ HalfNormal(0.1)</code>. Deliberately wide — the data should dominate.</p>
+        <p><strong style="color:var(--fg-0)">Likelihood:</strong> <code>M_obs ~ Normal((1 − T/Tc)^β, σ)</code> when <code>T &lt; Tc</code>; exactly 0 above. The piecewise form captures the broken-symmetry ordered phase.</p>
       </div>
       <div class="info-card reveal">
-        <h3>4 · NUTS inference</h3>
-        <p>Posterior sampling with NUTS: 4 chains, 2000 draws, 1000 tuning, <code>target_accept=0.9</code>. Diagnostics with ArviZ — R̂, ESS, trace plots — targeting <code>R̂ &lt; 1.01</code> and <code>ESS &gt; 400</code> for all parameters.</p>
+        <h3>4 · NUTS sampling</h3>
+        <p><strong style="color:var(--fg-0)">Config:</strong> 4 chains × (1000 tune + 2000 draws) = 12 000 posterior samples, <code>target_accept=0.9</code>.</p>
+        <p><strong style="color:var(--fg-0)">Output:</strong> the full joint posterior <code>P(Tc, β, σ | data)</code> — distributions, not point estimates. Convergence checks via ArviZ: <code>R̂ &lt; 1.01</code>, <code>ESS &gt; 400</code> across all parameters.</p>
       </div>
       <div class="info-card reveal">
         <h3>5 · Validation against Onsager</h3>
-        <p>Exact values (<code>Tc ≈ 2.2692</code>, <code>β = 1/8</code>) are overlaid on the posterior distributions as reference lines. It's the strongest possible validation: numerical inference compared against an exact analytical result from 1944.</p>
+        <p>Overlay the exact values (<code>Tc = 2/ln(1+√2) ≈ 2.2692</code>, <code>β = 1/8</code>) on the posteriors. Success criterion: the 95% HDI of each posterior brackets its exact value. If not → the prior is too tight, the simulator has a bug, or the sampler hasn't converged.</p>
       </div>
       <div class="info-card reveal">
         <h3>6 · Final figures</h3>
-        <p>Three figures: (a) simulated M(T) curve with error bars and Onsager's Tc; (b) marginal posteriors of Tc and β with exact values overlaid; (c) trace plots for visual verification of MCMC convergence. Everything saved to <code>results/</code>.</p>
+        <p>Three PNGs auto-saved to <code>results/</code> by <code>src/plots.py</code>:</p>
+        <ul style="margin: 8px 0 0; padding-left: 18px; color: var(--fg-1); font-size: 14px;">
+          <li><code>magnetization.png</code> — M(T) + Onsager's Tc</li>
+          <li><code>posteriors.png</code> — marginal posteriors with exact values</li>
+          <li><code>trace.png</code> — per-chain trace plots</li>
+        </ul>
       </div>
     </div>
   </div>
@@ -225,9 +234,9 @@
 </section>
 
 <footer>
-  <div class="container" style="display:flex; justify-content: space-between; width: 100%; align-items: center; flex-wrap: wrap; gap: 12px;">
+  <div class="container">
     <span>&copy; <span id="year"></span> · Camilo Rozo. Built with HTML + CSS.</span>
-    <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; color: var(--fg-1);">MADE WITH MATH ∙ PHYSICS ∙ CODE</span>
+    <span class="footer-sub">MADE WITH MATH ∙ PHYSICS ∙ CODE</span>
   </div>
 </footer>
 

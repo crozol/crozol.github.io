@@ -185,49 +185,14 @@
   </div>
 </section>
 
-<section class="content-section">
-  <div class="container">
-    <div class="section-eyebrow reveal">// Metrics</div>
-    <h2 class="reveal">Success criteria</h2>
-    <div class="two-col">
-      <div class="info-card reveal">
-        <h3>Inference (achieved)</h3>
-        <p><strong style="color:var(--fg-0)">Tc = 2.396 ± 0.041</strong><br />Onsager exact: 2.2692. The ~5% upward shift is a well-known finite-size effect on a 28×28 lattice.</p>
-        <p style="margin-bottom:0;"><strong style="color:var(--fg-0)">β = 0.100 ± 0.025</strong><br />Exact: 1/8 = 0.125. The 95% HDI brackets the exact value.</p>
-      </div>
-      <div class="info-card reveal">
-        <h3>MCMC diagnostics (achieved)</h3>
-        <p>R̂ ≤ 1.02 across all parameters — converged.</p>
-        <p>ESS_bulk ≥ 221 (effective independent samples).</p>
-        <p style="margin-bottom:0;">Trace plots show no drift or pathological autocorrelation.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
 <section class="content-section" id="results">
   <div class="container">
     <div class="section-eyebrow reveal">// Results</div>
     <h2 class="reveal">Outputs and final metrics</h2>
-    <p class="section-intro reveal">Generated figures, inferred values, and final artifacts of the project.</p>
+    <p class="section-intro reveal">Interactive figures rendered from the actual MCMC posterior samples. Hover for values, zoom with the toolbar, toggle traces in the legend.</p>
 
-    <div class="results-grid reveal" style="grid-template-columns: 1fr;">
-      <div class="result-figure">
-        <img src="../assets/results/01-magnetization.png" alt="M(T) phase transition curve" />
-        <div class="caption">Fig 1 · Simulated M(T) on a 28×28 lattice with 95% error bars. Pink dashed line marks Onsager's Tc = 2.2692. Clean second-order phase transition visible around T ≈ 2.3.</div>
-      </div>
-    </div>
-    <div class="results-grid reveal" style="margin-top: 20px;">
-      <div class="result-figure">
-        <img src="../assets/results/01-posteriors.png" alt="Posteriors of Tc and β" />
-        <div class="caption">Fig 2 · Marginal posteriors of Tc (left) and β (right), 95% HDI bars. Orange vertical lines mark Onsager's exact values.</div>
-      </div>
-      <div class="result-figure">
-        <img src="../assets/results/01-trace.png" alt="Trace plots" />
-        <div class="caption">Fig 3 · Trace plots across 4 chains. Good mixing, no visible drift, parameters stable.</div>
-      </div>
-    </div>
-    <div class="results-grid reveal" style="margin-top: 20px;">
+    <!-- Headline metrics -->
+    <div class="results-grid reveal" style="margin-bottom: 28px;">
       <div class="result-metric">
         <div class="value">Tc = 2.396 ± 0.041</div>
         <div class="label">Onsager exact: 2.2692 · shift is a finite-size effect on 28×28</div>
@@ -245,6 +210,177 @@
         <div class="label">effective independent samples — healthy</div>
       </div>
     </div>
+
+    <!-- Chart 1: M(T) -->
+    <div class="chart-container reveal">
+      <div id="chart-magnetization" style="width:100%; height:480px;">
+        <div class="chart-loading">Loading magnetization curve…</div>
+      </div>
+      <div class="chart-caption"><strong>Fig 1</strong> · Simulated ⟨|M|⟩ vs. temperature on a 28×28 lattice, with 95% error bars per temperature. Pink dashed line: Onsager's exact Tc. The curve shows the characteristic second-order phase transition — sharp drop around T ≈ 2.3.</div>
+    </div>
+
+    <!-- Chart 2: Posteriors -->
+    <div class="chart-container reveal" style="margin-top: 24px;">
+      <div id="chart-posteriors" style="width:100%; height:480px;">
+        <div class="chart-loading">Loading posteriors…</div>
+      </div>
+      <div class="chart-caption"><strong>Fig 2</strong> · Marginal posteriors of Tc (left) and β (right) built from 12 000 MCMC samples. Shaded band: 95% HDI. Amber solid line: posterior mean. Pink dashed line: Onsager's exact value. β's HDI brackets its exact value; Tc's does not — the gap is the finite-size effect.</div>
+    </div>
+
+    <!-- Chart 3: Trace plots -->
+    <div class="chart-container reveal" style="margin-top: 24px;">
+      <div id="chart-trace" style="width:100%; height:620px;">
+        <div class="chart-loading">Loading trace plots…</div>
+      </div>
+      <div class="chart-caption"><strong>Fig 3</strong> · Per-chain traces across 1500 thinned post-burn iterations (4 chains overlaid). Chains exploring the same band = good mixing. Use the legend to isolate a chain. No visible drift or stuck regions — sampler is healthy.</div>
+    </div>
+
+    <noscript>
+      <div class="results-grid" style="grid-template-columns: 1fr; margin-top: 24px;">
+        <div class="result-figure">
+          <img src="../assets/results/01-magnetization.png" alt="M(T) curve" />
+          <div class="caption">Fig 1 · static fallback (enable JavaScript for interactive charts)</div>
+        </div>
+      </div>
+    </noscript>
+  </div>
+</section>
+
+<section class="content-section" id="analysis">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Analysis</div>
+    <h2 class="reveal">Results analysis</h2>
+    <p class="section-intro reveal">Why there's no accuracy or confusion matrix here, which metrics <em>do</em> apply, and what the numbers actually mean.</p>
+
+    <!-- Subsection: What kind of problem -->
+    <h3 class="reveal" style="margin-top: 12px;">What type of problem is this?</h3>
+    <p class="reveal" style="color: var(--fg-1); max-width: 820px;">The natural reflex is to ask for accuracy, precision/recall, or a confusion matrix. None of those apply here. This project isn't a classifier — it's a <strong style="color:var(--fg-0)">parameter inference</strong> problem: given a noisy M(T) curve, what is the joint probability distribution of the physical parameters (Tc, β, σ)?</p>
+
+    <table class="analysis-table reveal">
+      <thead>
+        <tr>
+          <th>Problem type</th>
+          <th>Output</th>
+          <th>Typical metrics</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Classification</td>
+          <td>discrete class label</td>
+          <td>accuracy, precision, recall, F1, ROC-AUC, confusion matrix</td>
+        </tr>
+        <tr>
+          <td>Regression</td>
+          <td>continuous number</td>
+          <td>MSE, MAE, R², RMSE</td>
+        </tr>
+        <tr>
+          <td class="highlight">Parameter inference (this project)</td>
+          <td>posterior distribution over parameters</td>
+          <td>HDI, R̂, ESS, posterior predictive checks, ground-truth validation</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Subsection: Evaluation methodology -->
+    <h3 class="reveal" style="margin-top: 40px;">Evaluation methodology</h3>
+    <p class="reveal" style="color: var(--fg-1); max-width: 820px;">Four layers stacked together — each answers a different question.</p>
+
+    <div class="two-col" style="margin-top: 16px;">
+      <div class="info-card reveal">
+        <h3>① Point estimate</h3>
+        <p>Posterior mean as the "most likely" value. For Tc the mean is <strong style="color:var(--fg-0)">2.396</strong>, for β it's <strong style="color:var(--fg-0)">0.100</strong>. Never reported alone — always with its uncertainty.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>② Uncertainty quantification</h3>
+        <p>Posterior standard deviation and <strong style="color:var(--fg-0)">95% HDI</strong> (Highest Density Interval) — the densest region containing 95% of the posterior mass. This is the Bayesian analogue of the confidence interval.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>③ MCMC convergence</h3>
+        <p><strong style="color:var(--fg-0)">R̂ (Gelman-Rubin)</strong> compares between-chain vs. within-chain variance (target: ≤ 1.01). <strong style="color:var(--fg-0)">ESS</strong> is the effective number of independent samples after accounting for autocorrelation. <strong style="color:var(--fg-0)">Acceptance rate</strong> of MH proposals (target: 20–40% for ℝ³).</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>④ Ground-truth validation</h3>
+        <p>The Ising 2D model has an <strong style="color:var(--fg-0)">exact analytical solution</strong> (Onsager 1944). The 95% HDI of the posterior either brackets the exact value or it doesn't — a clean pass/fail check. Stronger than any accuracy metric.</p>
+      </div>
+    </div>
+
+    <!-- Subsection: Numeric rubric -->
+    <h3 class="reveal" style="margin-top: 40px;">Metrics achieved vs. thresholds</h3>
+    <table class="analysis-table reveal">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>What it measures</th>
+          <th>Threshold</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>R̂ max</td>
+          <td>chain convergence (Gelman-Rubin)</td>
+          <td>≤ 1.01 ideal · ≤ 1.05 tolerable</td>
+          <td class="check">1.02 ✓</td>
+        </tr>
+        <tr>
+          <td>ESS_bulk min</td>
+          <td>effective independent samples</td>
+          <td>≥ 200</td>
+          <td class="check">221 ✓</td>
+        </tr>
+        <tr>
+          <td>ESS_tail min</td>
+          <td>sample size in distribution tails</td>
+          <td>≥ 200</td>
+          <td class="check">462 ✓</td>
+        </tr>
+        <tr>
+          <td>Acceptance rate</td>
+          <td>MH proposals accepted</td>
+          <td>20–40% optimal (for ℝ³)</td>
+          <td class="check">31.7 / 33.3 / 34.7 / 35.1% ✓</td>
+        </tr>
+        <tr>
+          <td>β · 95% HDI contains exact?</td>
+          <td>ground-truth validation</td>
+          <td>must contain 0.125</td>
+          <td class="check">[0.052, 0.148] ✓</td>
+        </tr>
+        <tr>
+          <td>Tc · 95% HDI contains exact?</td>
+          <td>ground-truth validation</td>
+          <td>must contain 2.2692</td>
+          <td class="warn">[2.333, 2.465] — shifted +5% (finite-size)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Subsection: interpretation -->
+    <h3 class="reveal" style="margin-top: 40px;">Interpretation</h3>
+    <p class="reveal" style="color: var(--fg-1); max-width: 820px;">Three observations, from the most reassuring to the most nuanced.</p>
+
+    <div class="analysis-callout reveal">
+      <h4>1 · β recovered correctly</h4>
+      <p>The posterior of β is centered at 0.100 and its 95% HDI <strong>[0.052, 0.148]</strong> comfortably brackets the exact value 1/8 = 0.125. This confirms that the piecewise power-law likelihood captures the critical behavior and that the sampler explores the right part of parameter space.</p>
+    </div>
+
+    <div class="analysis-callout reveal">
+      <h4>2 · Tc shifted upward by a finite-size effect</h4>
+      <p>The posterior of Tc centers at <strong>2.396</strong> — about +0.13 above Onsager's exact 2.2692. This is <strong>not</strong> a bug. Finite-size scaling theory predicts that on an N×N lattice the apparent critical temperature satisfies <code>Tc(N) − Tc(∞) ∝ 1/N</code>. At N = 28, a shift of +0.1 to +0.2 is consistent with the literature (Ferrenberg &amp; Landau, 1991).</p>
+      <p>To recover Onsager's value within the HDI, running on a 64×64 or 128×128 lattice would close the gap — at a proportionally higher compute cost.</p>
+    </div>
+
+    <div class="analysis-callout reveal">
+      <h4>3 · The sampler is healthy</h4>
+      <p>All four chains reach R̂ ≤ 1.02 with ESS above 200. The trace plots (Fig 3) show no drift, no stuck regions, and good mixing across chains. Acceptance rates sit in the 31–35% band — right in the optimal range for random-walk Metropolis in 3 dimensions. If any of this failed, none of the posterior numbers above would be trustworthy.</p>
+    </div>
+
+    <!-- Subsection: why not classification metrics -->
+    <h3 class="reveal" style="margin-top: 40px;">What about accuracy, precision, confusion matrix?</h3>
+    <p class="reveal" style="color: var(--fg-1); max-width: 820px;">Those metrics require discrete labels and a predicted class per example — the problem doesn't have either. The right parallel would be: <em>"given a snapshot of the spin lattice, classify whether it's in the ordered or disordered phase"</em>. That's a classifier and would indeed produce a confusion matrix and ROC curve. It's a different problem (and an interesting one), but not this one.</p>
+    <p class="reveal" style="color: var(--fg-1); max-width: 820px;">In this portfolio, <a href="03-anomaly-detection-api.html" style="color: var(--accent-2);">Project 03 · Anomaly Detection API</a> is the explicit classification problem — the confusion matrix and ROC-AUC belong there.</p>
   </div>
 </section>
 
@@ -271,5 +407,7 @@
 </footer>
 
 <script src="../assets/portfolio.js"></script>
+<script src="https://cdn.plot.ly/plotly-basic-2.35.0.min.js" charset="utf-8"></script>
+<script src="../assets/charts/01-ising.js" defer></script>
 </body>
 </html>

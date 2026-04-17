@@ -1,17 +1,18 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Camilo A. Rozo · Machine Learning Engineer</title>
-<meta name="description" content="Portafolio de Camilo A. Rozo — Físico y Matemático (UNAL), Machine Learning Engineer. Proyectos en mecánica estadística, inferencia bayesiana, deep learning y topología aplicada." />
+<title>Camilo Rozo · Machine Learning Engineer</title>
+<meta name="description" content="Portfolio of Camilo Rozo — Physicist and Mathematician (UNAL), Machine Learning Engineer. Projects in statistical mechanics, Bayesian inference, deep learning, and applied topology." />
 <link rel="stylesheet" href="assets/styles.css" />
 <style>
-  .hero .inner .eyebrow, .hero .inner h1, .hero .inner p.lead, .hero .inner .cta-row { opacity: 0; }
+  .hero .inner .eyebrow, .hero .inner h1, .hero .inner .hero-role, .hero .inner p.lead, .hero .inner .cta-row { opacity: 0; }
   .hero .inner .eyebrow { animation: fadeUp 0.9s 0.1s forwards ease-out; }
   .hero .inner h1 { animation: fadeUp 0.9s 0.25s forwards ease-out; }
-  .hero .inner p.lead { animation: fadeUp 0.9s 0.45s forwards ease-out; }
-  .hero .inner .cta-row { animation: fadeUp 0.9s 0.65s forwards ease-out; }
+  .hero .inner .hero-role { animation: fadeUp 0.9s 0.4s forwards ease-out; }
+  .hero .inner p.lead { animation: fadeUp 0.9s 0.55s forwards ease-out; }
+  .hero .inner .cta-row { animation: fadeUp 0.9s 0.7s forwards ease-out; }
   .scroll-hint { animation: fadeUp 0.9s 1s forwards ease-out; opacity: 0; }
 </style>
 </head>
@@ -19,9 +20,9 @@
 
 <script>
   window.PORTFOLIO = {
-    fullName: "Camilo A. Rozo",
+    fullName: "Camilo Rozo",
     title: "Machine Learning Engineer",
-    bio: "Físico y matemático aplicando mecánica estadística, redes neuronales y sistemas complejos a problemas reales. 2+ años deployando modelos ML en producción.",
+    bio: "Physicist and mathematician applying statistical mechanics, neural networks, and complex systems to real-world problems. 2+ years deploying ML models in production.",
     github: "https://github.com/crozol",
     linkedin: "https://www.linkedin.com/in/camilo-a-rozo-l/",
     email: "rozol.ca555@gmail.com"
@@ -36,10 +37,10 @@
 <nav class="topnav">
   <a href="index.html" class="brand">// CAMILO ROZO</a>
   <ul>
-    <li><a class="menu" href="#about">Sobre mí</a></li>
-    <li><a class="menu" href="#experience">Experiencia</a></li>
-    <li><a class="menu" href="#projects">Proyectos</a></li>
-    <li><a class="menu" href="#contact">Contacto</a></li>
+    <li><a class="menu" href="#about">About</a></li>
+    <li><a class="menu" href="#experience">Experience</a></li>
+    <li><a class="menu" href="#projects">Projects</a></li>
+    <li><a class="menu" href="#contact">Contact</a></li>
   </ul>
 </nav>
 
@@ -47,14 +48,13 @@
   <div class="container inner">
     <div class="eyebrow">Physics · Math · ML</div>
     <h1 class="display">
-      <span class="grad" id="heroName">Camilo A. Rozo</span><br />
-      <span class="grad">Machine Learning</span><br />
-      <span class="grad">Engineer</span>
+      <span class="grad" id="heroName">Camilo Rozo</span>
     </h1>
-    <p class="lead" id="heroBio">Físico y matemático aplicando mecánica estadística, redes neuronales y sistemas complejos a problemas reales. 2+ años deployando modelos ML en producción.</p>
+    <div class="hero-role">Machine Learning Engineer</div>
+    <p class="lead" id="heroBio">Physicist and mathematician applying statistical mechanics, neural networks, and complex systems to real-world problems. 2+ years deploying ML models in production.</p>
     <div class="cta-row">
-      <a href="#projects" class="btn btn-primary">Ver proyectos →</a>
-      <a href="#experience" class="btn btn-ghost">Mi experiencia</a>
+      <a href="#projects" class="btn btn-primary">View projects →</a>
+      <a href="#experience" class="btn btn-ghost">See my experience</a>
     </div>
   </div>
   <div class="scroll-hint">scroll</div>
@@ -63,33 +63,33 @@
 <section id="about">
   <div class="container">
     <div class="section-eyebrow reveal">01 · About</div>
-    <h2 class="reveal">Sobre mí</h2>
+    <h2 class="reveal">About me</h2>
     <p class="section-intro reveal">
-      Físico y Matemático de la Universidad Nacional de Colombia, con foco en sistemas complejos, mecánica estadística y machine learning aplicado. Trabajo en la intersección entre física, matemática avanzada e ingeniería de software.
+      Physicist and Mathematician from Universidad Nacional de Colombia, focused on complex systems, statistical mechanics, and applied machine learning. I work at the intersection of physics, advanced mathematics, and software engineering.
     </p>
 
     <div class="about-grid">
       <div class="about-card reveal">
         <p style="margin: 0 0 16px; color: var(--fg-1); font-size: 15px;">
-          Me mueve el reto intelectual de <strong style="color:var(--fg-0)">extraer información de sistemas aparentemente indescifrables</strong> — alto número de grados de libertad, dinámica no lineal, observaciones ruidosas. Aplico modelos matemáticos y físicos para resolver problemas reales y optimizar el bienestar humano y la sostenibilidad.
+          Driven by the intellectual challenge of <strong style="color:var(--fg-0)">extracting information from seemingly indecipherable systems</strong> — high degrees of freedom, nonlinear dynamics, noisy observations. Applying mathematical and physical models to solve real-world problems and optimize human well-being and sustainability.
         </p>
         <p style="margin: 0 0 16px; color: var(--fg-1); font-size: 15px;">
-          Mi tesis de pregrado (Física) investigó <strong style="color:var(--fg-0)">procesos de difusión en grafos dinámicos</strong>, conectando la topología de redes con transiciones de fase mediante mecánica estadística. Ese mismo enfoque — ver la estructura matemática detrás del dato — es el que llevo a cada proyecto de ML.
+          My undergraduate Physics thesis investigated <strong style="color:var(--fg-0)">diffusion processes on dynamic graphs</strong>, connecting network topology with phase transitions through statistical mechanics. That same approach — seeing the mathematical structure behind the data — goes into every ML project.
         </p>
         <p style="margin: 0; color: var(--fg-1); font-size: 15px;">
-          Valido cada modelo contra resultados analíticos exactos, benchmarks públicos o métricas objetivas. Un modelo sin validación rigurosa no es ciencia — es decoración.
+          Every model is validated against exact analytical results, public benchmarks, or objective metrics. A model without rigorous validation isn't science — it's decoration.
         </p>
 
         <div class="languages-row">
-          <div class="language-chip"><div class="lang">Español</div><div class="level">Native</div></div>
+          <div class="language-chip"><div class="lang">Spanish</div><div class="level">Native</div></div>
           <div class="language-chip"><div class="lang">English</div><div class="level">Full Professional</div></div>
         </div>
       </div>
       <div class="stats">
-        <div class="stat reveal"><div class="n">2+ yrs</div><div class="l">ML Engineer en producción</div></div>
-        <div class="stat reveal"><div class="n">2</div><div class="l">Titulaciones UNAL (Física + Matemáticas)</div></div>
-        <div class="stat reveal"><div class="n">5</div><div class="l">Proyectos en portafolio</div></div>
-        <div class="stat reveal"><div class="n">4</div><div class="l">Certificaciones (ICTP · Stanford · UNAL)</div></div>
+        <div class="stat reveal"><div class="n">2+ yrs</div><div class="l">ML Engineer in production</div></div>
+        <div class="stat reveal"><div class="n">2</div><div class="l">Degrees at UNAL (Physics + Mathematics)</div></div>
+        <div class="stat reveal"><div class="n">5</div><div class="l">Portfolio projects</div></div>
+        <div class="stat reveal"><div class="n">4</div><div class="l">Certifications (ICTP · Stanford · UNAL)</div></div>
       </div>
     </div>
   </div>
@@ -98,31 +98,31 @@
 <section id="experience">
   <div class="container">
     <div class="section-eyebrow reveal">02 · Experience</div>
-    <h2 class="reveal">Experiencia profesional</h2>
-    <p class="section-intro reveal">Trayectoria en ML aplicado y docencia en la UNAL.</p>
+    <h2 class="reveal">Professional experience</h2>
+    <p class="section-intro reveal">Trajectory in applied ML and academic tutoring at UNAL.</p>
 
     <div class="timeline">
       <article class="timeline-item current reveal">
-        <div class="timeline-date">Feb 2024 — Actualidad · 2+ años</div>
+        <div class="timeline-date">Feb 2024 — Present · 2+ years</div>
         <h3>Machine Learning Engineer</h3>
         <div class="timeline-org"><strong>BS Energy And Automation SAS.</strong> · Part-time · Bogotá, Colombia · On-site</div>
         <ul>
-          <li>Desarrollo y despliegue de modelos ML production-ready en Python, aplicando modelado estocástico y principios de mecánica estadística para optimizar el rendimiento de redes a gran escala y predecir cambios sistémicos.</li>
-          <li>Diseño y validación de algoritmos avanzados para datasets de alta dimensionalidad, traduciendo frameworks teóricos en soluciones prácticas para modernización de infraestructura y eficiencia de sistemas distribuidos.</li>
-          <li>Implementación de estrategias rigurosas de tuning, con análisis profundo de errores y optimización de hiperparámetros para asegurar predicciones de alta fidelidad en entornos no lineales.</li>
-          <li>Optimización del rendimiento para despliegue, balanceando complejidad computacional y restricciones de hardware para procesamiento real-time eficiente sin pérdida de precisión.</li>
+          <li>Develop and deploy production-ready ML models in Python, applying stochastic modeling and statistical mechanics principles to optimize large-scale network performance and predict systemic shifts.</li>
+          <li>Design and validate advanced algorithms for high-dimensional datasets, translating theoretical frameworks into practical solutions for infrastructure modernization and distributed system efficiency.</li>
+          <li>Implement rigorous model-tuning strategies with deep error analysis and hyperparameter optimization to ensure high-fidelity predictions in nonlinear environments.</li>
+          <li>Streamline model performance for deployment, balancing computational complexity with hardware constraints to enable efficient real-time processing without loss of accuracy.</li>
         </ul>
       </article>
 
       <article class="timeline-item reveal">
-        <div class="timeline-date">Ago 2022 — Dic 2025 · 3 años 5 meses</div>
+        <div class="timeline-date">Aug 2022 — Dec 2025 · 3 yrs 5 mos</div>
         <h3>Mathematics Tutor</h3>
         <div class="timeline-org"><strong>Universidad Nacional de Colombia</strong> · Part-time · Bogotá · Hybrid</div>
         <ul>
-          <li>Asistencia académica a estudiantes en cursos de física y matemáticas durante 6 semestres consecutivos.</li>
-          <li>Desarrollo de habilidades de comunicación para simplificar conceptos altamente abstractos y matemáticos a audiencias diversas.</li>
+          <li>Academic support to students in physics and mathematics courses across 6 consecutive semesters.</li>
+          <li>Developed communication skills for simplifying highly abstract theoretical and mathematical concepts to diverse audiences.</li>
         </ul>
-        <span class="award-chip">Mejor Tutor de Matemáticas 2024</span>
+        <span class="award-chip">Best Mathematics Tutor · 2024</span>
       </article>
     </div>
   </div>
@@ -131,29 +131,29 @@
 <section id="education">
   <div class="container">
     <div class="section-eyebrow reveal">03 · Education</div>
-    <h2 class="reveal">Formación académica</h2>
-    <p class="section-intro reveal">Doble titulación en Física y Matemáticas en la Universidad Nacional de Colombia.</p>
+    <h2 class="reveal">Education</h2>
+    <p class="section-intro reveal">Double degree in Physics and Mathematics at Universidad Nacional de Colombia.</p>
 
     <div class="edu-grid">
       <article class="edu-card reveal">
-        <div class="edu-date">Feb 2018 — Dic 2024</div>
-        <h3>BS Physics</h3>
+        <div class="edu-date">Feb 2018 — Dec 2024</div>
+        <h3>BS in Physics</h3>
         <div class="edu-org">Universidad Nacional de Colombia</div>
-        <p>Tesis de pregrado sobre sistemas complejos y procesos de difusión en grafos dinámicos, usando herramientas de mecánica estadística para conectar la topología de redes con transiciones de fase.</p>
+        <p>Undergraduate thesis on complex systems and diffusion processes on dynamic graphs, using statistical mechanics tools to connect network topology with phase transitions.</p>
       </article>
 
       <article class="edu-card reveal">
-        <div class="edu-date">Feb 2018 — Dic 2025</div>
-        <h3>BS Mathematics</h3>
+        <div class="edu-date">Feb 2018 — Dec 2025</div>
+        <h3>BS in Mathematics</h3>
         <div class="edu-org">Universidad Nacional de Colombia</div>
-        <p>Dominio de Python y MATLAB para cálculo numérico y simulación. Integración de herramientas de IA en el flujo de trabajo. Áreas favoritas: topología y teoría de la medida.</p>
+        <p>Proficient in Python and MATLAB for numerical computation and simulation. Integrating AI tools into the workflow. Favorite areas: topology and measure theory.</p>
       </article>
 
       <article class="edu-card reveal" style="grid-column: 1 / -1;">
-        <div class="edu-date">Feb 2010 — Dic 2017</div>
-        <h3>Diploma Físico · High School</h3>
+        <div class="edu-date">Feb 2010 — Dec 2017</div>
+        <h3>High School Diploma · Science</h3>
         <div class="edu-org">Liceo Campo David</div>
-        <p>Reconocimiento por obtener el mayor puntaje ICFES de la promoción.</p>
+        <p>Recognized for the highest ICFES score in the graduating class.</p>
       </article>
     </div>
   </div>
@@ -162,13 +162,13 @@
 <section id="certifications">
   <div class="container">
     <div class="section-eyebrow reveal">04 · Certifications</div>
-    <h2 class="reveal">Certificaciones</h2>
-    <p class="section-intro reveal">Formación complementaria en ML, sistemas complejos y física-matemática avanzada.</p>
+    <h2 class="reveal">Certifications</h2>
+    <p class="section-intro reveal">Complementary training in ML, complex systems, and advanced mathematical physics.</p>
 
     <div class="cert-grid">
       <article class="cert-card reveal">
         <div class="issuer-badge">ML</div>
-        <div class="cert-date">Abril 2026</div>
+        <div class="cert-date">April 2026</div>
         <h3>Supervised Machine Learning: Regression and Classification</h3>
         <div class="cert-issuer">DeepLearning.AI · Coursera · Stanford CPD · UVM</div>
         <div class="cert-credential">Credential ID: 7IWJT9H7I15S</div>
@@ -176,7 +176,7 @@
 
       <article class="cert-card reveal">
         <div class="issuer-badge">ICTP</div>
-        <div class="cert-date">Marzo 2026</div>
+        <div class="cert-date">March 2026</div>
         <h3>Spring College in the Physics of Complex Systems</h3>
         <div class="cert-issuer">Abdus Salam International Centre for Theoretical Physics (ICTP)</div>
         <div class="skill-chip-row" style="margin-top: 10px;">
@@ -188,8 +188,8 @@
 
       <article class="cert-card reveal">
         <div class="issuer-badge">UNAL</div>
-        <div class="cert-date">Agosto 2024</div>
-        <h3>ENREDANDO 2024 — Escuela Iberoamericana de Redes y Sistemas Complejos</h3>
+        <div class="cert-date">August 2024</div>
+        <h3>ENREDANDO 2024 — Iberoamerican School of Networks and Complex Systems</h3>
         <div class="cert-issuer">Universidad Nacional de Colombia</div>
         <div class="skill-chip-row" style="margin-top: 10px;">
           <span class="tag">Complex Systems</span>
@@ -200,8 +200,8 @@
 
       <article class="cert-card reveal">
         <div class="issuer-badge">UNAL</div>
-        <div class="cert-date">Enero 2024</div>
-        <h3>Aspectos Geométricos en Física y Matemáticas</h3>
+        <div class="cert-date">January 2024</div>
+        <h3>Geometric Aspects in Physics and Mathematics</h3>
         <div class="cert-issuer">Universidad Nacional de Colombia</div>
         <div class="skill-chip-row" style="margin-top: 10px;">
           <span class="tag">Differential Geometry</span>
@@ -216,32 +216,32 @@
 <section id="skills">
   <div class="container">
     <div class="section-eyebrow reveal">05 · Skills</div>
-    <h2 class="reveal">Stack y competencias</h2>
-    <p class="section-intro reveal">Lo que domino activamente y aparece en los proyectos del portafolio y en el trabajo en producción.</p>
+    <h2 class="reveal">Stack &amp; competencies</h2>
+    <p class="section-intro reveal">Actively mastered and present across portfolio projects and production work.</p>
 
     <div class="skills-grid">
       <div class="skill-card reveal">
         <div class="icon">λ</div>
         <h3>Machine Learning</h3>
-        <p>Deep learning, inferencia bayesiana, autoencoders, Neural ODEs, PINNs, modelado estocástico.</p>
+        <p>Deep learning, Bayesian inference, autoencoders, Neural ODEs, PINNs, stochastic modeling.</p>
         <div class="skill-tags"><span class="tag">PyTorch</span><span class="tag">PyMC</span><span class="tag">scikit-learn</span><span class="tag">torchdiffeq</span></div>
       </div>
       <div class="skill-card reveal">
         <div class="icon">∑</div>
-        <h3>Matemática aplicada</h3>
-        <p>Topología algebraica, teoría de la medida, probabilidad, análisis, optimización, EDOs/PDEs.</p>
-        <div class="skill-tags"><span class="tag">MCMC</span><span class="tag">Homología</span><span class="tag">Autograd</span><span class="tag">Bayes</span></div>
+        <h3>Applied Mathematics</h3>
+        <p>Algebraic topology, measure theory, probability, analysis, optimization, ODEs/PDEs.</p>
+        <div class="skill-tags"><span class="tag">MCMC</span><span class="tag">Homology</span><span class="tag">Autograd</span><span class="tag">Bayes</span></div>
       </div>
       <div class="skill-card reveal">
         <div class="icon">⚛</div>
-        <h3>Física</h3>
-        <p>Mecánica estadística, transiciones de fase, sistemas dinámicos, Monte Carlo, sistemas complejos.</p>
+        <h3>Physics</h3>
+        <p>Statistical mechanics, phase transitions, dynamical systems, Monte Carlo, complex systems.</p>
         <div class="skill-tags"><span class="tag">Ising</span><span class="tag">Metropolis</span><span class="tag">Graphs</span><span class="tag">PDEs</span></div>
       </div>
       <div class="skill-card reveal">
         <div class="icon">&lt;/&gt;</div>
-        <h3>Ingeniería</h3>
-        <p>APIs, contenedores, testing, Git, deployment reproducible, demos interactivas, tuning productivo.</p>
+        <h3>Engineering</h3>
+        <p>APIs, containers, testing, Git, reproducible deployment, interactive demos, production tuning.</p>
         <div class="skill-tags"><span class="tag">Python</span><span class="tag">MATLAB</span><span class="tag">FastAPI</span><span class="tag">Docker</span><span class="tag">Streamlit</span></div>
       </div>
     </div>
@@ -251,69 +251,69 @@
 <section id="projects">
   <div class="container">
     <div class="section-eyebrow reveal">06 · Projects</div>
-    <h2 class="reveal">Proyectos</h2>
-    <p class="section-intro reveal">Cinco proyectos ordenados por complejidad creciente. Click en cualquiera para ver el detalle completo.</p>
+    <h2 class="reveal">Projects</h2>
+    <p class="section-intro reveal">Five projects ordered by increasing complexity. Click any card to see the full detail.</p>
 
     <div class="projects-grid">
 
       <a class="project reveal" href="projects/01-ising-bayesian.html">
-        <span class="status in-progress">Código completo</span>
+        <span class="status in-progress">Code complete</span>
         <div class="num">01</div>
-        <div class="domain">Mecánica estadística · Bayesiano</div>
-        <h3>Inferencia Bayesiana en el Modelo de Ising 2D</h3>
-        <p>Simulador Metropolis con Numba de una red de spines + modelo PyMC que infiere la temperatura crítica y el exponente crítico vía NUTS. Validación contra la solución exacta de Onsager (1944).</p>
+        <div class="domain">Statistical mechanics · Bayesian</div>
+        <h3>Bayesian Inference on the 2D Ising Model</h3>
+        <p>Metropolis simulator with Numba for a lattice of spins, plus a PyMC model that infers the critical temperature and critical exponent via NUTS. Validated against the exact Onsager (1944) solution.</p>
         <div class="project-tags">
           <span class="tag">Python</span><span class="tag">PyMC</span><span class="tag">NumPy</span><span class="tag">ArviZ</span><span class="tag">Monte Carlo</span>
         </div>
-        <span class="project-link-hint">Ver detalle →</span>
+        <span class="project-link-hint">View details →</span>
       </a>
 
       <a class="project reveal" href="projects/02-neural-odes.html">
-        <span class="status planned">Planeado</span>
+        <span class="status planned">Planned</span>
         <div class="num">02</div>
-        <div class="domain">Deep learning · Sistemas dinámicos</div>
-        <h3>Neural ODEs para dinámica de sistemas</h3>
-        <p>Red neuronal que aprende el campo vectorial de un péndulo amortiguado o un sistema Lotka-Volterra desde trayectorias observadas, usando integradores diferenciables.</p>
+        <div class="domain">Deep learning · Dynamical systems</div>
+        <h3>Neural ODEs for dynamical systems</h3>
+        <p>Neural network that learns the vector field of a damped pendulum or Lotka-Volterra system from observed trajectories, using differentiable integrators.</p>
         <div class="project-tags">
-          <span class="tag">PyTorch</span><span class="tag">torchdiffeq</span><span class="tag">EDOs</span><span class="tag">Autograd</span>
+          <span class="tag">PyTorch</span><span class="tag">torchdiffeq</span><span class="tag">ODEs</span><span class="tag">Autograd</span>
         </div>
-        <span class="project-link-hint">Ver detalle →</span>
+        <span class="project-link-hint">View details →</span>
       </a>
 
       <a class="project reveal" href="projects/03-anomaly-detection-api.html">
-        <span class="status planned">Planeado</span>
+        <span class="status planned">Planned</span>
         <div class="num">03</div>
         <div class="domain">Deep learning · MLOps</div>
         <h3>Anomaly Detection API · Autoencoder + FastAPI + Docker</h3>
-        <p>Autoencoder LSTM que detecta fallas en sensores del dataset NASA Turbofan, expuesto como API REST con demo Streamlit. Contenedorizado con Docker para despliegue inmediato.</p>
+        <p>LSTM autoencoder that detects sensor failures in the NASA Turbofan dataset, served as a REST API with a Streamlit demo. Containerized with Docker for immediate deployment.</p>
         <div class="project-tags">
           <span class="tag">PyTorch</span><span class="tag">FastAPI</span><span class="tag">Docker</span><span class="tag">Streamlit</span><span class="tag">Pandas</span>
         </div>
-        <span class="project-link-hint">Ver detalle →</span>
+        <span class="project-link-hint">View details →</span>
       </a>
 
       <a class="project reveal" href="projects/04-pinns.html">
-        <span class="status planned">Planeado</span>
+        <span class="status planned">Planned</span>
         <div class="num">04</div>
-        <div class="domain">ML para ciencia · PDEs</div>
+        <div class="domain">ML for science · PDEs</div>
         <h3>Physics-Informed Neural Networks (PINNs)</h3>
-        <p>Implementación de PINNs (Raissi et al. 2019) para resolver la ecuación del calor y la ecuación de Burgers, validado contra soluciones analíticas y numéricas de referencia.</p>
+        <p>Implementation of PINNs (Raissi et al. 2019) to solve the heat equation and the Burgers equation, validated against analytical and numerical reference solutions.</p>
         <div class="project-tags">
           <span class="tag">PyTorch</span><span class="tag">PDEs</span><span class="tag">Autograd</span><span class="tag">Research</span>
         </div>
-        <span class="project-link-hint">Ver detalle →</span>
+        <span class="project-link-hint">View details →</span>
       </a>
 
       <a class="project reveal" href="projects/05-tda-finance.html" style="grid-column: 1 / -1;">
-        <span class="status planned">Planeado</span>
+        <span class="status planned">Planned</span>
         <div class="num">05</div>
-        <div class="domain">Topología aplicada · Finanzas</div>
-        <h3>TDA en series financieras — detección de cambios de régimen</h3>
-        <p>Homología persistente sobre ventanas deslizantes de retornos multi-activo para detectar transiciones entre régimen normal y crisis (2008, 2011, 2015, 2020). Features topológicos como input a un clasificador supervisado.</p>
+        <div class="domain">Applied topology · Finance</div>
+        <h3>TDA on financial time series — regime change detection</h3>
+        <p>Persistent homology over sliding windows of multi-asset returns to detect transitions between normal regime and market crises (2008, 2011, 2015, 2020). Topological features as input to a supervised classifier.</p>
         <div class="project-tags">
           <span class="tag">Giotto-TDA</span><span class="tag">Persistence Homology</span><span class="tag">scikit-learn</span><span class="tag">Pandas</span><span class="tag">yfinance</span>
         </div>
-        <span class="project-link-hint">Ver detalle →</span>
+        <span class="project-link-hint">View details →</span>
       </a>
 
     </div>
@@ -323,32 +323,56 @@
 <section id="contact">
   <div class="container">
     <div class="section-eyebrow reveal">07 · Contact</div>
-    <h2 class="reveal">Conectemos</h2>
-    <p class="section-intro reveal">Abierto a roles MLE senior, research engineering y colaboraciones en sistemas complejos. Respondo rápido.</p>
+    <h2 class="reveal">Get in touch</h2>
 
-    <div class="contact-grid">
-      <a class="contact-card reveal" href="#" id="linkGithub" target="_blank" rel="noopener">
-        <span class="label">GitHub</span>
-        <span class="value">@crozol</span>
-        <span class="sub">Código y proyectos</span>
-      </a>
-      <a class="contact-card reveal" href="#" id="linkLinkedin" target="_blank" rel="noopener">
-        <span class="label">LinkedIn</span>
-        <span class="value">/in/camilo-a-rozo-l</span>
-        <span class="sub">Perfil profesional</span>
-      </a>
-      <a class="contact-card reveal" href="mailto:rozol.ca555@gmail.com" id="linkEmail">
-        <span class="label">Email</span>
-        <span class="value">rozol.ca555@gmail.com</span>
-        <span class="sub">Para oportunidades directas</span>
-      </a>
+    <div class="contact-panel reveal">
+      <div class="contact-panel-left">
+        <h3>Let's Work Together</h3>
+        <p>Open to Machine Learning Engineering, research engineering, and technical consulting opportunities. Particularly interested in projects at the intersection of ML, physics, and mathematics — complex systems, Bayesian inference, and applied topology.</p>
+
+        <div class="contact-list">
+          <div class="contact-list-item">
+            <div class="icon-wrap" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            </div>
+            <div>
+              <div class="label">Email</div>
+              <div class="value">rozol.ca555@gmail.com</div>
+            </div>
+          </div>
+          <div class="contact-list-item">
+            <div class="icon-wrap" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div>
+              <div class="label">Location</div>
+              <div class="value">Bogotá, Colombia</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-panel-right">
+        <a href="https://github.com/crozol" id="linkGithub" class="action-btn" target="_blank" rel="noopener">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+          <span>GitHub</span>
+        </a>
+        <a href="https://www.linkedin.com/in/camilo-a-rozo-l/" id="linkLinkedin" class="action-btn" target="_blank" rel="noopener">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.852 3.37-1.852 3.601 0 4.267 2.37 4.267 5.455v6.288zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          <span>LinkedIn</span>
+        </a>
+        <a href="mailto:rozol.ca555@gmail.com" id="linkEmail" class="action-btn primary">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          <span>Send Email</span>
+        </a>
+      </div>
     </div>
   </div>
 </section>
 
 <footer>
   <div class="container" style="display:flex; justify-content: space-between; width: 100%; align-items: center; flex-wrap: wrap; gap: 12px;">
-    <span>&copy; <span id="year"></span> · <span id="footName">Camilo A. Rozo</span>. Construido con HTML + CSS.</span>
+    <span>&copy; <span id="year"></span> · <span id="footName">Camilo Rozo</span>. Built with HTML + CSS.</span>
     <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; color: var(--fg-1);">MADE WITH MATH ∙ PHYSICS ∙ CODE</span>
   </div>
 </footer>

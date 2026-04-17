@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>01 · Ising Bayesiano · Portfolio</title>
+<title>01 · Ising Bayesian · Camilo Rozo</title>
 <link rel="stylesheet" href="../assets/styles.css" />
 </head>
 <body>
@@ -14,7 +14,7 @@
 <div class="cursor-glow" id="cursorGlow"></div>
 
 <nav class="topnav">
-  <a href="../index.html" class="brand">// PORTFOLIO</a>
+  <a href="../index.html" class="brand">// CAMILO ROZO</a>
   <ul>
     <li><a class="menu" href="../index.html#projects">Projects</a></li>
     <li><a class="menu" href="../index.html#contact">Contact</a></li>
@@ -23,42 +23,42 @@
 
 <header class="detail-hero">
   <div class="container">
-    <a href="../index.html#projects" class="back-link reveal">← Volver a proyectos</a>
+    <a href="../index.html#projects" class="back-link reveal">← Back to projects</a>
     <div class="badges reveal" style="margin-top: 28px;">
       <span class="badge">01 / 05</span>
-      <span class="badge domain">Mecánica estadística · Bayesiano</span>
-      <span class="badge status-in-progress">Código completo · ejecutando resultados</span>
+      <span class="badge domain">Statistical mechanics · Bayesian</span>
+      <span class="badge status-in-progress">Code complete · running results</span>
     </div>
-    <h1 class="reveal"><span class="grad">Inferencia Bayesiana en el Modelo de Ising 2D</span></h1>
-    <p class="tagline reveal">Pipeline que simula la red de spines de Ising con Monte Carlo, infiere la temperatura crítica y el exponente crítico vía MCMC en PyMC, y valida los resultados contra la solución exacta de Onsager (1944).</p>
+    <h1 class="reveal"><span class="grad">Bayesian Inference on the 2D Ising Model</span></h1>
+    <p class="tagline reveal">A pipeline that simulates the Ising spin lattice with Monte Carlo, infers the critical temperature and the critical exponent via MCMC in PyMC, and validates results against the exact Onsager (1944) solution.</p>
     <div class="cta-row reveal">
-      <a href="https://github.com/crozol/01-ising-bayesian" class="btn btn-primary" target="_blank" rel="noopener">Código en GitHub →</a>
-      <a href="#resultados" class="btn btn-ghost">Ver resultados</a>
+      <a href="https://github.com/crozol/01-ising-bayesian" class="btn btn-primary" target="_blank" rel="noopener">Code on GitHub →</a>
+      <a href="#results" class="btn btn-ghost">See results</a>
     </div>
   </div>
 </header>
 
 <section class="content-section">
   <div class="container">
-    <div class="section-eyebrow reveal">// Resumen</div>
-    <h2 class="reveal">Sobre el proyecto</h2>
+    <div class="section-eyebrow reveal">// Overview</div>
+    <h2 class="reveal">About this project</h2>
     <div class="two-col">
       <div class="reveal">
-        <p>El proyecto combina en un solo pipeline tres cosas que raramente aparecen juntas en un portafolio de ML junior: <strong style="color:var(--fg-0)">física estadística real</strong>, <strong style="color:var(--fg-0)">estadística bayesiana aplicada</strong> y <strong style="color:var(--fg-0)">código Python científico ejecutable de extremo a extremo</strong>. El modelo de Ising 2D es ideal: tiene una transición de fase no trivial y, a la vez, una solución analítica exacta contra la cual validar cualquier código numérico.</p>
-        <p>Un simulador Metropolis acelerado con Numba genera la curva M(T) del sistema, y un modelo probabilístico en PyMC con priors físicamente motivados infiere los parámetros críticos a partir de esa curva con ruido. La comparación contra Onsager es la prueba última: si la inferencia recupera `Tc ≈ 2.2692` y `β = 1/8` con incertidumbre razonable, el pipeline completo está bien.</p>
-        <p>Todo está pensado para ser reproducible en un comando: <code>python main.py</code> corre simulación, inferencia y genera todas las figuras finales.</p>
+        <p>This project combines three things rarely seen together in a junior ML portfolio: <strong style="color:var(--fg-0)">real statistical physics</strong>, <strong style="color:var(--fg-0)">applied Bayesian statistics</strong> and <strong style="color:var(--fg-0)">end-to-end scientific Python code</strong>. The 2D Ising model is ideal: it has a nontrivial phase transition and, at the same time, an exact analytical solution against which any numerical code can be validated.</p>
+        <p>A Numba-accelerated Metropolis simulator generates the M(T) curve of the system, and a probabilistic model in PyMC with physically motivated priors infers the critical parameters from that noisy curve. The comparison against Onsager is the ultimate test: if inference recovers `Tc ≈ 2.2692` and `β = 1/8` with reasonable uncertainty, the full pipeline is sound.</p>
+        <p>Everything runs in a single command: <code>python main.py</code> executes simulation, inference, and generates all final figures.</p>
       </div>
       <div class="theory-card reveal">
-        <h3>Fórmulas centrales</h3>
-        <p style="margin-top: 0;">Energía del sistema:</p>
+        <h3>Core formulas</h3>
+        <p style="margin-top: 0;">System energy:</p>
         <div class="formula">E = −J ∑⟨i,j⟩ sᵢ · sⱼ</div>
-        <p>Regla de aceptación Metropolis:</p>
+        <p>Metropolis acceptance rule:</p>
         <div class="formula">P(flip) = min(1, e<sup>−ΔE/T</sup>)</div>
-        <p>Ley de potencia cerca de Tc:</p>
+        <p>Power law near Tc:</p>
         <div class="formula">M(T) ≈ (1 − T/Tc)<sup>β</sup></div>
-        <p>Teorema de Bayes aplicado:</p>
-        <div class="formula">P(Tc, β | datos) ∝ P(datos | Tc, β) · P(Tc, β)</div>
-        <p>Solución exacta de Onsager:</p>
+        <p>Bayes theorem applied:</p>
+        <div class="formula">P(Tc, β | data) ∝ P(data | Tc, β) · P(Tc, β)</div>
+        <p>Onsager's exact solution:</p>
         <div class="formula">Tc = 2 / ln(1 + √2) ≈ 2.2692</div>
         <div class="formula">β = 1/8 = 0.125</div>
       </div>
@@ -68,34 +68,34 @@
 
 <section class="content-section">
   <div class="container">
-    <div class="section-eyebrow reveal">// Componentes</div>
-    <h2 class="reveal">Cómo está construido</h2>
-    <p class="section-intro reveal">Seis piezas conectadas end-to-end. Cada una vive en un módulo aislado y expone su propia CLI.</p>
+    <div class="section-eyebrow reveal">// Components</div>
+    <h2 class="reveal">How it's built</h2>
+    <p class="section-intro reveal">Six pieces connected end-to-end. Each lives in an isolated module and exposes its own CLI.</p>
 
     <div class="two-col">
       <div class="info-card reveal">
-        <h3>1 · Simulador Metropolis</h3>
-        <p>Implementación desde cero del algoritmo de Metropolis-Hastings para muestrear configuraciones del ensemble canónico de la red de spines. La regla de aceptación usa la diferencia de energía local ΔE al voltear un spin, con probabilidad <code>min(1, exp(−ΔE/T))</code>. Cada barrido hace N² intentos de flip — uno por sitio en promedio. El kernel crítico está acelerado con <code>@numba.njit(cache=True)</code> para un speedup de ~50× sobre NumPy puro, con fallback transparente si Numba no está disponible.</p>
+        <h3>1 · Metropolis simulator</h3>
+        <p>From-scratch implementation of the Metropolis-Hastings algorithm to sample configurations from the canonical ensemble of the spin lattice. Acceptance rule uses the local energy change ΔE when flipping a spin, with probability <code>min(1, exp(−ΔE/T))</code>. Each sweep performs N² flip attempts — one per site on average. The critical kernel is accelerated with <code>@numba.njit(cache=True)</code> for a ~50× speedup over pure NumPy, with transparent fallback if Numba is unavailable.</p>
       </div>
       <div class="info-card reveal">
-        <h3>2 · Barrido de temperaturas</h3>
-        <p>Barrido de 30 temperaturas en <code>T ∈ [1.5, 3.5]</code>, cubriendo con margen la Tc teórica. Para cada T: 2000 barridos de termalización + 3000 barridos de medición, registrando media y desviación estándar de <code>⟨|M|⟩</code>. El resultado es un CSV con columnas <code>T, M_mean, M_std</code> que actúa como dataset para la inferencia.</p>
+        <h3>2 · Temperature sweep</h3>
+        <p>Sweep over 30 temperatures in <code>T ∈ [1.5, 3.5]</code>, comfortably covering the theoretical Tc. For each T: 2000 thermalization sweeps + 3000 measurement sweeps, recording mean and standard deviation of <code>⟨|M|⟩</code>. Output: a CSV with columns <code>T, M_mean, M_std</code> that serves as the dataset for inference.</p>
       </div>
       <div class="info-card reveal">
-        <h3>3 · Modelo probabilístico</h3>
-        <p>Modelo bayesiano en PyMC con priors físicamente motivados: <code>Tc ~ Normal(2.3, 0.3)</code>, <code>β ~ Normal(0.12, 0.05)</code>, <code>σ ~ HalfNormal(0.1)</code>. La predicción es la ley de potencia <code>(1 − T/Tc)^β</code> si <code>T &lt; Tc</code>, y 0 en el régimen desordenado. El likelihood es gaussiano con desviación <code>σ</code> también inferida.</p>
+        <h3>3 · Probabilistic model</h3>
+        <p>Bayesian model in PyMC with physically motivated priors: <code>Tc ~ Normal(2.3, 0.3)</code>, <code>β ~ Normal(0.12, 0.05)</code>, <code>σ ~ HalfNormal(0.1)</code>. The prediction is the power law <code>(1 − T/Tc)^β</code> for <code>T &lt; Tc</code>, and 0 in the disordered regime. Likelihood is Gaussian with <code>σ</code> also inferred.</p>
       </div>
       <div class="info-card reveal">
-        <h3>4 · Inferencia con NUTS</h3>
-        <p>Muestreo del posterior con NUTS: 4 cadenas, 2000 draws, 1000 de tuning, <code>target_accept=0.9</code>. Diagnóstico con ArviZ — R̂, ESS, trace plots — apuntando a <code>R̂ &lt; 1.01</code> y <code>ESS &gt; 400</code> en todos los parámetros.</p>
+        <h3>4 · NUTS inference</h3>
+        <p>Posterior sampling with NUTS: 4 chains, 2000 draws, 1000 tuning, <code>target_accept=0.9</code>. Diagnostics with ArviZ — R̂, ESS, trace plots — targeting <code>R̂ &lt; 1.01</code> and <code>ESS &gt; 400</code> for all parameters.</p>
       </div>
       <div class="info-card reveal">
-        <h3>5 · Validación contra Onsager</h3>
-        <p>Los valores exactos (<code>Tc ≈ 2.2692</code>, <code>β = 1/8</code>) se superponen sobre las distribuciones posteriores como líneas de referencia. Es la validación más fuerte posible: inferencia numérica contra resultado analítico exacto de 1944.</p>
+        <h3>5 · Validation against Onsager</h3>
+        <p>Exact values (<code>Tc ≈ 2.2692</code>, <code>β = 1/8</code>) are overlaid on the posterior distributions as reference lines. It's the strongest possible validation: numerical inference compared against an exact analytical result from 1944.</p>
       </div>
       <div class="info-card reveal">
-        <h3>6 · Figuras finales</h3>
-        <p>Tres figuras: (a) curva M(T) simulada con barras de error y Tc de Onsager; (b) posteriores marginales de Tc y β con valores exactos superpuestos; (c) trace plots para verificación visual de la convergencia del MCMC. Todo se guarda en <code>results/</code>.</p>
+        <h3>6 · Final figures</h3>
+        <p>Three figures: (a) simulated M(T) curve with error bars and Onsager's Tc; (b) marginal posteriors of Tc and β with exact values overlaid; (c) trace plots for visual verification of MCMC convergence. Everything saved to <code>results/</code>.</p>
       </div>
     </div>
   </div>
@@ -103,27 +103,27 @@
 
 <section class="content-section">
   <div class="container">
-    <div class="section-eyebrow reveal">// Skills demostrados</div>
-    <h2 class="reveal">Qué habilidades certifica</h2>
-    <p class="section-intro reveal">Cada skill aparece en una pieza concreta del código, no como afirmación genérica.</p>
+    <div class="section-eyebrow reveal">// Skills demonstrated</div>
+    <h2 class="reveal">What skills it certifies</h2>
+    <p class="section-intro reveal">Each skill appears in a concrete piece of code, not as a generic claim.</p>
 
     <div class="skill-matrix reveal" style="margin-bottom: 32px;">
-      <div class="skill-name">Python científico</div>
-      <div class="skill-how">Simulador Metropolis vectorizado y estructurado en módulos limpios, con CLI argparse en cada script.</div>
-      <div class="skill-name">Aceleración con Numba</div>
-      <div class="skill-how">Kernel <code>@njit(cache=True)</code> con fallback transparente si Numba no está instalado.</div>
+      <div class="skill-name">Scientific Python</div>
+      <div class="skill-how">Vectorized Metropolis simulator organized in clean modules, with argparse CLI per script.</div>
+      <div class="skill-name">Numba acceleration</div>
+      <div class="skill-how"><code>@njit(cache=True)</code> kernel with transparent fallback if Numba isn't installed.</div>
       <div class="skill-name">Monte Carlo</div>
-      <div class="skill-how">Metropolis-Hastings con condiciones periódicas y termalización + medición separadas.</div>
-      <div class="skill-name">Inferencia bayesiana</div>
-      <div class="skill-how">Modelo PyMC con priors Normal/HalfNormal y likelihood gaussiano sobre la ley de potencia.</div>
+      <div class="skill-how">Metropolis-Hastings with periodic boundaries and separated thermalization + measurement.</div>
+      <div class="skill-name">Bayesian inference</div>
+      <div class="skill-how">PyMC model with Normal/HalfNormal priors and Gaussian likelihood over the power law.</div>
       <div class="skill-name">MCMC (NUTS)</div>
-      <div class="skill-how">Muestreo de 4 cadenas × 2000 draws con diagnóstico R̂, ESS y trace plots via ArviZ.</div>
-      <div class="skill-name">Visualización técnica</div>
-      <div class="skill-how">Curva M(T) con errores, posteriores con valores exactos superpuestos, trace plots para convergencia.</div>
-      <div class="skill-name">Rigor científico</div>
-      <div class="skill-how">Validación cuantitativa contra Onsager (1944): Tc = 2.2692 exacto, β = 1/8 exacto.</div>
-      <div class="skill-name">Reproducibilidad</div>
-      <div class="skill-how"><code>python main.py</code> corre el pipeline completo de extremo a extremo sin intervención manual.</div>
+      <div class="skill-how">Sampling of 4 chains × 2000 draws with R̂, ESS, and trace plot diagnostics via ArviZ.</div>
+      <div class="skill-name">Technical visualization</div>
+      <div class="skill-how">M(T) curve with errors, posteriors with exact values overlaid, convergence trace plots.</div>
+      <div class="skill-name">Scientific rigor</div>
+      <div class="skill-how">Quantitative validation against Onsager (1944): Tc = 2.2692 exact, β = 1/8 exact.</div>
+      <div class="skill-name">Reproducibility</div>
+      <div class="skill-how"><code>python main.py</code> runs the full pipeline end-to-end without manual intervention.</div>
     </div>
 
     <div class="skill-chip-row reveal">
@@ -141,92 +141,71 @@
 
 <section class="content-section">
   <div class="container">
-    <div class="section-eyebrow reveal">// Estructura</div>
-    <h2 class="reveal">Organización del proyecto</h2>
+    <div class="section-eyebrow reveal">// Structure</div>
+    <h2 class="reveal">Project organization</h2>
     <pre class="code-tree reveal"><span class="folder">01-ising-bayesian/</span>
 ├── <span class="file">README.md</span>
 ├── <span class="file">requirements.txt</span>
-├── <span class="file">main.py</span>                 <span class="comment"># pipeline completo end-to-end</span>
+├── <span class="file">main.py</span>                 <span class="comment"># end-to-end pipeline</span>
 ├── <span class="folder">src/</span>
 │   ├── <span class="file">__init__.py</span>
-│   ├── <span class="file">metropolis.py</span>       <span class="comment"># simulador Metropolis con Numba</span>
-│   ├── <span class="file">bayesian.py</span>         <span class="comment"># modelo PyMC + MCMC + summary</span>
-│   └── <span class="file">plots.py</span>            <span class="comment"># figuras M(T), posteriores, trace</span>
-├── <span class="folder">data/</span>                 <span class="comment"># (gitignored) CSV + NetCDF generados</span>
-└── <span class="folder">results/</span>              <span class="comment"># (gitignored) figuras PNG</span></pre>
+│   ├── <span class="file">metropolis.py</span>       <span class="comment"># Numba-accelerated Metropolis simulator</span>
+│   ├── <span class="file">bayesian.py</span>         <span class="comment"># PyMC model + MCMC + summary</span>
+│   └── <span class="file">plots.py</span>            <span class="comment"># M(T), posteriors, trace figures</span>
+├── <span class="folder">data/</span>                 <span class="comment"># (gitignored) generated CSV + NetCDF</span>
+└── <span class="folder">results/</span>              <span class="comment"># (gitignored) PNG figures</span></pre>
   </div>
 </section>
 
 <section class="content-section">
   <div class="container">
     <div class="section-eyebrow reveal">// Roadmap</div>
-    <h2 class="reveal">Estado del proyecto</h2>
+    <h2 class="reveal">Project status</h2>
     <ul class="roadmap reveal">
-      <li class="done">Diseño del modelo probabilístico y elección de priors físicamente motivados</li>
-      <li class="done">Simulador Metropolis con aceleración Numba y condiciones periódicas</li>
-      <li class="done">CLI argparse para cada módulo y pipeline end-to-end en <code>main.py</code></li>
-      <li class="done">Modelo PyMC con likelihood gaussiano y switch piecewise para la ley de potencia</li>
-      <li class="done">Módulo de visualización con las tres figuras finales ya codificadas</li>
-      <li class="active">Ejecutar simulación completa (30 temperaturas × 5000 barridos) y generar CSV</li>
-      <li class="active">Correr MCMC y verificar diagnósticos (R̂ &lt; 1.01, ESS &gt; 400)</li>
-      <li>Generar PNGs finales e insertarlos en el README</li>
-      <li>Notebook interactivo complementario para exploración visual</li>
+      <li class="done">Probabilistic model design and selection of physically motivated priors</li>
+      <li class="done">Metropolis simulator with Numba acceleration and periodic boundary conditions</li>
+      <li class="done">Argparse CLI per module and end-to-end pipeline in <code>main.py</code></li>
+      <li class="done">PyMC model with Gaussian likelihood and piecewise switch for the power law</li>
+      <li class="done">Visualization module with the three final figures already coded</li>
+      <li class="active">Run full simulation (30 temperatures × 5000 sweeps) and generate CSV</li>
+      <li class="active">Run MCMC and verify diagnostics (R̂ &lt; 1.01, ESS &gt; 400)</li>
+      <li>Generate final PNGs and embed them in the README</li>
+      <li>Companion interactive notebook for visual exploration</li>
     </ul>
   </div>
 </section>
 
 <section class="content-section">
   <div class="container">
-    <div class="section-eyebrow reveal">// Métricas</div>
-    <h2 class="reveal">Criterios de éxito</h2>
+    <div class="section-eyebrow reveal">// Metrics</div>
+    <h2 class="reveal">Success criteria</h2>
     <div class="two-col">
       <div class="info-card reveal">
-        <h3>Inferencia</h3>
-        <p><strong style="color:var(--fg-0)">Tc = 2.27 ± 0.04</strong><br />consistente con Onsager (2.2692).</p>
-        <p style="margin-bottom:0;"><strong style="color:var(--fg-0)">β = 0.125 ± 0.02</strong><br />consistente con el valor exacto 1/8.</p>
+        <h3>Inference</h3>
+        <p><strong style="color:var(--fg-0)">Tc = 2.27 ± 0.04</strong><br />consistent with Onsager (2.2692).</p>
+        <p style="margin-bottom:0;"><strong style="color:var(--fg-0)">β = 0.125 ± 0.02</strong><br />consistent with the exact value 1/8.</p>
       </div>
       <div class="info-card reveal">
-        <h3>Diagnósticos MCMC</h3>
-        <p>R̂ &lt; 1.01 en todos los parámetros.</p>
-        <p>ESS &gt; 400 (muestras efectivas independientes).</p>
-        <p style="margin-bottom:0;">Trace plots sin deriva ni autocorrelación patológica.</p>
+        <h3>MCMC diagnostics</h3>
+        <p>R̂ &lt; 1.01 across all parameters.</p>
+        <p>ESS &gt; 400 (effective independent samples).</p>
+        <p style="margin-bottom:0;">Trace plots without drift or pathological autocorrelation.</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="content-section" id="resultados">
+<section class="content-section" id="results">
   <div class="container">
-    <div class="section-eyebrow reveal">// Resultados</div>
-    <h2 class="reveal">Outputs y métricas finales</h2>
-    <p class="section-intro reveal">Figuras generadas, valores inferidos y artefactos finales del proyecto.</p>
+    <div class="section-eyebrow reveal">// Results</div>
+    <h2 class="reveal">Outputs and final metrics</h2>
+    <p class="section-intro reveal">Generated figures, inferred values, and final artifacts of the project.</p>
 
     <div class="result-empty reveal">
-      <div class="big">Pendiente de ejecución</div>
-      <p>El código está listo. Faltan solamente correr el pipeline y subir los PNGs.</p>
-      <p class="hint">Aquí irán: curva M(T) con la transición de fase, posteriores de Tc y β con los valores exactos superpuestos, y trace plots de convergencia.</p>
+      <div class="big">Pending execution</div>
+      <p>The code is ready. Only the pipeline run and PNG upload remain.</p>
+      <p class="hint">What goes here: M(T) curve with the phase transition, posteriors of Tc and β with exact values overlaid, and convergence trace plots.</p>
     </div>
-
-    <!-- Cuando ejecutes el pipeline y tengas los PNGs, reemplazá el bloque .result-empty por:
-    <div class="results-grid">
-      <div class="result-figure">
-        <img src="../assets/results/01-magnetization.png" alt="Curva M(T)" />
-        <div class="caption">Fig 1 · M(T) simulada + Tc de Onsager superpuesta</div>
-      </div>
-      <div class="result-figure">
-        <img src="../assets/results/01-posteriors.png" alt="Posteriores" />
-        <div class="caption">Fig 2 · Posteriores marginales de Tc y β</div>
-      </div>
-      <div class="result-metric">
-        <div class="value">Tc = 2.27 ± 0.04</div>
-        <div class="label">exacto (Onsager): 2.2692</div>
-      </div>
-      <div class="result-metric">
-        <div class="value">β = 0.125 ± 0.02</div>
-        <div class="label">exacto: 1/8 = 0.125</div>
-      </div>
-    </div>
-    -->
   </div>
 </section>
 
@@ -234,11 +213,11 @@
   <div class="container">
     <nav class="page-nav">
       <a href="../index.html#projects">
-        <div class="dir">← Volver</div>
-        <span class="title">Todos los proyectos</span>
+        <div class="dir">← Back</div>
+        <span class="title">All projects</span>
       </a>
       <a href="02-neural-odes.html" class="next">
-        <div class="dir">Siguiente →</div>
+        <div class="dir">Next →</div>
         <span class="title">02 · Neural ODEs</span>
       </a>
     </nav>
@@ -247,7 +226,7 @@
 
 <footer>
   <div class="container" style="display:flex; justify-content: space-between; width: 100%; align-items: center; flex-wrap: wrap; gap: 12px;">
-    <span>&copy; <span id="year"></span> · Camilo. Construido con HTML + CSS.</span>
+    <span>&copy; <span id="year"></span> · Camilo Rozo. Built with HTML + CSS.</span>
     <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; color: var(--fg-1);">MADE WITH MATH ∙ PHYSICS ∙ CODE</span>
   </div>
 </footer>

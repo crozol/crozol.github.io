@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>05 · TDA Finance · Portfolio</title>
+<title>05 · TDA Finance · Camilo Rozo</title>
 <link rel="stylesheet" href="../assets/styles.css" />
 </head>
 <body>
@@ -14,7 +14,7 @@
 <div class="cursor-glow" id="cursorGlow"></div>
 
 <nav class="topnav">
-  <a href="../index.html" class="brand">// PORTFOLIO</a>
+  <a href="../index.html" class="brand">// CAMILO ROZO</a>
   <ul>
     <li><a class="menu" href="../index.html#projects">Projects</a></li>
     <li><a class="menu" href="../index.html#contact">Contact</a></li>
@@ -23,41 +23,41 @@
 
 <header class="detail-hero">
   <div class="container">
-    <a href="../index.html#projects" class="back-link reveal">← Volver a proyectos</a>
+    <a href="../index.html#projects" class="back-link reveal">← Back to projects</a>
     <div class="badges reveal" style="margin-top: 28px;">
       <span class="badge">05 / 05</span>
-      <span class="badge domain">Topología aplicada · Finanzas</span>
-      <span class="badge status-planned">Planeado</span>
+      <span class="badge domain">Applied topology · Finance</span>
+      <span class="badge status-planned">Planned</span>
     </div>
-    <h1 class="reveal"><span class="grad">TDA en series financieras</span><br /><span class="grad">Detección de cambios de régimen</span></h1>
-    <p class="tagline reveal">Usar homología persistente sobre ventanas deslizantes de retornos multi-activo para detectar transiciones entre régimen normal y crisis de mercado (2008, 2011, 2015, 2020). Los descriptores topológicos alimentan un clasificador supervisado.</p>
+    <h1 class="reveal"><span class="grad">TDA on financial time series</span><br /><span class="grad">Regime change detection</span></h1>
+    <p class="tagline reveal">Use persistent homology over sliding windows of multi-asset returns to detect transitions between normal regime and market crises (2008, 2011, 2015, 2020). Topological descriptors feed a supervised classifier.</p>
     <div class="cta-row reveal">
-      <a href="https://github.com/crozol/05-tda-finance" class="btn btn-primary" target="_blank" rel="noopener">Código en GitHub →</a>
-      <a href="#" class="btn btn-ghost">Demo (pendiente)</a>
+      <a href="https://github.com/crozol/05-tda-finance" class="btn btn-primary" target="_blank" rel="noopener">Code on GitHub →</a>
+      <a href="#" class="btn btn-ghost">Demo (pending)</a>
     </div>
   </div>
 </header>
 
 <section class="content-section">
   <div class="container">
-    <div class="section-eyebrow reveal">// Resumen</div>
-    <h2 class="reveal">¿De qué se trata este proyecto?</h2>
+    <div class="section-eyebrow reveal">// Overview</div>
+    <h2 class="reveal">About this project</h2>
     <div class="two-col">
       <div class="reveal">
-        <p>Los métodos clásicos para detectar cambios de régimen en finanzas (volatilidad rolling, correlaciones móviles, HMMs) miran momentos estadísticos. El <strong style="color:var(--fg-0)">Topological Data Analysis</strong> propone un enfoque complementario: mirar la <strong style="color:var(--fg-0)">forma</strong> de la nube de retornos en ℝ<sup>d</sup> mediante <strong style="color:var(--fg-0)">homología persistente</strong>, y extraer invariantes robustos ante reparametrización.</p>
-        <p>Idea: en régimen normal los retornos forman una nube "redonda" de baja correlación; durante una crisis, la nube colapsa hacia una dirección (co-movimiento sistémico) y su topología cambia. Las barras de persistencia detectan ese cambio antes que métricas agregadas tradicionales.</p>
-        <p>Este proyecto usa tu formación en <strong style="color:var(--fg-0)">topología algebraica</strong> — una herramienta que ningún MLE junior va a tener — para un problema financiero con impacto real.</p>
+        <p>Classical methods for detecting regime changes in finance (rolling volatility, rolling correlations, HMMs) look at statistical moments. <strong style="color:var(--fg-0)">Topological Data Analysis</strong> proposes a complementary angle: look at the <strong style="color:var(--fg-0)">shape</strong> of the return cloud in ℝ<sup>d</sup> through <strong style="color:var(--fg-0)">persistent homology</strong>, extracting invariants that are robust to reparameterization.</p>
+        <p>Idea: in a normal regime, returns form a "round" low-correlation cloud; during a crisis, the cloud collapses toward a single direction (systemic co-movement) and its topology changes. Persistence bars detect that change earlier than traditional aggregate metrics.</p>
+        <p>This project uses training in <strong style="color:var(--fg-0)">algebraic topology</strong> — a tool no other junior ML engineer will have — on a financial problem with real impact.</p>
       </div>
       <div class="theory-card reveal">
-        <h3>Pipeline matemático</h3>
-        <p>Retornos log:</p>
+        <h3>Mathematical pipeline</h3>
+        <p>Log returns:</p>
         <div class="formula">r<sub>t</sub> = log(p<sub>t</sub> / p<sub>t−1</sub>) ∈ ℝ<sup>d</sup></div>
-        <p>Ventana deslizante:</p>
+        <p>Sliding window:</p>
         <div class="formula">W<sub>t</sub> = {r<sub>s</sub> : t − h ≤ s ≤ t} ⊂ ℝ<sup>d</sup></div>
-        <p>Homología persistente Vietoris-Rips:</p>
+        <p>Vietoris-Rips persistent homology:</p>
         <div class="formula">PD<sub>0</sub>(W<sub>t</sub>), PD<sub>1</sub>(W<sub>t</sub>)</div>
         <p>Features:</p>
-        <div class="formula">φ(W<sub>t</sub>) = [entropía, landscape, n. componentes, persistencia máxima]</div>
+        <div class="formula">φ(W<sub>t</sub>) = [entropy, landscape, # components, max persistence]</div>
       </div>
     </div>
   </div>
@@ -65,24 +65,24 @@
 
 <section class="content-section">
   <div class="container">
-    <div class="section-eyebrow reveal">// Skills demostrados</div>
-    <h2 class="reveal">Qué habilidades certifica</h2>
+    <div class="section-eyebrow reveal">// Skills demonstrated</div>
+    <h2 class="reveal">What skills it certifies</h2>
 
     <div class="skill-matrix reveal" style="margin-bottom: 32px;">
-      <div class="skill-name">Topología algebraica aplicada</div>
-      <div class="skill-how">Cálculo de homología persistente Vietoris-Rips en dimensiones 0 y 1 sobre nubes de puntos.</div>
-      <div class="skill-name">Feature engineering exótico</div>
-      <div class="skill-how">Convertir diagramas de persistencia en vectores (persistence landscapes, entropía, images) para ML clásico.</div>
-      <div class="skill-name">Series temporales</div>
-      <div class="skill-how">Ventanas deslizantes, alineamiento temporal, manejo de ticks faltantes y días festivos.</div>
-      <div class="skill-name">Finanzas cuantitativas</div>
-      <div class="skill-how">Retornos log, volatilidad realizada, correlaciones rolling como baseline de comparación.</div>
-      <div class="skill-name">ML clásico</div>
-      <div class="skill-how">Random Forest / SVM sobre features topológicos con validación cruzada temporal (walk-forward).</div>
-      <div class="skill-name">Validación de dominio</div>
-      <div class="skill-how">Confirmar que los picos del score coinciden con eventos macro reales (Lehman 2008, COVID 2020).</div>
-      <div class="skill-name">Storytelling visual</div>
-      <div class="skill-how">Gráficas antes / durante / después de crisis con diagramas de persistencia anotados.</div>
+      <div class="skill-name">Applied algebraic topology</div>
+      <div class="skill-how">Vietoris-Rips persistent homology computation in dimensions 0 and 1 over point clouds.</div>
+      <div class="skill-name">Exotic feature engineering</div>
+      <div class="skill-how">Convert persistence diagrams into vectors (persistence landscapes, entropy, images) as input to classical ML.</div>
+      <div class="skill-name">Time series</div>
+      <div class="skill-how">Sliding windows, temporal alignment, handling missing ticks and holidays.</div>
+      <div class="skill-name">Quantitative finance</div>
+      <div class="skill-how">Log returns, realized volatility, rolling correlations as comparison baselines.</div>
+      <div class="skill-name">Classical ML</div>
+      <div class="skill-how">Random Forest / SVM over topological features with temporal cross-validation (walk-forward).</div>
+      <div class="skill-name">Domain validation</div>
+      <div class="skill-how">Confirm score peaks coincide with real macro events (Lehman 2008, COVID 2020).</div>
+      <div class="skill-name">Visual storytelling</div>
+      <div class="skill-how">Before / during / after crisis plots with annotated persistence diagrams.</div>
     </div>
 
     <div class="skill-chip-row reveal">
@@ -101,51 +101,51 @@
 
 <section class="content-section">
   <div class="container">
-    <div class="section-eyebrow reveal">// Estructura</div>
-    <h2 class="reveal">Organización del proyecto</h2>
+    <div class="section-eyebrow reveal">// Structure</div>
+    <h2 class="reveal">Project organization</h2>
     <pre class="code-tree reveal"><span class="folder">05-tda-finance/</span>
 ├── <span class="file">README.md</span>
 ├── <span class="file">requirements.txt</span>
 ├── <span class="folder">src/</span>
-│   ├── <span class="file">data.py</span>          <span class="comment"># Descarga precios y calcula retornos log</span>
-│   ├── <span class="file">persistence.py</span>   <span class="comment"># Homología persistente sobre ventanas deslizantes</span>
-│   ├── <span class="file">features.py</span>      <span class="comment"># Persistence landscapes / images / entropy</span>
-│   └── <span class="file">classify.py</span>      <span class="comment"># Clasificador supervisado régimen normal vs. crisis</span>
-└── <span class="folder">notebooks/</span>        <span class="comment"># Análisis histórico + visualizaciones</span></pre>
+│   ├── <span class="file">data.py</span>          <span class="comment"># download prices and compute log returns</span>
+│   ├── <span class="file">persistence.py</span>   <span class="comment"># persistent homology over sliding windows</span>
+│   ├── <span class="file">features.py</span>      <span class="comment"># persistence landscapes / images / entropy</span>
+│   └── <span class="file">classify.py</span>      <span class="comment"># supervised classifier normal vs. crisis</span>
+└── <span class="folder">notebooks/</span>        <span class="comment"># historical analysis + visualizations</span></pre>
   </div>
 </section>
 
 <section class="content-section">
   <div class="container">
     <div class="section-eyebrow reveal">// Roadmap</div>
-    <h2 class="reveal">Progreso del proyecto</h2>
+    <h2 class="reveal">Project status</h2>
     <ul class="roadmap reveal">
-      <li>Descargar precios diarios (SP500, NASDAQ, sector ETFs) via yfinance</li>
-      <li>Preprocessing: retornos log, normalización, manejo de gaps</li>
-      <li>Ventanas deslizantes → nubes de puntos en ℝ<sup>d</sup></li>
-      <li>Calcular homología persistente (dim 0 y 1) con Giotto-TDA</li>
-      <li>Convertir diagramas en persistence landscapes y entropía</li>
-      <li>Entrenar Random Forest con validación temporal walk-forward</li>
-      <li>Graficar score temporal con anotaciones de crisis reales</li>
-      <li>README con narrativa + notebook interactivo</li>
+      <li>Download daily prices (SP500, NASDAQ, sector ETFs) via yfinance</li>
+      <li>Preprocessing: log returns, normalization, gap handling</li>
+      <li>Sliding windows → point clouds in ℝ<sup>d</sup></li>
+      <li>Compute persistent homology (dim 0 and 1) with Giotto-TDA</li>
+      <li>Convert diagrams into persistence landscapes and entropy</li>
+      <li>Train Random Forest with walk-forward temporal validation</li>
+      <li>Plot temporal score with annotations of real crises</li>
+      <li>README with narrative + interactive notebook</li>
     </ul>
   </div>
 </section>
 
 <section class="content-section">
   <div class="container">
-    <div class="section-eyebrow reveal">// Resultado esperado</div>
-    <h2 class="reveal">Métricas de éxito</h2>
+    <div class="section-eyebrow reveal">// Metrics</div>
+    <h2 class="reveal">Success criteria</h2>
     <div class="two-col">
       <div class="info-card reveal">
-        <h3>Clasificación</h3>
-        <p>ROC-AUC &gt; 0.85 separando régimen normal de crisis.</p>
-        <p style="margin-bottom:0;">Outperform frente a baseline de volatilidad realizada.</p>
+        <h3>Classification</h3>
+        <p>ROC-AUC &gt; 0.85 separating normal regime from crisis.</p>
+        <p style="margin-bottom:0;">Outperforms realized volatility baseline.</p>
       </div>
       <div class="info-card reveal">
-        <h3>Interpretabilidad</h3>
-        <p>Picos temporales del "topological anomaly score" coincidiendo con:</p>
-        <p style="margin-bottom:0;">subprime 2008 · default europeo 2011 · selloff China 2015 · COVID 2020.</p>
+        <h3>Interpretability</h3>
+        <p>Temporal peaks of the "topological anomaly score" coinciding with:</p>
+        <p style="margin-bottom:0;">subprime 2008 · European default 2011 · China selloff 2015 · COVID 2020.</p>
       </div>
     </div>
   </div>
@@ -153,36 +153,15 @@
 
 <section class="content-section">
   <div class="container">
-    <div class="section-eyebrow reveal">// Resultados</div>
-    <h2 class="reveal">Outputs y métricas finales</h2>
-    <p class="section-intro reveal">Score temporal con eventos macro, diagramas de persistencia y métricas del clasificador.</p>
+    <div class="section-eyebrow reveal">// Results</div>
+    <h2 class="reveal">Outputs and final metrics</h2>
+    <p class="section-intro reveal">Temporal score with macro events, persistence diagrams, and classifier metrics.</p>
 
     <div class="result-empty reveal">
-      <div class="big">Pendiente</div>
-      <p>Aún no hay resultados publicados.</p>
-      <p class="hint">Aquí irán: serie temporal del "topological anomaly score" con crisis anotadas, diagramas de persistencia en distintos regímenes, matriz de confusión y AUC del clasificador.</p>
+      <div class="big">Pending</div>
+      <p>No results published yet.</p>
+      <p class="hint">What goes here: "topological anomaly score" time series with annotated crises, persistence diagrams across regimes, confusion matrix, and classifier AUC.</p>
     </div>
-
-    <!-- Cuando tengas resultados, reemplazá el bloque .result-empty por:
-    <div class="results-grid">
-      <div class="result-figure">
-        <img src="../assets/results/05-score-timeseries.png" alt="Score temporal" />
-        <div class="caption">Fig 1 · Score topológico con crisis anotadas (2008, 2020)</div>
-      </div>
-      <div class="result-figure">
-        <img src="../assets/results/05-persistence-diagrams.png" alt="Persistence diagrams" />
-        <div class="caption">Fig 2 · Diagramas de persistencia en régimen normal vs. crisis</div>
-      </div>
-      <div class="result-metric">
-        <div class="value">AUC = 0.88</div>
-        <div class="label">clasificador régimen normal vs. crisis</div>
-      </div>
-      <div class="result-metric">
-        <div class="value">+0.12 AUC</div>
-        <div class="label">mejora vs. baseline de volatilidad realizada</div>
-      </div>
-    </div>
-    -->
   </div>
 </section>
 
@@ -190,12 +169,12 @@
   <div class="container">
     <nav class="page-nav">
       <a href="04-pinns.html">
-        <div class="dir">← Anterior</div>
+        <div class="dir">← Previous</div>
         <span class="title">04 · PINNs</span>
       </a>
       <a href="../index.html#projects" class="next">
-        <div class="dir">Volver →</div>
-        <span class="title">Todos los proyectos</span>
+        <div class="dir">Back →</div>
+        <span class="title">All projects</span>
       </a>
     </nav>
   </div>
@@ -203,7 +182,7 @@
 
 <footer>
   <div class="container" style="display:flex; justify-content: space-between; width: 100%; align-items: center; flex-wrap: wrap; gap: 12px;">
-    <span>&copy; <span id="year"></span> · Camilo. Construido con HTML + CSS.</span>
+    <span>&copy; <span id="year"></span> · Camilo Rozo. Built with HTML + CSS.</span>
     <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; color: var(--fg-1);">MADE WITH MATH ∙ PHYSICS ∙ CODE</span>
   </div>
 </footer>

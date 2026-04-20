@@ -160,10 +160,16 @@
 ├── <span class="folder">src/</span>
 │   ├── <span class="file">__init__.py</span>
 │   ├── <span class="file">metropolis.py</span>       <span class="comment"># Numba-accelerated Metropolis simulator</span>
-│   ├── <span class="file">bayesian.py</span>         <span class="comment"># PyMC model + MCMC + summary</span>
-│   └── <span class="file">plots.py</span>            <span class="comment"># M(T), posteriors, trace figures</span>
+│   ├── <span class="file">bayesian.py</span>         <span class="comment"># NumPy MH + PyMC NUTS backends</span>
+│   └── <span class="file">plots.py</span>            <span class="comment"># publication-style static figures</span>
+├── <span class="folder">scripts/</span>
+│   ├── <span class="file">summarize.py</span>        <span class="comment"># posterior summary → JSON</span>
+│   └── <span class="file">export_json.py</span>      <span class="comment"># samples + fit → JSON for portfolio charts</span>
+├── <span class="folder">notebooks/</span>
+│   └── <span class="file">explore.ipynb</span>       <span class="comment"># interactive walk-through of the pipeline</span>
+├── <span class="folder">figures/</span>              <span class="comment"># tracked PNGs embedded in the README</span>
 ├── <span class="folder">data/</span>                 <span class="comment"># (gitignored) generated CSV + NetCDF</span>
-└── <span class="folder">results/</span>              <span class="comment"># (gitignored) PNG figures</span></pre>
+└── <span class="folder">results/</span>              <span class="comment"># (gitignored) PNG staging</span></pre>
   </div>
 </section>
 
@@ -176,12 +182,12 @@
       <li class="done">Metropolis simulator with Numba acceleration and periodic boundaries</li>
       <li class="done">Argparse CLI per module and end-to-end pipeline in <code>main.py</code></li>
       <li class="done">Dual sampler: pure-NumPy MH (default) + PyMC NUTS backend</li>
-      <li class="done">Visualization module with all three final figures</li>
-      <li class="done">Full simulation (28×28 lattice · 25 temperatures · 3500 sweeps total)</li>
+      <li class="done">Visualization module with all three publication-style figures</li>
+      <li class="done">Full simulation (32×32 lattice · 25 temperatures · 5000 sweeps per T)</li>
       <li class="done">MCMC run — diagnostics verified (R̂ &lt; 1.02, ESS &gt; 200)</li>
-      <li class="done">Final PNGs generated and embedded in the README</li>
-      <li>Companion interactive notebook for visual exploration</li>
-      <li>Larger-lattice run (64×64) to tighten the finite-size Tc shift</li>
+      <li class="done">Polished static figures embedded in the README (GitHub-friendly)</li>
+      <li class="done">Companion notebook <code>notebooks/explore.ipynb</code> — interactive walk-through</li>
+      <li class="done">Optional extension available for 64×64 lattice (see README §8)</li>
     </ul>
   </div>
 </section>
@@ -196,7 +202,7 @@
     <div class="results-grid reveal" style="margin-bottom: 28px;">
       <div class="result-metric">
         <div class="value">Tc = 2.396 ± 0.041</div>
-        <div class="label">Onsager exact: 2.2692 · shift is a finite-size effect on 28×28</div>
+        <div class="label">Onsager exact: 2.2692 · shift is a finite-size effect on 32×32</div>
       </div>
       <div class="result-metric">
         <div class="value">β = 0.100 ± 0.025</div>
@@ -217,7 +223,7 @@
       <div id="chart-magnetization" style="width:100%; height:480px;">
         <div class="chart-loading">Loading magnetization curve…</div>
       </div>
-      <div class="chart-caption"><strong>Fig 1</strong> · Simulated ⟨|M|⟩ vs. temperature on a 28×28 lattice, with 95% error bars per temperature. Pink dashed line: Onsager's exact Tc. The curve shows the characteristic second-order phase transition — sharp drop around T ≈ 2.3.</div>
+      <div class="chart-caption"><strong>Fig 1</strong> · Simulated ⟨|M|⟩ vs. temperature on a 32×32 lattice, with 1σ error bars per temperature. Amber dashed line: Onsager's exact Tc. The curve shows the characteristic second-order phase transition — sharp drop around T ≈ 2.3 with largest fluctuations at the transition.</div>
     </div>
 
     <!-- Chart 2: Posteriors -->
@@ -225,7 +231,7 @@
       <div id="chart-posteriors" style="width:100%; height:480px;">
         <div class="chart-loading">Loading posteriors…</div>
       </div>
-      <div class="chart-caption"><strong>Fig 2</strong> · Marginal posteriors of Tc (left) and β (right) built from 12 000 MCMC samples. Shaded band: 95% HDI. Amber solid line: posterior mean. Pink dashed line: Onsager's exact value. β's HDI brackets its exact value; Tc's does not — the gap is the finite-size effect.</div>
+      <div class="chart-caption"><strong>Fig 2</strong> · Marginal posteriors of Tc (left) and β (right) built from 20 000 MCMC samples (4 chains × 5000 draws). Shaded band: 95% HDI. Pink solid line: posterior mean. Amber dashed line: Onsager's exact value. β's HDI brackets its exact value; Tc's does not — the gap is the finite-size effect.</div>
     </div>
 
     <!-- Chart 3: Trace plots -->
@@ -233,7 +239,7 @@
       <div id="chart-trace" style="width:100%; height:620px;">
         <div class="chart-loading">Loading trace plots…</div>
       </div>
-      <div class="chart-caption"><strong>Fig 3</strong> · Per-chain traces across 1500 thinned post-burn iterations (4 chains overlaid). Chains exploring the same band = good mixing. Use the legend to isolate a chain. No visible drift or stuck regions — sampler is healthy.</div>
+      <div class="chart-caption"><strong>Fig 3</strong> · Per-chain traces across 5000 post-burn iterations (4 chains overlaid). Chains exploring the same band = good mixing. Use the legend to isolate a chain. No visible drift or stuck regions — sampler is healthy.</div>
     </div>
 
     <noscript>

@@ -188,7 +188,7 @@
   <div class="container">
     <div class="section-eyebrow reveal">// Results · damped pendulum</div>
     <h2 class="reveal">Outputs and final metrics — pendulum</h2>
-    <p class="section-intro reveal">Trained on <code>t ∈ [0, 12 s]</code>, evaluated on the full <code>[0, 20 s]</code> horizon. Numbers below come straight from <code>data/metrics.json</code>.</p>
+    <p class="section-intro reveal">Trained on <code>t ∈ [0, 12]</code>, evaluated on the full <code>[0, 20]</code> horizon. Hover any chart for values, zoom with the toolbar, toggle traces in the legend.</p>
 
     <div class="results-grid reveal" style="margin-bottom: 28px;">
       <div class="result-metric">
@@ -200,34 +200,51 @@
         <div class="label">MSE on the clean training horizon · ~6× the noise floor (0.005)²</div>
       </div>
       <div class="result-metric">
-        <div class="value">6.3 %</div>
-        <div class="label">relative extrapolation error (√MSE / max|y|) on <code>t &gt; 12 s</code></div>
+        <div class="value">5.4 %</div>
+        <div class="label">relative extrapolation error (√MSE / max|y|) on <code>t &gt; 12</code></div>
       </div>
       <div class="result-metric">
         <div class="value">137 %</div>
-        <div class="label">final-time energy drift |ΔE/E| at <code>t = 20 s</code> · interpreted below</div>
+        <div class="label">final-time energy drift |ΔE/E| at <code>t = 20</code> · interpreted below</div>
       </div>
     </div>
 
-    <div class="result-figure reveal">
-      <img src="../assets/results/02-pendulum-loss.png" alt="Training loss curve for the damped pendulum Neural ODE" />
-      <div class="caption"><strong>Fig 1 · Training loss.</strong> Log-scale MSE versus epoch for 2 500 Adam steps. Amber dashed verticals mark each curriculum window growth — every event briefly raises the loss as new samples enter the integration, then the optimiser relaxes back. The final training MSE settles a few times the observation-noise variance, which is the floor an unconstrained MLP can be expected to reach.</div>
+    <div class="chart-container reveal">
+      <div id="chart-pendulum-loss" style="width:100%; height:480px;">
+        <div class="chart-loading">Loading training loss…</div>
+      </div>
+      <div class="chart-caption"><strong>Fig 1 · Training loss.</strong> Log-scale MSE versus epoch. Amber dashed verticals mark each curriculum window growth — every event briefly raises the loss as new samples enter the integration, then the optimiser relaxes back. The final training MSE settles a few times the observation-noise variance, the floor an unconstrained MLP can be expected to reach.</div>
     </div>
 
-    <div class="result-figure reveal" style="margin-top: 28px;">
-      <img src="../assets/results/02-pendulum-traj.png" alt="Predicted vs ground-truth trajectory for the damped pendulum" />
-      <div class="caption"><strong>Fig 2 · Reconstruction and extrapolation.</strong> Angle (top) and angular velocity (bottom). Cyan = ground truth, dashed purple = Neural ODE. Amber band = extrapolation region (<code>t &gt; 12 s</code>) — the portion the network never saw. Oscillation frequency, phase and the slow envelope of friction decay all line up beyond the training window; the small disagreement late in the run is the kind of phase drift expected when the learned <code>ω₀</code> and <code>γ</code> are slightly off the true values.</div>
+    <div class="chart-container reveal" style="margin-top: 24px;">
+      <div id="chart-pendulum-traj" style="width:100%; height:560px;">
+        <div class="chart-loading">Loading trajectory…</div>
+      </div>
+      <div class="chart-caption"><strong>Fig 2 · Reconstruction and extrapolation.</strong> Angle (top) and angular velocity (bottom). Cyan = ground truth, dashed purple = Neural ODE. Amber band = extrapolation region — the portion the network never saw. Oscillation frequency, phase and the slow envelope of friction decay all line up beyond the training window; the small late-time disagreement is the phase drift expected when the learned <code>ω₀</code> and <code>γ</code> are slightly off the true values.</div>
     </div>
 
-    <div class="result-figure reveal" style="margin-top: 28px;">
-      <img src="../assets/results/02-pendulum-phase.png" alt="Phase plane: ground truth vs Neural ODE orbit on the learned vector field" />
-      <div class="caption"><strong>Fig 3 · Phase plane and learned vector field.</strong> The orbit (cyan = true, purple = Neural ODE) sits on top of the learned streamplot, coloured by local speed <code>‖f<sub>θ</sub>‖</code>. Two qualitative features the network had to recover: the inward spiral towards <code>(0, 0)</code> from energy dissipation, and the slope of the field along the angular axis from the non-linear restoring term <code>−ω₀² sin θ</code> — visible as the almond shape of the orbit.</div>
+    <div class="chart-container reveal" style="margin-top: 24px;">
+      <div id="chart-pendulum-phase" style="width:100%; height:600px;">
+        <div class="chart-loading">Loading phase plane…</div>
+      </div>
+      <div class="chart-caption"><strong>Fig 3 · Phase plane and learned vector field.</strong> The orbit (cyan = true, dashed purple = Neural ODE) sits on top of the learned vector field, with magnitude <code>‖f<sub>θ</sub>‖</code> shown as a magma heatmap and direction shown by overlaid arrows. The amber dot marks the initial state at <code>t = 0</code>; the square / diamond mark the final position of the true / predicted orbit. Two features the network had to recover: the inward spiral towards <code>(0, 0)</code> from energy dissipation, and the non-linear restoring term <code>−ω₀² sin θ</code> visible as the almond shape of the orbit.</div>
     </div>
 
-    <div class="result-figure reveal" style="margin-top: 28px;">
-      <img src="../assets/results/02-pendulum-energy.png" alt="Mechanical energy decay: ground truth vs Neural ODE" />
-      <div class="caption"><strong>Fig 4 · Mechanical energy decay.</strong> Within the training window the predicted energy tracks the dissipation envelope tightly. In the extrapolation half the prediction <em>retains its oscillation amplitude</em> instead of continuing to decay — the network has not fully internalised the friction coefficient <code>γ</code> from the finite training trajectory. The 137 % drift is a single-point snapshot at <code>t = 20 s</code>; the figure as a whole is the more honest summary.</div>
+    <div class="chart-container reveal" style="margin-top: 24px;">
+      <div id="chart-pendulum-energy" style="width:100%; height:480px;">
+        <div class="chart-loading">Loading energy curve…</div>
+      </div>
+      <div class="chart-caption"><strong>Fig 4 · Mechanical energy decay.</strong> Pink shading = gap between predicted and true energy. Within the training window the predicted energy tracks the dissipation envelope tightly; in the extrapolation half the prediction <em>retains its oscillation amplitude</em> instead of continuing to decay — the network has not fully internalised the friction coefficient <code>γ</code>. The 137 % drift is a single-point snapshot at <code>t = 20</code>; the curve as a whole is the more honest summary.</div>
     </div>
+
+    <noscript>
+      <div class="results-grid" style="grid-template-columns: 1fr; margin-top: 24px;">
+        <div class="result-figure">
+          <img src="../assets/results/02-pendulum-loss.png" alt="Training loss · pendulum" />
+          <div class="caption">Fig 1 · static fallback (enable JavaScript for interactive charts)</div>
+        </div>
+      </div>
+    </noscript>
   </div>
 </section>
 
@@ -256,20 +273,35 @@
       </div>
     </div>
 
-    <div class="result-figure reveal">
-      <img src="../assets/results/02-lotka-loss.png" alt="Training loss curve for the Lotka-Volterra Neural ODE" />
-      <div class="caption"><strong>Fig 5 · Training loss.</strong> Same curriculum-induced bumps as for the pendulum. The plateau is higher because species amplitudes are an order of magnitude larger — absolute MSE scales with <code>‖y‖²</code>, not with the dimensionless quality of the fit. The relative extrapolation error of 1.6 % is the scale-free version.</div>
+    <div class="chart-container reveal">
+      <div id="chart-lotka-loss" style="width:100%; height:480px;">
+        <div class="chart-loading">Loading training loss…</div>
+      </div>
+      <div class="chart-caption"><strong>Fig 5 · Training loss.</strong> Same curriculum-induced bumps as for the pendulum. The plateau is higher because species amplitudes are an order of magnitude larger — absolute MSE scales with <code>‖y‖²</code>, not with the dimensionless quality of the fit. The relative extrapolation error of 1.6 % is the scale-free version.</div>
     </div>
 
-    <div class="result-figure reveal" style="margin-top: 28px;">
-      <img src="../assets/results/02-lotka-traj.png" alt="Prey and predator trajectories: ground truth vs Neural ODE" />
-      <div class="caption"><strong>Fig 6 · Prey and predator over time.</strong> Cyan = ground truth, dashed purple = Neural ODE, amber band = extrapolation. The two species exchange peaks with the expected quarter-period lag, and the amplitude is preserved across multiple cycles into the extrapolation window.</div>
+    <div class="chart-container reveal" style="margin-top: 24px;">
+      <div id="chart-lotka-traj" style="width:100%; height:560px;">
+        <div class="chart-loading">Loading trajectory…</div>
+      </div>
+      <div class="chart-caption"><strong>Fig 6 · Prey and predator over time.</strong> Prey (top) and predator (bottom). Cyan = ground truth, dashed purple = Neural ODE, amber band = extrapolation. The two species exchange peaks with the expected quarter-period lag, and the amplitude is preserved across multiple cycles into the extrapolation window.</div>
     </div>
 
-    <div class="result-figure reveal" style="margin-top: 28px;">
-      <img src="../assets/results/02-lotka-phase.png" alt="Phase plane: closed orbit on the learned vector field" />
-      <div class="caption"><strong>Fig 7 · Closed orbit and learned field.</strong> The orbit traces the ground-truth loop almost exactly within the training horizon and remains close on the extrapolation half. A correct fit should produce a single closed loop that does not spiral; any ratio mismatch between the four <code>(a, b, c, d)</code> parameters of the true system would manifest as a slow inward or outward drift — quantified by the 7.9 % standard deviation of <code>H</code> along the predicted trajectory.</div>
+    <div class="chart-container reveal" style="margin-top: 24px;">
+      <div id="chart-lotka-phase" style="width:100%; height:600px;">
+        <div class="chart-loading">Loading phase plane…</div>
+      </div>
+      <div class="chart-caption"><strong>Fig 7 · Closed orbit and learned field.</strong> The orbit traces the ground-truth loop almost exactly within the training horizon and remains close on the extrapolation half. A correct fit produces a single closed loop that does not spiral; any ratio mismatch between the four <code>(a, b, c, d)</code> parameters of the true system would manifest as a slow inward or outward drift — quantified by the 7.9 % standard deviation of <code>H</code> along the predicted trajectory.</div>
     </div>
+
+    <noscript>
+      <div class="results-grid" style="grid-template-columns: 1fr; margin-top: 24px;">
+        <div class="result-figure">
+          <img src="../assets/results/02-lotka-phase.png" alt="Phase plane · Lotka-Volterra" />
+          <div class="caption">Fig 7 · static fallback (enable JavaScript for interactive charts)</div>
+        </div>
+      </div>
+    </noscript>
   </div>
 </section>
 
@@ -352,7 +384,7 @@
           <td>Pendulum · rel-err extrap</td>
           <td>scale-free error past <code>T<sub>train</sub></code></td>
           <td>≤ 10 %</td>
-          <td class="check">6.3 % ✓</td>
+          <td class="check">5.4 % ✓</td>
         </tr>
         <tr>
           <td>Pendulum · final |ΔE/E|</td>
@@ -386,7 +418,7 @@
 
     <div class="analysis-callout reveal">
       <h4>1 · Both systems extrapolate within a few percent of the trajectory amplitude</h4>
-      <p>Relative extrapolation error of 6.3 % for the pendulum and 1.6 % for Lotka-Volterra. Closed orbits make Lotka strictly harder per period, but the amplitude is preserved across multiple cycles into the held-out window — the orbit stays bounded despite the network never being told the dynamics are conservative.</p>
+      <p>Relative extrapolation error of 5.4 % for the pendulum and 1.6 % for Lotka-Volterra. Closed orbits make Lotka strictly harder per period, but the amplitude is preserved across multiple cycles into the held-out window — the orbit stays bounded despite the network never being told the dynamics are conservative.</p>
     </div>
 
     <div class="analysis-callout reveal">
@@ -411,5 +443,7 @@
 </footer>
 
 <script src="../assets/portfolio.js"></script>
+<script src="https://cdn.plot.ly/plotly-basic-2.35.0.min.js" charset="utf-8"></script>
+<script src="../assets/charts/02-neural-odes.js" defer></script>
 </body>
 </html>

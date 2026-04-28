@@ -290,11 +290,11 @@
       </a>
 
       <a class="project reveal" href="projects/03-anomaly-detection-api.html">
-        <span class="status planned">Planned</span>
+        <span class="status done">Completed</span>
         <div class="num">03</div>
         <div class="domain">Deep learning · MLOps</div>
         <h3>Anomaly Detection API · Autoencoder + FastAPI + Docker</h3>
-        <p>LSTM autoencoder that detects sensor failures in the NASA Turbofan dataset, served as a REST API with a Streamlit demo. Containerized with Docker for immediate deployment.</p>
+        <p>LSTM autoencoder trained on healthy CMAPSS turbofan windows; reconstruction error becomes the anomaly score, calibrated against a held-out healthy validation set. ROC-AUC 0.969, recall 93.7 % at the q99 threshold. Served as a typed FastAPI service with a Streamlit demo, two-service Docker stack.</p>
         <div class="project-tags">
           <span class="tag">PyTorch</span><span class="tag">FastAPI</span><span class="tag">Docker</span><span class="tag">Streamlit</span><span class="tag">Pandas</span>
         </div>

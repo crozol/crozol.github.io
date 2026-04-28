@@ -28,13 +28,13 @@
     <div class="badges reveal" style="margin-top: 28px;">
       <span class="badge">03 / 05</span>
       <span class="badge domain">Deep learning · MLOps</span>
-      <span class="badge status-planned">Planned</span>
+      <span class="badge status-done">Completed</span>
     </div>
     <h1 class="reveal"><span class="grad">Anomaly Detection API</span><br /><span class="grad">Autoencoder + FastAPI + Docker</span></h1>
-    <p class="tagline reveal">An LSTM autoencoder learns to reconstruct "healthy" multivariate sensor sequences (NASA Turbofan CMAPSS). When given anomalous data, reconstruction error spikes and triggers the alert. All served as a REST API with a Streamlit demo, containerized with Docker.</p>
+    <p class="tagline reveal">An LSTM autoencoder learns to reconstruct healthy multivariate sensor windows from the NASA CMAPSS turbofan dataset. The reconstruction error becomes the anomaly score, calibrated against a held-out healthy validation set, and any window above the threshold is flagged. The trained model is wrapped in a typed FastAPI service, an interactive Streamlit demo, and a two-service Docker stack.</p>
     <div class="cta-row reveal">
       <a href="https://github.com/crozol/03-anomaly-detection-api" class="btn btn-primary" target="_blank" rel="noopener">Code on GitHub →</a>
-      <a href="#" class="btn btn-ghost">Demo (pending)</a>
+      <a href="#results" class="btn btn-ghost">See results</a>
     </div>
   </div>
 </header>
@@ -45,18 +45,71 @@
     <h2 class="reveal">About this project</h2>
     <div class="two-col">
       <div class="reveal">
-        <p>This is the <strong style="color:var(--fg-0)">engineering pivot</strong> of the portfolio. While other projects showcase mathematical depth, this one shows real deployment: public dataset, trained model, documented API, reproducible container, interactive demo.</p>
-        <p>The technique is <strong style="color:var(--fg-0)">reconstruction-based anomaly detection</strong>: train an autoencoder only on normal sequences. When it receives anomalous data, it fails to reconstruct and the peak error rises. Simple, effective, and widely used in industry.</p>
-        <p>Dataset: NASA Turbofan CMAPSS — time series of ~20 jet engine sensors with remaining useful life labels. Public benchmark with reproducible metrics.</p>
+        <p>This is the <strong style="color:var(--fg-0)">engineering pivot</strong> of the portfolio: a model trained on a real public benchmark, calibrated against a held-out set, and exposed through a typed REST API and an interactive demo, all containerised.</p>
+        <p>The core idea is <strong style="color:var(--fg-0)">reconstruction-based anomaly detection</strong>. An LSTM autoencoder is fitted only on healthy sliding windows of the CMAPSS turbofan dataset; at inference time, anomalous windows are reconstructed poorly and the per-window MSE serves as the anomaly score. The decision threshold is the 99th-percentile of the score on a healthy validation set — by construction a <code>1 %</code> false-alarm rate budget on truly healthy data.</p>
+        <p>Engine-wise splits prevent leakage: distinct turbofans feed training, calibration, and evaluation. The test split labels each window <code>anomaly = (RUL ≤ 30)</code> from the run-to-failure ground truth, giving a clean binary task to score against.</p>
       </div>
       <div class="theory-card reveal">
-        <h3>Inference pipeline</h3>
-        <p>Training (normal data only):</p>
-        <div class="formula">min<sub>θ</sub> E [‖x − AE<sub>θ</sub>(x)‖²]</div>
-        <p>Anomaly threshold:</p>
-        <div class="formula">τ = percentile<sub>99</sub>(errors<sub>val</sub>)</div>
-        <p>Production decision:</p>
-        <div class="formula">anomaly = (‖x − AE<sub>θ</sub>(x)‖² &gt; τ)</div>
+        <h3>Core formulas</h3>
+        <p style="margin-top: 0;">Reconstruction-based score:</p>
+        <div class="formula">score(x) = ‖x − D<sub>θ</sub>(E<sub>θ</sub>(x))‖²</div>
+        <p>Training objective (healthy windows only):</p>
+        <div class="formula">min<sub>θ</sub> 𝔼<sub>x∈H</sub>[‖x − D<sub>θ</sub>(E<sub>θ</sub>(x))‖²]</div>
+        <p>Threshold calibration:</p>
+        <div class="formula">τ = quantile<sub>0.99</sub>(score(x), x ∈ val<sub>healthy</sub>)</div>
+        <p>Decision rule:</p>
+        <div class="formula">flag(x) = 1 ⇔ score(x) &gt; τ</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Components</div>
+    <h2 class="reveal">How it's built</h2>
+    <p class="section-intro reveal">Eight pieces connected end-to-end. Each lives in its own module with a dedicated responsibility.</p>
+
+    <div class="two-col">
+      <div class="info-card reveal">
+        <h3>1 · Data pipeline</h3>
+        <p><strong style="color:var(--fg-0)">Goal:</strong> turn the raw CMAPSS .txt files into engine-disjoint train/val/test windows with labels.</p>
+        <p><strong style="color:var(--fg-0)">How:</strong> <code>src/data.py</code> downloads the NASA PCOE archive once, parses 24-column run-to-failure tables, drops the 7 near-constant sensors, builds 30-cycle sliding windows, and fits per-sensor z-score statistics on the healthy training rows only. RUL is annotated automatically; <code>build_dataset</code> returns the three splits plus the binary labels.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>2 · LSTM autoencoder</h3>
+        <p><strong style="color:var(--fg-0)">Goal:</strong> a sequence-to-sequence reconstructor with an explicit information bottleneck.</p>
+        <p><strong style="color:var(--fg-0)">How:</strong> encoder LSTM <code>(14 → 64)</code>, linear bottleneck <code>(64 → 16)</code>, decoder LSTM driven by the bottleneck broadcast across 30 steps, linear head back to 14 channels. <strong>44 510 trainable parameters</strong>. Defined in <code>src/autoencoder.py</code>.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>3 · Training loop</h3>
+        <p><strong style="color:var(--fg-0)">Goal:</strong> fit the autoencoder on healthy windows only, monitor validation, save a portable checkpoint.</p>
+        <p><strong style="color:var(--fg-0)">How:</strong> <code>src/train.py</code> — Adam (<code>lr = 2·10⁻³</code>, weight decay <code>10⁻⁵</code>), cosine LR to zero across 80 epochs, gradient norm clipped at 1.0. The checkpoint persists weights, normalisation stats, and sensor list together so inference never has to re-derive them.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>4 · Threshold + metrics</h3>
+        <p><strong style="color:var(--fg-0)">Goal:</strong> turn the score into a binary decision and quantify it.</p>
+        <p><strong style="color:var(--fg-0)">How:</strong> <code>src/evaluate.py</code> — q99 of the val healthy errors gives <code>τ ≈ 0.5515</code>. Precision, recall, F1, accuracy, full ROC and PR sweeps and the confusion matrix are computed in NumPy (no scikit-learn dependency).</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>5 · FastAPI service</h3>
+        <p><strong style="color:var(--fg-0)">Goal:</strong> a typed inference endpoint with a real OpenAPI spec.</p>
+        <p><strong style="color:var(--fg-0)">How:</strong> <code>src/api.py</code> — <code>lifespan</code> loads the checkpoint and the threshold once at startup. <code>POST /predict</code> validates the window shape with Pydantic, applies the saved normalisation, returns <code>{score, threshold, is_anomaly}</code>. <code>/info</code> exposes metadata, <code>/health</code> for orchestration probes.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>6 · Streamlit demo</h3>
+        <p><strong style="color:var(--fg-0)">Goal:</strong> a minimal but realistic operator UI.</p>
+        <p><strong style="color:var(--fg-0)">How:</strong> <code>src/app_streamlit.py</code> — upload a CSV with the 14 informative sensor columns or pick a built-in CMAPSS test engine. The demo windows the input, scores each one, overlays the flagged regions on the input series, and lists the raw scores in an expander.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>7 · Docker stack</h3>
+        <p><strong style="color:var(--fg-0)">Goal:</strong> one command and the API and demo are running.</p>
+        <p><strong style="color:var(--fg-0)">How:</strong> multi-stage Dockerfile (builder venv with CPU torch wheel + slim Python runtime) plus a docker-compose with a Python-only urllib healthcheck on the API and <code>depends_on: service_healthy</code> on the demo. Image stays under 1 GB; <code>./data/raw</code> is mounted read-only so the built-in engine button works.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>8 · Tests + reproducibility</h3>
+        <p><strong style="color:var(--fg-0)">Goal:</strong> a service that does not regress silently.</p>
+        <p><strong style="color:var(--fg-0)">How:</strong> 5 pytests via FastAPI <code>TestClient</code> cover <code>/health</code>, <code>/info</code>, the 422 on bad shape, a sensible score on a near-zero window, and an obviously broken window flagged. The full pipeline is reproduced by <code>python main.py</code> in ≈ 1 minute on a CPU laptop.</p>
       </div>
     </div>
   </div>
@@ -66,34 +119,35 @@
   <div class="container">
     <div class="section-eyebrow reveal">// Skills demonstrated</div>
     <h2 class="reveal">What skills it certifies</h2>
-
     <div class="skill-matrix reveal" style="margin-bottom: 32px;">
       <div class="skill-name">Applied deep learning</div>
-      <div class="skill-how">LSTM / 1D-CNN autoencoder over multivariate time series with sliding windows.</div>
+      <div class="skill-how">Sequence-to-sequence LSTM autoencoder with explicit linear bottleneck on multivariate time series.</div>
       <div class="skill-name">Feature engineering</div>
-      <div class="skill-how">Per-sensor normalization, windowing, noise filtering, missing value handling.</div>
+      <div class="skill-how">Per-sensor normalisation fitted on healthy rows only, sliding windows, low-variance sensor pruning.</div>
+      <div class="skill-name">Calibration</div>
+      <div class="skill-how">99th-percentile threshold from healthy val errors. ROC + PR sweeps in NumPy without scikit-learn.</div>
       <div class="skill-name">Software engineering</div>
-      <div class="skill-how">FastAPI with typed endpoints via Pydantic, input validation, unit tests with pytest.</div>
-      <div class="skill-name">Containerization</div>
-      <div class="skill-how">Multi-stage Dockerfile + docker-compose orchestrating API and Streamlit demo.</div>
+      <div class="skill-how">Typed FastAPI + Pydantic, <code>lifespan</code>-driven model load, OpenAPI auto-generated.</div>
+      <div class="skill-name">Containerisation</div>
+      <div class="skill-how">Multi-stage Dockerfile, two-service compose, health-conditioned dependency on the API.</div>
       <div class="skill-name">UX / demos</div>
-      <div class="skill-how">Streamlit: user uploads a CSV, the model runs, and the series is visualized with anomaly windows highlighted.</div>
-      <div class="skill-name">Classification metrics</div>
-      <div class="skill-how">Precision, recall, F1, ROC-AUC against the CMAPSS benchmark labels.</div>
+      <div class="skill-how">Streamlit upload + built-in engine flow with metric tiles and inline overlays.</div>
+      <div class="skill-name">Tests</div>
+      <div class="skill-how">FastAPI <code>TestClient</code> contract tests covering shape validation and the anomalous-input path.</div>
       <div class="skill-name">Documentation</div>
-      <div class="skill-how">OpenAPI (auto-generated by FastAPI), README with curl examples and demo screenshot.</div>
+      <div class="skill-how">Lab-guide README, JSON metrics summary, machine-readable eval report.</div>
     </div>
 
     <div class="skill-chip-row reveal">
       <span class="skill-chip">PyTorch</span>
       <span class="skill-chip">FastAPI</span>
       <span class="skill-chip">Uvicorn</span>
+      <span class="skill-chip">Pydantic</span>
+      <span class="skill-chip">Streamlit</span>
       <span class="skill-chip">Docker</span>
       <span class="skill-chip">docker-compose</span>
-      <span class="skill-chip">Streamlit</span>
       <span class="skill-chip">Pandas</span>
-      <span class="skill-chip">scikit-learn</span>
-      <span class="skill-chip">Pydantic</span>
+      <span class="skill-chip">Matplotlib</span>
       <span class="skill-chip">pytest</span>
     </div>
   </div>
@@ -104,18 +158,25 @@
     <div class="section-eyebrow reveal">// Structure</div>
     <h2 class="reveal">Project organization</h2>
     <pre class="code-tree reveal"><span class="folder">03-anomaly-detection-api/</span>
-├── <span class="file">README.md</span>
+├── <span class="file">README.md</span>             <span class="comment"># lab-guide README, embedded figures</span>
 ├── <span class="file">requirements.txt</span>
-├── <span class="file">Dockerfile</span>          <span class="comment"># multi-stage: build + slim runtime</span>
-├── <span class="file">docker-compose.yml</span>  <span class="comment"># orchestrates API + Streamlit</span>
+├── <span class="file">Dockerfile</span>            <span class="comment"># builder venv + slim runtime</span>
+├── <span class="file">docker-compose.yml</span>    <span class="comment"># api (:8000) + demo (:8501) with healthcheck</span>
+├── <span class="file">main.py</span>               <span class="comment"># end-to-end pipeline</span>
 ├── <span class="folder">src/</span>
-│   ├── <span class="file">autoencoder.py</span>  <span class="comment"># LSTM autoencoder model</span>
-│   ├── <span class="file">data.py</span>         <span class="comment"># CMAPSS loading + preprocessing</span>
-│   ├── <span class="file">train.py</span>        <span class="comment"># training loop</span>
-│   ├── <span class="file">api.py</span>          <span class="comment"># FastAPI: POST /predict</span>
-│   └── <span class="file">app_streamlit.py</span> <span class="comment"># visual demo</span>
+│   ├── <span class="file">data.py</span>           <span class="comment"># CMAPSS download + windows + splits</span>
+│   ├── <span class="file">autoencoder.py</span>    <span class="comment"># LSTMAutoencoder + AEConfig</span>
+│   ├── <span class="file">train.py</span>          <span class="comment"># training loop + checkpoint I/O</span>
+│   ├── <span class="file">evaluate.py</span>       <span class="comment"># threshold, metrics, ROC/PR (numpy)</span>
+│   ├── <span class="file">plots.py</span>          <span class="comment"># dark-theme static figures</span>
+│   ├── <span class="file">api.py</span>            <span class="comment"># FastAPI service</span>
+│   └── <span class="file">app_streamlit.py</span>  <span class="comment"># interactive demo</span>
+├── <span class="folder">scripts/</span>
+│   ├── <span class="file">export_json.py</span>    <span class="comment"># arrays → JSON for this page</span>
+│   └── <span class="file">demo_preview.py</span>   <span class="comment"># static replica of the demo</span>
 ├── <span class="folder">tests/</span>
-└── <span class="folder">notebooks/</span></pre>
+│   └── <span class="file">test_api.py</span>       <span class="comment"># 5 contract tests via TestClient</span>
+└── <span class="folder">figures/</span>             <span class="comment"># tracked PNGs embedded in the README</span></pre>
   </div>
 </section>
 
@@ -124,47 +185,94 @@
     <div class="section-eyebrow reveal">// Roadmap</div>
     <h2 class="reveal">Project status</h2>
     <ul class="roadmap reveal">
-      <li>Download CMAPSS dataset and write preprocessing pipeline</li>
-      <li>Implement LSTM autoencoder and train only on "healthy" sequences</li>
-      <li>Determine anomaly threshold (99th percentile of validation error)</li>
-      <li>Evaluate against real labels: precision, recall, F1, ROC-AUC</li>
-      <li>FastAPI <code>/predict</code> endpoint with Pydantic validation</li>
-      <li>Streamlit demo with CSV upload and anomaly visualization</li>
-      <li>Dockerfile + docker-compose for one-command deployment</li>
-      <li>README with curl examples, screenshots, and final metrics</li>
+      <li class="done">CMAPSS FD001 download + preprocessing pipeline (sensor selection, normalisation, sliding windows)</li>
+      <li class="done">LSTM autoencoder (44 510 params) trained on healthy windows only — 80 epochs, ~46 s on CPU</li>
+      <li class="done">Threshold calibration on the healthy validation distribution (q99 ≈ 0.551)</li>
+      <li class="done">Binary-classification metrics: precision, recall, F1, ROC-AUC, PR-AUC, confusion matrix</li>
+      <li class="done">Polished figures in the dark portfolio palette (sensors, loss, error histograms, ROC, confusion, per-engine trajectory, demo preview)</li>
+      <li class="done">FastAPI service (<code>/health</code>, <code>/info</code>, <code>/predict</code>) with Pydantic validation and lifespan model load</li>
+      <li class="done">Streamlit demo: CSV upload + built-in test engine, score/threshold chart, sensor traces, raw-score table</li>
+      <li class="done">Multi-stage Dockerfile + docker-compose with health-conditioned demo</li>
+      <li class="done">5 pytest contract tests via FastAPI <code>TestClient</code></li>
+      <li class="done">Lab-guide README with all figures, references, and reproduction commands</li>
     </ul>
   </div>
 </section>
 
-<section class="content-section">
+<section class="content-section" id="results">
   <div class="container">
-    <div class="section-eyebrow reveal">// Metrics</div>
-    <h2 class="reveal">Success criteria</h2>
-    <div class="two-col">
-      <div class="info-card reveal">
-        <h3>Model</h3>
-        <p>ROC-AUC &gt; 0.9 on failure detection.</p>
-        <p style="margin-bottom:0;">Precision @ recall 0.9 &gt; 0.7 (few false alarms).</p>
+    <div class="section-eyebrow reveal">// Results</div>
+    <h2 class="reveal">Outputs and final metrics</h2>
+    <p class="section-intro reveal">Engine-disjoint splits on CMAPSS FD001: train/val on engines 1-80 (healthy windows only), test on engines 81-100 (all windows, labelled <code>anomaly = RUL ≤ 30</code>). Hover any chart for values, zoom with the toolbar, toggle traces in the legend.</p>
+
+    <div class="results-grid reveal" style="margin-bottom: 28px;">
+      <div class="result-metric">
+        <div class="value">0.969</div>
+        <div class="label">ROC-AUC on the test split · score-only ranking quality</div>
       </div>
-      <div class="info-card reveal">
-        <h3>Product</h3>
-        <p>One <code>docker-compose up</code> command runs API + demo.</p>
-        <p style="margin-bottom:0;">API auto-documented at <code>/docs</code>, latency &lt; 200 ms per prediction.</p>
+      <div class="result-metric">
+        <div class="value">93.7 %</div>
+        <div class="label">recall at the calibrated threshold · 581/620 anomalous windows caught</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">60.8 %</div>
+        <div class="label">precision · the bulk of false alarms is concentrated in the early-degradation phase</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">0.551</div>
+        <div class="label">decision threshold · q99 of the healthy validation reconstruction error</div>
       </div>
     </div>
+
+    <div class="chart-container reveal">
+      <div id="chart-loss" style="width:100%; height:420px;">
+        <div class="chart-loading">Loading training loss…</div>
+      </div>
+      <div class="chart-caption"><strong>Fig 1 · Training and validation loss.</strong> Reconstruction MSE on healthy CMAPSS windows, log-y. Training and validation tracks each other tightly across all 80 epochs — the small final gap (<code>train 0.447</code>, <code>val 0.456</code>) is consistent with a model that has captured a generic healthy manifold rather than memorising specific training trajectories.</div>
+    </div>
+
+    <div class="chart-container reveal" style="margin-top: 24px;">
+      <div id="chart-histograms" style="width:100%; height:460px;">
+        <div class="chart-loading">Loading score distributions…</div>
+      </div>
+      <div class="chart-caption"><strong>Fig 2 · Reconstruction error · healthy vs anomalous.</strong> Per-window MSE on the test split (log-y). Healthy windows (cyan) sit in a tight peak around 0.5; anomalous windows (amber) develop a long tail past MSE = 10. The threshold (pink dashed) cuts the tail off the healthy bulk almost exactly at the 99th-percentile of the healthy validation distribution.</div>
+    </div>
+
+    <div class="chart-container reveal" style="margin-top: 24px;">
+      <div id="chart-roc" style="width:100%; height:520px;">
+        <div class="chart-loading">Loading ROC curve…</div>
+      </div>
+      <div class="chart-caption"><strong>Fig 3 · ROC and operating point.</strong> Full sweep of threshold values; the q99 calibration sits on the steep upper-left of the curve at <code>FPR ≈ 0.11</code>, <code>TPR ≈ 0.94</code>. AUC of <code>0.969</code> means the score itself ranks anomalous windows above healthy ones almost perfectly — the operating point is just where one decides to cut.</div>
+    </div>
+
+    <div class="chart-container reveal" style="margin-top: 24px;">
+      <div id="chart-engine" style="width:100%; height:460px;">
+        <div class="chart-loading">Loading engine trajectory…</div>
+      </div>
+      <div class="chart-caption"><strong>Fig 4 · Per-engine reconstruction trajectory.</strong> Reconstruction MSE along one test engine's full life. A long flat segment at the healthy floor (≈ 0.45), an early-degradation deflection around RUL ≈ 50, and a near-exponential blow-up inside the labelled anomaly band (<code>RUL ≤ 30</code>). The deflection-before-the-band phase is the source of most false positives — and the most useful behaviour for a maintenance-scheduling use case.</div>
+    </div>
+
+    <noscript>
+      <div class="results-grid" style="grid-template-columns: 1fr; margin-top: 24px;">
+        <div class="result-figure">
+          <img src="../assets/results/03-roc.png" alt="ROC curve · CMAPSS FD001" />
+          <div class="caption">Static fallback (enable JavaScript for interactive charts)</div>
+        </div>
+      </div>
+    </noscript>
   </div>
 </section>
 
 <section class="content-section">
   <div class="container">
-    <div class="section-eyebrow reveal">// Results</div>
-    <h2 class="reveal">Outputs and final metrics</h2>
-    <p class="section-intro reveal">Model metrics, demo screenshot, and deployment artifacts.</p>
-
-    <div class="result-empty reveal">
-      <div class="big">Pending</div>
-      <p>No results published yet.</p>
-      <p class="hint">What goes here: Streamlit demo screenshot, ROC curve, confusion matrix, metrics (precision / recall / AUC) and a link to the deployed API.</p>
+    <div class="section-eyebrow reveal">// Demo preview</div>
+    <h2 class="reveal">What the Streamlit demo shows</h2>
+    <p class="section-intro reveal">A static replica of the demo running on test engine #95: 72 of 254 windows flagged, exactly aligned with the failure tail. The deployed Streamlit app takes the same path on any uploaded CSV with the 14 informative sensor columns.</p>
+    <div class="results-grid" style="grid-template-columns: 1fr; margin-top: 12px;">
+      <div class="result-figure reveal">
+        <img src="../assets/results/03-demo.png" alt="Streamlit demo preview · engine 95" />
+        <div class="caption">Sensors on top with the flagged window region shaded in amber; reconstruction score on the bottom with the calibrated threshold drawn.</div>
+      </div>
     </div>
   </div>
 </section>
@@ -177,5 +285,7 @@
 </footer>
 
 <script src="../assets/portfolio.js"></script>
+<script src="https://cdn.plot.ly/plotly-basic-2.35.0.min.js" charset="utf-8"></script>
+<script src="../assets/charts/03-anomaly.js" defer></script>
 </body>
 </html>

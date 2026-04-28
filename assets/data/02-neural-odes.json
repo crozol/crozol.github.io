@@ -1,0 +1,31 @@
+{
+  "generated_at": "2026-04-27T18:30:00",
+  "experiments": {
+    "damped_pendulum": {
+      "n_params": 19106,
+      "epochs": 2500,
+      "elapsed_s": 540.0,
+      "final_train_loss": 1.516553e-4,
+      "mse_train": 1.353e-4,
+      "mse_extrap": 1.582e-2,
+      "rel_err_extrap": 0.0629,
+      "energy_drift_final": 1.3715,
+      "t_train_max": 12.0,
+      "t_full_max": 20.0,
+      "noise_obs": 0.005
+    },
+    "lotka_volterra": {
+      "n_params": 19106,
+      "epochs": 2000,
+      "elapsed_s": 773.98,
+      "final_train_loss": 6.087e-3,
+      "mse_train": 5.565e-3,
+      "mse_extrap": 4.697e-2,
+      "rel_err_extrap": 0.01585,
+      "invariant_drift_relative": 0.07888,
+      "t_train_max": 12.0,
+      "t_full_max": 22.0,
+      "noise_obs": 0.03
+    }
+  }
+}

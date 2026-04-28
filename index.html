@@ -278,11 +278,11 @@
       </a>
 
       <a class="project reveal" href="projects/02-neural-odes.html">
-        <span class="status planned">Planned</span>
+        <span class="status done">Completed</span>
         <div class="num">02</div>
         <div class="domain">Deep learning · Dynamical systems</div>
         <h3>Neural ODEs for dynamical systems</h3>
-        <p>Neural network that learns the vector field of a damped pendulum or Lotka-Volterra system from observed trajectories, using differentiable integrators.</p>
+        <p>An MLP parametrises the right-hand side of an ODE and is integrated end-to-end with a differentiable Dormand-Prince solver. Learns the vector field of a damped pendulum and a Lotka-Volterra system from short noisy trajectories, then is rolled forward beyond the training horizon to test extrapolation.</p>
         <div class="project-tags">
           <span class="tag">PyTorch</span><span class="tag">torchdiffeq</span><span class="tag">ODEs</span><span class="tag">Autograd</span>
         </div>

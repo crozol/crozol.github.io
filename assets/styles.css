@@ -168,22 +168,31 @@ section .section-eyebrow {
 section .section-eyebrow::before { content: "//"; color: var(--accent-3); }
 section .section-intro { color: var(--fg-1); max-width: 680px; font-size: 1.05rem; margin-bottom: 56px; }
 
-/* Balanced text mode (opt-in via body class). Centres and justifies long
-   paragraphs so they don't sit against the left edge of the 1180 px
-   container with an empty right-hand half on wide screens. Applies only
-   to introductory / explanatory paragraphs, not to grids or layout
-   elements. Title alignment stays left so sections still feel anchored. */
-body.text-balanced section .section-intro {
-  margin-inline: auto;
-  text-align: justify;
-  text-justify: inter-word;
-  hyphens: auto;
-}
+/* Balanced text mode (opt-in via body class). Two complementary moves:
+   (1) every long paragraph (hero tagline, section intros, callout body
+   copy) gets a justified right edge — no more ragged-right on wide
+   screens; (2) sections that pair an intro paragraph with a multi-column
+   layout below (info-cards, skill-matrix, results-grid, skills-grid)
+   shrink their container to 1040 px and pull the intro flush-left, so
+   the intro and the cards share the same horizontal column instead of a
+   narrow centred intro hovering above wide cards. Hero, code-tree, prose
+   sections without multi-column layout keep the original 1180 px
+   container — only their text justification changes. */
+
 body.text-balanced .detail-hero .tagline,
+body.text-balanced section .section-intro,
 body.text-balanced .analysis-callout p {
   text-align: justify;
   text-justify: inter-word;
   hyphens: auto;
+}
+
+body.text-balanced .content-section:has(.two-col, .skill-matrix, .results-grid, .skills-grid) > .container {
+  width: min(1040px, 92%);
+}
+body.text-balanced .content-section:has(.two-col, .skill-matrix, .results-grid, .skills-grid) .section-intro {
+  margin-inline: 0;
+  max-width: 820px;
 }
 
 /* About / stats */

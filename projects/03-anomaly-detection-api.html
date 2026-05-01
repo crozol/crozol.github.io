@@ -33,7 +33,8 @@
     <h1 class="reveal"><span class="grad">Anomaly Detection API</span><br /><span class="grad">Autoencoder + FastAPI + Docker</span></h1>
     <p class="tagline reveal">An LSTM autoencoder learns to reconstruct healthy multivariate sensor windows from the NASA CMAPSS turbofan dataset. The reconstruction error becomes the anomaly score, calibrated against a held-out healthy validation set, and any window above the threshold is flagged. The trained model is wrapped in a typed FastAPI service, an interactive Streamlit demo, and a two-service Docker stack.</p>
     <div class="cta-row reveal">
-      <a href="https://github.com/crozol/03-anomaly-detection-api" class="btn btn-primary" target="_blank" rel="noopener">Code on GitHub →</a>
+      <a href="#live-demo" class="btn btn-primary">Try the live demo ↓</a>
+      <a href="https://github.com/crozol/03-anomaly-detection-api" class="btn btn-ghost" target="_blank" rel="noopener">Code on GitHub →</a>
       <a href="#results" class="btn btn-ghost">See results</a>
     </div>
   </div>
@@ -45,7 +46,7 @@
     <h2 class="reveal">About this project</h2>
     <div class="two-col">
       <div class="reveal">
-        <p>This is the <strong style="color:var(--fg-0)">engineering pivot</strong> of the portfolio: a model trained on a real public benchmark, calibrated against a held-out set, and exposed through a typed REST API and an interactive demo, all containerised.</p>
+        <p>The project pairs a model trained on a real public benchmark with the deployment artefacts around it: a typed REST API, an interactive Streamlit demo, and a two-service Docker stack.</p>
         <p>The core idea is <strong style="color:var(--fg-0)">reconstruction-based anomaly detection</strong>. An LSTM autoencoder is fitted only on healthy sliding windows of the CMAPSS turbofan dataset; at inference time, anomalous windows are reconstructed poorly and the per-window MSE serves as the anomaly score. The decision threshold is the 99th-percentile of the score on a healthy validation set — by construction a <code>1 %</code> false-alarm rate budget on truly healthy data.</p>
         <p>Engine-wise splits prevent leakage: distinct turbofans feed training, calibration, and evaluation. The test split labels each window <code>anomaly = (RUL ≤ 30)</code> from the run-to-failure ground truth, giving a clean binary task to score against.</p>
       </div>
@@ -263,17 +264,37 @@
   </div>
 </section>
 
-<section class="content-section">
+<section class="content-section" id="live-demo">
   <div class="container">
-    <div class="section-eyebrow reveal">// Demo preview</div>
-    <h2 class="reveal">What the Streamlit demo shows</h2>
-    <p class="section-intro reveal">A static replica of the demo running on test engine #95: 72 of 254 windows flagged, exactly aligned with the failure tail. The deployed Streamlit app takes the same path on any uploaded CSV with the 14 informative sensor columns.</p>
-    <div class="results-grid" style="grid-template-columns: 1fr; margin-top: 12px;">
-      <div class="result-figure reveal">
-        <img src="../assets/results/03-demo.png" alt="Streamlit demo preview · engine 95" />
-        <div class="caption">Sensors on top with the flagged window region shaded in amber; reconstruction score on the bottom with the calibrated threshold drawn.</div>
-      </div>
+    <div class="section-eyebrow reveal">// Live demo</div>
+    <h2 class="reveal">Run the model in your browser</h2>
+    <p class="section-intro reveal">The trained autoencoder is deployed as an interactive Streamlit app on Hugging Face Spaces. Click <strong style="color:var(--fg-0)">Use a built-in CMAPSS engine</strong> inside the demo to score a random engine from the held-out test split, or upload a CSV with the 14 informative sensor columns. The demo windows the input, scores each window, and overlays the flagged regions on the input series.</p>
+    <div class="cta-row reveal" style="margin: 12px 0 24px;">
+      <a href="https://huggingface.co/spaces/crozol/cmapss-anomaly-detector" class="btn btn-primary" target="_blank" rel="noopener">Open in new tab ↗</a>
+      <a href="https://github.com/crozol/03-anomaly-detection-api" class="btn btn-ghost" target="_blank" rel="noopener">Source code →</a>
     </div>
+    <div class="reveal" style="border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg-1);">
+      <iframe
+        src="https://crozol-cmapss-anomaly-detector.hf.space"
+        title="CMAPSS Anomaly Detector — live Streamlit demo"
+        loading="lazy"
+        width="100%"
+        height="780"
+        frameborder="0"
+        style="display: block; border: 0;"
+        allow="fullscreen"
+      ></iframe>
+    </div>
+    <p class="caption reveal" style="margin-top: 12px;">First load can take 20–40 s while the Hugging Face Space cold-starts; subsequent interactions are instant. If the iframe is blocked by your browser, use the <a href="https://huggingface.co/spaces/crozol/cmapss-anomaly-detector" target="_blank" rel="noopener">Open in new tab</a> link above.</p>
+
+    <noscript>
+      <div class="results-grid" style="grid-template-columns: 1fr; margin-top: 24px;">
+        <div class="result-figure">
+          <img src="../assets/results/03-demo.png" alt="Streamlit demo preview · engine 95" />
+          <div class="caption">Static fallback: a replica of the demo on test engine #95 — 72 of 254 windows flagged, exactly aligned with the failure tail. Enable JavaScript and iframes for the interactive version.</div>
+        </div>
+      </div>
+    </noscript>
   </div>
 </section>
 

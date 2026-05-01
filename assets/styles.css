@@ -218,6 +218,10 @@ section .section-intro { color: var(--fg-1); max-width: 680px; font-size: 1.05re
   padding: 4px 10px; border-radius: 999px;
   background: rgba(255,255,255,0.04); border: 1px solid var(--border);
 }
+.tag.tag-live {
+  color: #34d399; border-color: rgba(52,211,153,0.45);
+  background: rgba(52,211,153,0.08); font-weight: 600;
+}
 
 /* Project grid (index) */
 .projects-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }

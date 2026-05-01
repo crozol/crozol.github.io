@@ -168,6 +168,24 @@ section .section-eyebrow {
 section .section-eyebrow::before { content: "//"; color: var(--accent-3); }
 section .section-intro { color: var(--fg-1); max-width: 680px; font-size: 1.05rem; margin-bottom: 56px; }
 
+/* Balanced text mode (opt-in via body class). Centres and justifies long
+   paragraphs so they don't sit against the left edge of the 1180 px
+   container with an empty right-hand half on wide screens. Applies only
+   to introductory / explanatory paragraphs, not to grids or layout
+   elements. Title alignment stays left so sections still feel anchored. */
+body.text-balanced section .section-intro {
+  margin-inline: auto;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+}
+body.text-balanced .detail-hero .tagline,
+body.text-balanced .analysis-callout p {
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+}
+
 /* About / stats */
 .about-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 40px; align-items: start; }
 @media (max-width: 880px) { .about-grid { grid-template-columns: 1fr; } }

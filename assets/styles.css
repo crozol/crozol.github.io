@@ -187,10 +187,10 @@ body.text-balanced .analysis-callout p {
   hyphens: auto;
 }
 
-body.text-balanced .content-section:has(.two-col, .skill-matrix, .results-grid, .skills-grid) > .container {
+body.text-balanced .content-section:has(.two-col, .skill-matrix, .results-grid, .skills-grid, .analysis-callout) > .container {
   width: min(1040px, 92%);
 }
-body.text-balanced .content-section:has(.two-col, .skill-matrix, .results-grid, .skills-grid) .section-intro {
+body.text-balanced .content-section:has(.two-col, .skill-matrix, .results-grid, .skills-grid, .analysis-callout) .section-intro {
   margin-inline: 0;
   max-width: 820px;
 }

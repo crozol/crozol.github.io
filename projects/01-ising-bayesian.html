@@ -94,7 +94,7 @@
       <div class="info-card reveal">
         <h3>4 · NUTS sampling</h3>
         <p><strong style="color:var(--fg-0)">Config:</strong> 4 chains × (1000 tune + 5000 draws) = 20 000 posterior samples, <code>target_accept=0.9</code>.</p>
-        <p><strong style="color:var(--fg-0)">Output:</strong> the full joint posterior <code>P(Tc, β, σ | data)</code> — distributions, not point estimates. Convergence checks via ArviZ: <code>R̂ &#8818; 1.03</code>; ESS is a few hundred for <code>Tc</code> and <code>σ</code> and ≈ 150–200 for the slower-mixing <code>β</code>.</p>
+        <p><strong style="color:var(--fg-0)">Output:</strong> the full joint posterior <code>P(Tc, β, σ | data)</code> — distributions, not point estimates. Convergence checks via ArviZ: <code>R̂ ≤ 1.01</code>; ESS is a few hundred for every parameter (≈ 770 for <code>Tc</code>, ≈ 740 for <code>σ</code>, ≈ 300 for the slower-mixing <code>β</code>).</p>
       </div>
       <div class="info-card reveal">
         <h3>5 · Validation against Onsager</h3>
@@ -203,20 +203,20 @@
     <!-- Headline metrics -->
     <div class="results-grid reveal" style="margin-bottom: 28px;">
       <div class="result-metric">
-        <div class="value">Tc = 2.371 ± 0.034</div>
+        <div class="value">Tc = 2.363 ± 0.027</div>
         <div class="label">Onsager exact: 2.2692 · shift is a finite-size effect on 32×32</div>
       </div>
       <div class="result-metric">
-        <div class="value">β = 0.093 ± 0.023</div>
+        <div class="value">β = 0.090 ± 0.020</div>
         <div class="label">exact 1/8 = 0.125 · 95% HDI brackets the exact value</div>
       </div>
       <div class="result-metric">
-        <div class="value">R̂ ≤ 1.03</div>
+        <div class="value">R̂ ≤ 1.01</div>
         <div class="label">Gelman-Rubin across all parameters — converged</div>
       </div>
       <div class="result-metric">
-        <div class="value">ESS_bulk ≈ 150–200 (β)</div>
-        <div class="label">β is the slowest-mixing parameter; Tc and σ clear a few hundred</div>
+        <div class="value">ESS_bulk ≥ 297</div>
+        <div class="label">β is the slowest-mixing parameter; Tc and σ clear ~750</div>
       </div>
     </div>
 

@@ -92,8 +92,8 @@
         <p><strong style="color:var(--fg-0)">Likelihood:</strong> <code>M_obs ~ Normal((1 − T/Tc)^β, σ)</code> when <code>T &lt; Tc</code>; exactly 0 above. The piecewise form captures the broken-symmetry ordered phase.</p>
       </div>
       <div class="info-card reveal">
-        <h3>4 · NUTS sampling</h3>
-        <p><strong style="color:var(--fg-0)">Config:</strong> 4 chains × (1000 tune + 5000 draws) = 20 000 posterior samples, <code>target_accept=0.9</code>.</p>
+        <h3>4 · MCMC sampling</h3>
+        <p><strong style="color:var(--fg-0)">Config:</strong> 4 chains × (1000 tune + 5000 draws) = 20 000 posterior samples, drawn by the default random-walk Metropolis-Hastings sampler (NumPy); a PyMC NUTS backend is also available.</p>
         <p><strong style="color:var(--fg-0)">Output:</strong> the full joint posterior <code>P(Tc, β, σ | data)</code> — distributions, not point estimates. Convergence checks via ArviZ: <code>R̂ ≤ 1.01</code>; ESS is a few hundred for every parameter (≈ 770 for <code>Tc</code>, ≈ 740 for <code>σ</code>, ≈ 300 for the slower-mixing <code>β</code>).</p>
       </div>
       <div class="info-card reveal">
@@ -128,7 +128,7 @@
       <div class="skill-how">Metropolis-Hastings with periodic boundaries and separated thermalization + measurement.</div>
       <div class="skill-name">Bayesian inference</div>
       <div class="skill-how">PyMC model with Normal/HalfNormal priors and Gaussian likelihood over the power law.</div>
-      <div class="skill-name">MCMC (NUTS)</div>
+      <div class="skill-name">MCMC (MH + NUTS)</div>
       <div class="skill-how">Sampling of 4 chains × 5000 draws with R̂, ESS, and trace plot diagnostics via ArviZ.</div>
       <div class="skill-name">Technical visualization</div>
       <div class="skill-how">M(T) curve with errors, posteriors with exact values overlaid, convergence trace plots.</div>

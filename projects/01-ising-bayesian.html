@@ -33,7 +33,8 @@
     <h1 class="reveal"><span class="grad">Bayesian Inference on the 2D Ising Model</span></h1>
     <p class="tagline reveal">A pipeline that simulates the Ising spin lattice with Monte Carlo, infers the critical temperature and the critical exponent via MCMC in PyMC, and validates results against the exact Onsager (1944) solution.</p>
     <div class="cta-row reveal">
-      <a href="https://github.com/crozol/01-ising-bayesian" class="btn btn-primary" target="_blank" rel="noopener">Code on GitHub →</a>
+      <a href="#live-demo" class="btn btn-primary">Try the live demo ↓</a>
+      <a href="https://github.com/crozol/01-ising-bayesian" class="btn btn-ghost" target="_blank" rel="noopener">Code on GitHub →</a>
       <a href="#results" class="btn btn-ghost">See results</a>
     </div>
   </div>
@@ -384,6 +385,40 @@
       <p>All four chains reach R̂ ≤ 1.02 with ESS above 200. The trace plots (Fig 3) show no drift, no stuck regions, and good mixing across chains. Acceptance rates sit in the 31–35% band — right in the optimal range for random-walk Metropolis in 3 dimensions. If any of this failed, none of the posterior numbers above would be trustworthy.</p>
     </div>
 
+  </div>
+</section>
+
+<section class="content-section" id="live-demo">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Live demo</div>
+    <h2 class="reveal">Run the simulation in your browser</h2>
+    <p class="section-intro reveal">The Monte Carlo half of this project, made interactive. The same Numba-accelerated Metropolis sampler runs live as a Streamlit app on Hugging Face Spaces — nothing is pre-computed. Set a <strong style="color:var(--fg-0)">temperature</strong> and a <strong style="color:var(--fg-0)">lattice size</strong> and watch the spins settle into an ordered or disordered phase; then sample several temperatures with <strong style="color:var(--fg-0)">Add point to M(T)</strong> and trace the magnetization collapsing across the Onsager critical temperature <code>Tc ≈ 2.269</code>.</p>
+    <div class="cta-row reveal" style="margin: 12px 0 24px;">
+      <a href="https://huggingface.co/spaces/crozol/ising-bayesian-demo" class="btn btn-primary" target="_blank" rel="noopener">Open in new tab ↗</a>
+      <a href="https://github.com/crozol/01-ising-bayesian" class="btn btn-ghost" target="_blank" rel="noopener">Source code →</a>
+    </div>
+    <div class="reveal" style="border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg-1);">
+      <iframe
+        src="https://crozol-ising-bayesian-demo.hf.space"
+        title="2D Ising · Monte Carlo explorer — live Streamlit demo"
+        loading="lazy"
+        width="100%"
+        height="820"
+        frameborder="0"
+        style="display: block; border: 0;"
+        allow="fullscreen"
+      ></iframe>
+    </div>
+    <p class="caption reveal" style="margin-top: 12px;">First load can take 20–40 s while the Hugging Face Space cold-starts, plus a one-time Numba compilation on the first simulation; subsequent interactions are fast. If the iframe is blocked by your browser, use the <a href="https://huggingface.co/spaces/crozol/ising-bayesian-demo" target="_blank" rel="noopener">Open in new tab</a> link above.</p>
+
+    <noscript>
+      <div class="results-grid" style="grid-template-columns: 1fr; margin-top: 24px;">
+        <div class="result-figure">
+          <img src="../assets/results/01-snapshots.png" alt="2D Ising equilibrium configurations — static preview" />
+          <div class="caption">Static fallback: two equilibrium lattices, one ordered and one disordered. Enable JavaScript and iframes for the interactive simulator.</div>
+        </div>
+      </div>
+    </noscript>
   </div>
 </section>
 

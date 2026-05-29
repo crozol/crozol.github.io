@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Key results · Camilo Rozo</title>
+<meta name="description" content="Headline results from Camilo Rozo's portfolio projects — Bayesian inference on the 2D Ising model, Neural ODEs with a Hamiltonian prior, and reconstruction-based anomaly detection on NASA CMAPSS." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
+<link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+
+<script>
+  window.PORTFOLIO = {
+    fullName: "Camilo Rozo",
+    title: "Machine Learning Engineer",
+    github: "https://github.com/crozol",
+    linkedin: "https://www.linkedin.com/in/camilo-a-rozo-l/",
+    email: "rozol.ca555@gmail.com"
+  };
+</script>
+
+<div class="bg-stage"></div>
+<div class="bg-grid"></div>
+<div class="bg-noise"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<nav class="topnav">
+  <a href="index.html" class="brand">// CAMILO ROZO</a>
+  <ul>
+    <li><a class="menu" href="index.html#about">About</a></li>
+    <li><a class="menu" href="index.html#experience">Experience</a></li>
+    <li><a class="menu" href="index.html#projects">Projects</a></li>
+    <li><a class="menu" href="results.html">Results</a></li>
+    <li><a class="menu" href="index.html#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<header class="detail-hero">
+  <div class="container">
+    <a href="index.html#projects" class="back-link reveal">← Back to home</a>
+    <div class="badges reveal" style="margin-top: 28px;">
+      <span class="badge">Portfolio</span>
+      <span class="badge domain">Headline numbers · 3 completed projects</span>
+    </div>
+    <h1 class="reveal"><span class="grad">Key results</span></h1>
+    <p class="tagline reveal">The headline numbers from each completed project, side by side with the exact benchmark it was validated against. Every figure here matches the project's repository; click through for the full method, interactive figures and the live demo.</p>
+  </div>
+</header>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">01 · Statistical mechanics · Bayesian</div>
+    <h2 class="reveal">Bayesian inference on the 2D Ising model</h2>
+    <p class="section-intro reveal">Simulate a lattice of spins with Metropolis Monte Carlo, then infer the critical temperature and critical exponent with MCMC — validated against the exact Onsager (1944) solution.</p>
+
+    <div class="results-grid reveal" style="margin-bottom: 22px;">
+      <div class="result-metric">
+        <div class="value">Tc = 2.371 ± 0.034</div>
+        <div class="label">critical temperature · Onsager exact 2.2692; the upward shift is the finite-size effect on a 32×32 lattice</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">β = 0.093 ± 0.023</div>
+        <div class="label">critical exponent · the 95% HDI brackets the exact universal value 1/8 = 0.125</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">R̂ ≤ 1.03</div>
+        <div class="label">Gelman-Rubin across all parameters — the sampler converged</div>
+      </div>
+    </div>
+
+    <div class="cta-row reveal">
+      <a href="projects/01-ising-bayesian.html" class="btn btn-primary">View details →</a>
+      <a href="https://github.com/crozol/01-ising-bayesian" class="btn btn-ghost" target="_blank" rel="noopener">Code on GitHub →</a>
+      <a href="https://huggingface.co/spaces/crozol/ising-bayesian-demo" class="btn btn-ghost" target="_blank" rel="noopener">Live demo ↗</a>
+    </div>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">02 · Deep learning · Dynamical systems</div>
+    <h2 class="reveal">Neural ODEs with a Hamiltonian prior</h2>
+    <p class="section-intro reveal">Learn the right-hand side of conservative ODEs from short noisy trajectories. A Hamiltonian Neural Network encodes the symplectic structure, so it conserves the invariant <code>H</code> by construction where an unconstrained MLP drifts (5-seed error bars).</p>
+
+    <div class="results-grid reveal" style="margin-bottom: 22px;">
+      <div class="result-metric">
+        <div class="value">9.0 ± 3.3 % → 2.4 %</div>
+        <div class="label">invariant-<code>H</code> drift on Lotka-Volterra · unconstrained MLP → Hamiltonian NN, same parameter budget</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">0.96 ± 0.57 %</div>
+        <div class="label">relative extrapolation error past the training window (Lotka-Volterra baseline)</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">8.3 ± 2.4 %</div>
+        <div class="label">relative extrapolation error on the damped pendulum (baseline)</div>
+      </div>
+    </div>
+
+    <div class="cta-row reveal">
+      <a href="projects/02-neural-odes.html" class="btn btn-primary">View details →</a>
+      <a href="https://github.com/crozol/02-neural-odes" class="btn btn-ghost" target="_blank" rel="noopener">Code on GitHub →</a>
+      <a href="https://huggingface.co/spaces/crozol/neural-odes-hnn-demo" class="btn btn-ghost" target="_blank" rel="noopener">Live demo ↗</a>
+    </div>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">03 · Deep learning · MLOps</div>
+    <h2 class="reveal">Reconstruction-based anomaly detection · CMAPSS</h2>
+    <p class="section-intro reveal">An LSTM autoencoder trained on healthy turbofan windows from NASA CMAPSS FD001; the reconstruction error becomes the anomaly score, with the threshold fixed as the 99th-percentile of the healthy validation error. Served as a typed FastAPI service, a Streamlit demo and a two-service Docker stack.</p>
+
+    <div class="results-grid reveal" style="margin-bottom: 22px;">
+      <div class="result-metric">
+        <div class="value">ROC-AUC 0.969</div>
+        <div class="label">the score alone ranks anomalous windows above healthy ones almost perfectly</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">F1 0.738</div>
+        <div class="label">at the calibrated threshold · recall 0.937 at precision 0.608</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">PR-AUC 0.882</div>
+        <div class="label">precision-recall area · robust to the 15.8% anomaly class imbalance</div>
+      </div>
+    </div>
+
+    <div class="cta-row reveal">
+      <a href="projects/03-anomaly-detection-api.html" class="btn btn-primary">View details →</a>
+      <a href="https://github.com/crozol/03-anomaly-detection-api" class="btn btn-ghost" target="_blank" rel="noopener">Code on GitHub →</a>
+      <a href="https://huggingface.co/spaces/crozol/cmapss-anomaly-detector" class="btn btn-ghost" target="_blank" rel="noopener">Live demo ↗</a>
+    </div>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <p class="section-intro reveal" style="opacity: 0.8;">Two more projects are in preparation — physics-informed neural networks (PINNs) and topological data analysis of financial time series. They will appear here once their results are final. See the <a href="index.html#projects">projects overview</a> for the full roadmap.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <span>&copy; <span id="year"></span> · <span id="footName">Camilo Rozo</span>.</span>
+    <span class="footer-sub">All rights reserved</span>
+  </div>
+</footer>
+
+<script src="assets/portfolio.js"></script>
+</body>
+</html>

@@ -49,6 +49,7 @@
         <p>The project pairs a model trained on a real public benchmark with the deployment artefacts around it: a typed REST API, an interactive Streamlit demo, and a two-service Docker stack.</p>
         <p>The core idea is <strong style="color:var(--fg-0)">reconstruction-based anomaly detection</strong>. An LSTM autoencoder is fitted only on healthy sliding windows of the CMAPSS turbofan dataset; at inference time, anomalous windows are reconstructed poorly and the per-window MSE serves as the anomaly score. The decision threshold is the 99th-percentile of the score on a healthy validation set — by construction a <code>1 %</code> false-alarm rate budget on truly healthy data.</p>
         <p>Engine-wise splits prevent leakage: distinct turbofans feed training, calibration, and evaluation. The test split labels each window <code>anomaly = (RUL ≤ 30)</code> from the run-to-failure ground truth, giving a clean binary task to score against.</p>
+        <p>Physically, <code>τ</code> is a degradation line, not just a statistic. Since the autoencoder only ever sees nominal operation, the reconstruction error measures how far a window's sensor signature has drifted from healthy behaviour; as the high-pressure compressor degrades that drift grows and the error climbs past <code>τ</code>. This is why most false alarms sit at <code>RUL</code> 30–60 — real early degradation the binary label has not yet called anomalous.</p>
       </div>
       <div class="theory-card reveal">
         <h3>Core formulas</h3>
@@ -75,7 +76,7 @@
       <div class="info-card reveal">
         <h3>1 · Data pipeline</h3>
         <p><strong style="color:var(--fg-0)">Goal:</strong> turn the raw CMAPSS .txt files into engine-disjoint train/val/test windows with labels.</p>
-        <p><strong style="color:var(--fg-0)">How:</strong> <code>src/data.py</code> downloads the NASA PCOE archive once, parses 24-column run-to-failure tables, drops the 7 near-constant sensors, builds 30-cycle sliding windows, and fits per-sensor z-score statistics on the healthy training rows only. RUL is annotated automatically; <code>build_dataset</code> returns the three splits plus the binary labels.</p>
+        <p><strong style="color:var(--fg-0)">How:</strong> <code>src/data.py</code> downloads the NASA PCOE archive once, parses 26-column run-to-failure tables, drops the 7 near-constant sensors, builds 30-cycle sliding windows, and fits per-sensor z-score statistics on the healthy training rows only. RUL is annotated automatically; <code>build_dataset</code> returns the three splits plus the binary labels.</p>
       </div>
       <div class="info-card reveal">
         <h3>2 · LSTM autoencoder</h3>

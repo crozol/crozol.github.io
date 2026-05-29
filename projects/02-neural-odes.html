@@ -33,7 +33,8 @@
     <h1 class="reveal"><span class="grad">Neural ODEs for dynamical systems</span></h1>
     <p class="tagline reveal">A small MLP parametrises the right-hand side of an ODE and is integrated end-to-end with a differentiable Dormand-Prince solver. The network learns the vector field of a damped pendulum and a Lotka-Volterra system directly from short noisy trajectories, then is rolled forward beyond the training horizon to test extrapolation.</p>
     <div class="cta-row reveal">
-      <a href="https://github.com/crozol/02-neural-odes" class="btn btn-primary" target="_blank" rel="noopener">Code on GitHub →</a>
+      <a href="#live-demo" class="btn btn-primary">Try the live demo ↓</a>
+      <a href="https://github.com/crozol/02-neural-odes" class="btn btn-ghost" target="_blank" rel="noopener">Code on GitHub →</a>
       <a href="#results" class="btn btn-ghost">See results</a>
     </div>
   </div>
@@ -391,6 +392,40 @@
         <div class="result-figure">
           <img src="../assets/results/02-hnn-phase.png" alt="Phase plane · MLP vs HNN · Lotka-Volterra" />
           <div class="caption">Fig 9 · static fallback (enable JavaScript for interactive charts)</div>
+        </div>
+      </div>
+    </noscript>
+  </div>
+</section>
+
+<section class="content-section" id="live-demo">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Live demo</div>
+    <h2 class="reveal">Run the comparison in your browser</h2>
+    <p class="section-intro reveal">The ablation above, made interactive. Both models — the unconstrained MLP and the Hamiltonian NN — are deployed as a Streamlit app on Hugging Face Spaces, running live inference from the pre-trained checkpoints. Pick a system (<strong style="color:var(--fg-0)">Lotka-Volterra</strong> or the simple harmonic oscillator), drag the <strong style="color:var(--fg-0)">horizon</strong> slider, and watch the conserved quantity <code>H</code> wobble for the MLP while the HNN holds it almost flat. The honest catch: on the trivial harmonic case the MLP matches the HNN — the Hamiltonian prior earns its keep only on the harder Lotka-Volterra system.</p>
+    <div class="cta-row reveal" style="margin: 12px 0 24px;">
+      <a href="https://huggingface.co/spaces/crozol/neural-odes-hnn-demo" class="btn btn-primary" target="_blank" rel="noopener">Open in new tab ↗</a>
+      <a href="https://github.com/crozol/02-neural-odes" class="btn btn-ghost" target="_blank" rel="noopener">Source code →</a>
+    </div>
+    <div class="reveal" style="border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg-1);">
+      <iframe
+        src="https://crozol-neural-odes-hnn-demo.hf.space"
+        title="Neural ODE · HNN vs MLP — live Streamlit demo"
+        loading="lazy"
+        width="100%"
+        height="820"
+        frameborder="0"
+        style="display: block; border: 0;"
+        allow="fullscreen"
+      ></iframe>
+    </div>
+    <p class="caption reveal" style="margin-top: 12px;">First load can take 20–40 s while the Hugging Face Space cold-starts; subsequent interactions are instant. If the iframe is blocked by your browser, use the <a href="https://huggingface.co/spaces/crozol/neural-odes-hnn-demo" target="_blank" rel="noopener">Open in new tab</a> link above.</p>
+
+    <noscript>
+      <div class="results-grid" style="grid-template-columns: 1fr; margin-top: 24px;">
+        <div class="result-figure">
+          <img src="../assets/results/02-hnn-phase.png" alt="HNN vs MLP — static preview" />
+          <div class="caption">Static fallback: phase-plane orbits, truth · MLP · HNN. Enable JavaScript and iframes for the interactive version.</div>
         </div>
       </div>
     </noscript>

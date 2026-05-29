@@ -88,6 +88,7 @@
         <h3>3 · Differentiable solver</h3>
         <p><strong style="color:var(--fg-0)">Backend:</strong> <code>torchdiffeq.odeint</code> with the Dormand-Prince adaptive RK45 method (<code>dopri5</code>, <code>rtol=1e-5</code>, <code>atol=1e-7</code>).</p>
         <p>Every internal solver state is kept on the autograd graph, so <code>L.backward()</code> propagates gradients through all the steps the solver took.</p>
+        <p><strong style="color:var(--fg-0)">Adjoint alternative:</strong> keeping the whole trajectory on the graph costs <code>O(L)</code> memory in solver steps. The <em>adjoint method</em> (Pontryagin 1962; Chen et al. 2018) instead integrates a backward ODE for the gradient at <code>O(1)</code> memory — a drop-in <code>odeint_adjoint</code>. These 2D systems are small enough that plain <code>odeint</code> is faster and exact, so the adjoint is reserved for high-dimensional or long-horizon problems.</p>
       </div>
       <div class="info-card reveal">
         <h3>4 · Curriculum-aware training loop</h3>

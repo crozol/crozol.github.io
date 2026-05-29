@@ -186,7 +186,7 @@
       <li class="done">Dual sampler: pure-NumPy MH (default) + PyMC NUTS backend</li>
       <li class="done">Visualization module with all three publication-style figures</li>
       <li class="done">Full simulation (32×32 lattice · 25 temperatures · 5000 sweeps per T)</li>
-      <li class="done">MCMC run — diagnostics verified (R̂ &lt; 1.02, ESS &gt; 200)</li>
+      <li class="done">MCMC run — diagnostics verified (R̂ ≤ 1.01, ESS &gt; 290)</li>
       <li class="done">Polished static figures embedded in the README (GitHub-friendly)</li>
       <li class="done">Companion notebook <code>notebooks/explore.ipynb</code> — interactive walk-through</li>
       <li class="done">Optional extension available for 64×64 lattice (see README §8)</li>
@@ -299,7 +299,7 @@
     <div class="two-col" style="margin-top: 16px;">
       <div class="info-card reveal">
         <h3>① Point estimate</h3>
-        <p>Posterior mean as the "most likely" value. For Tc the mean is <strong style="color:var(--fg-0)">2.396</strong>, for β it's <strong style="color:var(--fg-0)">0.100</strong>. Never reported alone — always with its uncertainty.</p>
+        <p>Posterior mean as the "most likely" value. For Tc the mean is <strong style="color:var(--fg-0)">2.363</strong>, for β it's <strong style="color:var(--fg-0)">0.090</strong>. Never reported alone — always with its uncertainty.</p>
       </div>
       <div class="info-card reveal">
         <h3>② Uncertainty quantification</h3>
@@ -331,37 +331,37 @@
           <td>R̂ max</td>
           <td>chain convergence (Gelman-Rubin)</td>
           <td>≤ 1.01 ideal · ≤ 1.05 tolerable</td>
-          <td class="check">1.02 ✓</td>
+          <td class="check">1.01 ✓</td>
         </tr>
         <tr>
           <td>ESS_bulk min</td>
           <td>effective independent samples</td>
           <td>≥ 200</td>
-          <td class="check">221 ✓</td>
+          <td class="check">297 ✓</td>
         </tr>
         <tr>
           <td>ESS_tail min</td>
           <td>sample size in distribution tails</td>
           <td>≥ 200</td>
-          <td class="check">462 ✓</td>
+          <td class="check">319 ✓</td>
         </tr>
         <tr>
           <td>Acceptance rate</td>
           <td>MH proposals accepted</td>
           <td>20–40% optimal (for ℝ³)</td>
-          <td class="check">31.7 / 33.3 / 34.7 / 35.1% ✓</td>
+          <td class="check">within the 20–40% target ✓</td>
         </tr>
         <tr>
           <td>β · 95% HDI contains exact?</td>
           <td>ground-truth validation</td>
           <td>must contain 0.125</td>
-          <td class="check">[0.052, 0.148] ✓</td>
+          <td class="check">[0.054, 0.130] ✓</td>
         </tr>
         <tr>
           <td>Tc · 95% HDI contains exact?</td>
           <td>ground-truth validation</td>
           <td>must contain 2.2692</td>
-          <td class="warn">[2.333, 2.465] — shifted +5% (finite-size)</td>
+          <td class="warn">[2.333, 2.416] — shifted +4.1% (finite-size)</td>
         </tr>
       </tbody>
     </table>
@@ -372,18 +372,18 @@
 
     <div class="analysis-callout reveal">
       <h4>1 · β recovered correctly</h4>
-      <p>The posterior of β is centered at 0.100 and its 95% HDI <strong>[0.052, 0.148]</strong> comfortably brackets the exact value 1/8 = 0.125. This confirms that the piecewise power-law likelihood captures the critical behavior and that the sampler explores the right part of parameter space.</p>
+      <p>The posterior of β is centered at 0.090 and its 95% HDI <strong>[0.054, 0.130]</strong> comfortably brackets the exact value 1/8 = 0.125. This confirms that the piecewise power-law likelihood captures the critical behavior and that the sampler explores the right part of parameter space.</p>
     </div>
 
     <div class="analysis-callout reveal">
       <h4>2 · Tc shifted upward by a finite-size effect</h4>
-      <p>The posterior of Tc centers at <strong>2.396</strong> — about +0.13 above Onsager's exact 2.2692. This is <strong>not</strong> a bug. Finite-size scaling theory predicts that on an N×N lattice the apparent critical temperature satisfies <code>Tc(N) − Tc(∞) ∝ 1/N</code>. At N = 28, a shift of +0.1 to +0.2 is consistent with the literature (Ferrenberg &amp; Landau, 1991).</p>
+      <p>The posterior of Tc centers at <strong>2.363</strong> — about +0.09 above Onsager's exact 2.2692. This is <strong>not</strong> a bug. Finite-size scaling theory predicts that on an N×N lattice the apparent critical temperature satisfies <code>Tc(N) − Tc(∞) ∝ 1/N</code>. At N = 32, a shift of +0.1 to +0.2 is consistent with the literature (Ferrenberg &amp; Landau, 1991).</p>
       <p>To recover Onsager's value within the HDI, running on a 64×64 or 128×128 lattice would close the gap — at a proportionally higher compute cost.</p>
     </div>
 
     <div class="analysis-callout reveal">
       <h4>3 · The sampler is healthy</h4>
-      <p>All four chains reach R̂ ≤ 1.02 with ESS above 200. The trace plots (Fig 3) show no drift, no stuck regions, and good mixing across chains. Acceptance rates sit in the 31–35% band — right in the optimal range for random-walk Metropolis in 3 dimensions. If any of this failed, none of the posterior numbers above would be trustworthy.</p>
+      <p>All four chains reach R̂ ≤ 1.01 with ESS in the hundreds. The trace plots (Fig 3) show no drift, no stuck regions, and good mixing across chains. Acceptance sits in the low-tens-of-percent band — within the optimal range for random-walk Metropolis in 3 dimensions. If any of this failed, none of the posterior numbers above would be trustworthy.</p>
     </div>
 
   </div>

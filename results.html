@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Key results · Camilo Rozo</title>
-<meta name="description" content="Headline results from Camilo Rozo's portfolio projects — Bayesian inference on the 2D Ising model, Neural ODEs with a Hamiltonian prior, and reconstruction-based anomaly detection on NASA CMAPSS." />
+<meta name="description" content="Headline results from Camilo Rozo's portfolio projects — Bayesian inference on the 2D Ising model, Neural ODEs with a Hamiltonian prior, reconstruction-based anomaly detection on NASA CMAPSS, and physics-informed neural networks for the heat and Burgers equations." />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,7 +44,7 @@
     <a href="index.html#projects" class="back-link reveal">← Back to home</a>
     <div class="badges reveal" style="margin-top: 28px;">
       <span class="badge">Portfolio</span>
-      <span class="badge domain">Headline numbers · 3 completed projects</span>
+      <span class="badge domain">Headline numbers · 4 completed projects</span>
     </div>
     <h1 class="reveal"><span class="grad">Key results</span></h1>
     <p class="tagline reveal">The headline numbers from each completed project, side by side with the exact benchmark it was validated against. Every figure here matches the project's repository; click through for the full method, interactive figures and the live demo.</p>
@@ -140,7 +140,35 @@
 
 <section class="content-section">
   <div class="container">
-    <p class="section-intro reveal" style="opacity: 0.8;">Two more projects are in preparation — physics-informed neural networks (PINNs) and topological data analysis of financial time series. They will appear here once their results are final. See the <a href="index.html#projects">projects overview</a> for the full roadmap.</p>
+    <div class="section-eyebrow reveal">04 · ML for science · PDEs</div>
+    <h2 class="reveal">Physics-informed neural networks</h2>
+    <p class="section-intro reveal">The PDE residual, computed by autodifferentiating the network's own output, becomes part of the loss — so the model is trained to satisfy the heat and Burgers equations directly, without a mesh and without solved-PDE training data.</p>
+
+    <div class="results-grid reveal" style="margin-bottom: 22px;">
+      <div class="result-metric">
+        <div class="value">0.45%</div>
+        <div class="label">heat equation · relative L2 error vs. the exact analytical solution</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">2.04%</div>
+        <div class="label">Burgers equation · relative L2 error vs. a Chebyshev-spectral reference, after L-BFGS fine-tuning</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">~9% → 2.04%</div>
+        <div class="label">Burgers · Adam alone plateaus above target; L-BFGS on a fixed point batch gets it there</div>
+      </div>
+    </div>
+
+    <div class="cta-row reveal">
+      <a href="projects/04-pinns.html" class="btn btn-primary">View details →</a>
+      <a href="https://github.com/crozol/04-pinns" class="btn btn-ghost" target="_blank" rel="noopener">Code on GitHub →</a>
+    </div>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <p class="section-intro reveal" style="opacity: 0.8;">One more project is in preparation — topological data analysis of financial time series. It will appear here once its results are final. See the <a href="index.html#projects">projects overview</a> for the full roadmap.</p>
   </div>
 </section>
 

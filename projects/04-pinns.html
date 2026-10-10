@@ -32,13 +32,12 @@
     <div class="badges reveal" style="margin-top: 28px;">
       <span class="badge">04 / 05</span>
       <span class="badge domain">ML for science · PDEs</span>
-      <span class="badge status-planned">Planned</span>
+      <span class="badge status-done">Completed</span>
     </div>
     <h1 class="reveal"><span class="grad">Physics-Informed Neural Networks (PINNs)</span></h1>
     <p class="tagline reveal">Solve partial differential equations (heat, Burgers) by training a neural network whose loss includes the PDE residual, computed with autograd. Implementation of the idea by Raissi, Perdikaris &amp; Karniadakis (2019), validated against analytical solutions.</p>
     <div class="cta-row reveal">
       <a href="https://github.com/crozol/04-pinns" class="btn btn-primary" target="_blank" rel="noopener">Code on GitHub →</a>
-      <a href="#" class="btn btn-ghost">Demo (pending)</a>
     </div>
   </div>
 </header>
@@ -53,9 +52,9 @@
         <p>This project implements two classic cases:</p>
         <ul>
           <li><strong style="color:var(--fg-0)">1D heat equation</strong>: linear case with a known analytical solution. Serves as a sanity check.</li>
-          <li><strong style="color:var(--fg-0)">1D Burgers equation</strong>: classic nonlinear case with shock-like discontinuities that challenge any numerical method.</li>
+          <li><strong style="color:var(--fg-0)">1D Burgers equation</strong>: classic nonlinear case with a thin, physically sharp internal layer that is genuinely hard to fit — this is where the method gets stress-tested.</li>
         </ul>
-        <p>PINNs are at the active research frontier (Nature, AIAA, JCP papers). A technical blog post explaining the implementation generates visibility and organic contacts.</p>
+        <p>Adam alone gets the heat equation to 0.45% relative L2 error, well past the target. Burgers is a different story: Adam plateaus around 9%, above the 5% target. Following Raissi et al.'s own recipe — L-BFGS fine-tuning on top of Adam, on a <em>fixed</em> batch of points rather than resampling every step — brings it down to 2.04%.</p>
       </div>
       <div class="theory-card reveal">
         <h3>Mathematical formulation</h3>
@@ -113,12 +112,15 @@
     <h2 class="reveal">Project organization</h2>
     <pre class="code-tree reveal"><span class="folder">04-pinns/</span>
 ├── <span class="file">README.md</span>
+├── <span class="file">main.py</span>          <span class="comment"># full pipeline: train, validate, save figures + metrics.json</span>
 ├── <span class="file">requirements.txt</span>
 ├── <span class="folder">src/</span>
 │   ├── <span class="file">pinn.py</span>        <span class="comment"># u_theta(x, t) network with Tanh activation</span>
 │   ├── <span class="file">physics.py</span>     <span class="comment"># heat and Burgers residuals via autograd</span>
-│   └── <span class="file">train.py</span>       <span class="comment"># loop with composite loss (PDE + BC + IC)</span>
-└── <span class="folder">notebooks/</span>      <span class="comment"># comparison with analytical / numerical solution</span></pre>
+│   ├── <span class="file">reference.py</span>   <span class="comment"># Chebyshev-spectral reference solution for Burgers</span>
+│   └── <span class="file">train.py</span>       <span class="comment"># Adam + L-BFGS, composite loss (PDE + BC + IC)</span>
+├── <span class="folder">tests/</span>         <span class="comment"># pytest: residuals, reference sanity, training smoke test</span>
+└── <span class="folder">figures/</span>       <span class="comment"># PINN-vs-reference comparison plots</span></pre>
   </div>
 </section>
 
@@ -127,13 +129,14 @@
     <div class="section-eyebrow reveal">// Roadmap</div>
     <h2 class="reveal">Project status</h2>
     <ul class="roadmap reveal">
-      <li>Implement MLP with Tanh activation (twice-differentiable)</li>
-      <li><code>heat_residual(u, x, t, α)</code> function using <code>autograd.grad</code></li>
-      <li><code>burgers_residual(u, x, t, ν)</code> function</li>
-      <li>Sampling of collocation, boundary, and initial points</li>
-      <li>Training loop with composite loss and λ weights</li>
-      <li>Validation: heat vs. analytical solution, Burgers vs. spectral solver</li>
-      <li>Space-time figures + explanatory blog post</li>
+      <li class="done">Implement MLP with Tanh activation (twice-differentiable)</li>
+      <li class="done"><code>heat_residual(u, x, t, α)</code> function using <code>autograd.grad</code></li>
+      <li class="done"><code>burgers_residual(u, x, t, ν)</code> function</li>
+      <li class="done">Sampling of collocation, boundary, and initial points</li>
+      <li class="done">Training loop with composite loss (PDE + BC + IC)</li>
+      <li class="done">L-BFGS fine-tuning on a fixed batch (Adam alone plateaus above target on Burgers)</li>
+      <li class="done">Validation: heat vs. analytical solution, Burgers vs. Chebyshev-spectral solver</li>
+      <li class="done">Space-time comparison figures</li>
     </ul>
   </div>
 </section>
@@ -145,12 +148,12 @@
     <div class="two-col">
       <div class="info-card reveal">
         <h3>Heat equation</h3>
-        <p style="margin-bottom:0;">Relative L² error &lt; 1% vs. analytical solution across the entire domain.</p>
+        <p style="margin-bottom:0;">Target: relative L² error &lt; 1% vs. analytical solution. <strong style="color:var(--fg-0)">Achieved: 0.45%</strong>, Adam only, no fine-tuning needed.</p>
       </div>
       <div class="info-card reveal">
         <h3>Burgers equation</h3>
-        <p>Relative L² error &lt; 5% vs. high-resolution numerical reference.</p>
-        <p style="margin-bottom:0;">Correct capture of emergent shock without pathological oscillations.</p>
+        <p>Target: relative L² error &lt; 5% vs. high-resolution numerical reference. <strong style="color:var(--fg-0)">Achieved: 2.04%</strong>, after L-BFGS fine-tuning.</p>
+        <p style="margin-bottom:0;">Adam alone plateaus at ~9% — above target. The remaining error after L-BFGS concentrates almost entirely in the thin internal layer at x = 0, not spread across the domain.</p>
       </div>
     </div>
   </div>
@@ -160,12 +163,35 @@
   <div class="container">
     <div class="section-eyebrow reveal">// Results</div>
     <h2 class="reveal">Outputs and final metrics</h2>
-    <p class="section-intro reveal">Learned solutions, comparison to analytical/numerical reference, and L² errors.</p>
+    <p class="section-intro reveal">Learned solutions compared against the reference across the full space-time domain, plus the pointwise error (rightmost panel of each figure).</p>
 
-    <div class="result-empty reveal">
-      <div class="big">Pending</div>
-      <p>No results published yet.</p>
-      <p class="hint">What goes here: space-time heatmaps of learned u(x,t), side-by-side comparison with exact/numerical solution, and relative L² errors.</p>
+    <div class="results-grid reveal" style="margin-bottom: 28px;">
+      <div class="result-metric">
+        <div class="value">0.45%</div>
+        <div class="label">heat equation · relative L² error vs. the exact analytical solution</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">2.04%</div>
+        <div class="label">Burgers equation · relative L² error vs. the spectral reference, after L-BFGS</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">~9%</div>
+        <div class="label">Burgers · Adam only, no fine-tuning — the honest number before L-BFGS</div>
+      </div>
+    </div>
+
+    <div class="results-grid reveal" style="grid-template-columns: 1fr; margin-bottom: 20px;">
+      <div class="result-figure">
+        <img src="../assets/results/04-heat-comparison.png" alt="Heat equation: PINN vs. analytical solution, space-time heatmaps" />
+        <div class="caption">Fig 1 · Heat equation — reference, PINN, and pointwise difference. The error panel is essentially blank: this is the easy case.</div>
+      </div>
+    </div>
+
+    <div class="results-grid reveal" style="grid-template-columns: 1fr;">
+      <div class="result-figure">
+        <img src="../assets/results/04-burgers-comparison.png" alt="Burgers equation: PINN vs. Chebyshev-spectral reference, space-time heatmaps" />
+        <div class="caption">Fig 2 · Burgers equation — reference, PINN, and pointwise difference. The error concentrates in a thin vertical band right at the internal layer (x = 0), exactly where the solution is hardest to fit — not scattered randomly across the domain.</div>
+      </div>
     </div>
   </div>
 </section>

@@ -73,6 +73,37 @@
 
 <section class="content-section">
   <div class="container">
+    <div class="section-eyebrow reveal">// Debugging story</div>
+    <h2 class="reveal">Why Burgers took two optimizers</h2>
+    <p class="section-intro reveal">The heat equation converges cleanly with Adam alone (0.45% error, no fine-tuning). Burgers didn't — and the first fix attempt failed silently before the real fix worked.</p>
+
+    <div class="analysis-callout reveal">
+      <h4>Attempt 1 · Adam alone</h4>
+      <p>Same recipe as the heat equation — 8000 epochs, 10k resampled collocation points — applied to the harder problem. Relative L2 error against the Chebyshev-spectral reference: <strong style="color:var(--fg-0)">≈ 8.8%</strong>, above the 5% target. The loss curve below shows why: it decays smoothly at first, then stops improving past roughly step 5000 and oscillates around 0.01 instead of continuing down.</p>
+    </div>
+
+    <div class="results-grid reveal" style="grid-template-columns: 1fr; margin: 20px 0;">
+      <div class="result-figure">
+        <img src="../assets/results/04-burgers-loss-curve.png" alt="Burgers PINN training loss: Adam plateaus around step 6000-8000, L-BFGS drops it an order of magnitude further" />
+        <div class="caption">Adam (cyan, steps 0-8000) plateaus. L-BFGS (pink, steps 8000-9000) on a fixed point batch drops the loss by more than an order of magnitude in a tenth as many steps.</div>
+      </div>
+    </div>
+
+    <div class="analysis-callout reveal">
+      <h4>Attempt 2 · L-BFGS — looked like it worked, hadn't</h4>
+      <p>Raissi et al.'s own paper follows Adam with L-BFGS fine-tuning, so that was the obvious next step. The first run reported a lower loss (<code>6.46 × 10⁻³</code> vs. Adam's <code>1.04 × 10⁻²</code>) — but the relative L2 error against the reference came back <strong style="color:var(--fg-0)">identical to 15 significant figures</strong> to the pre-refinement number. The model hadn't actually changed at all.</p>
+      <p>The cause: <code>torch.optim.LBFGS</code>'s line search assumes the loss is a <em>deterministic</em> function of the parameters — evaluating it twice at the same point must give the same value. The training loop resamples a fresh batch of collocation/boundary/initial points on every call, which is correct for Adam's stochastic mini-batches but turns the objective into a noisy function under L-BFGS. The line search's step-size probes land on different random realizations of the loss, can never reliably satisfy the Wolfe conditions, and the step gets rejected — silently, with no exception and no warning.</p>
+    </div>
+
+    <div class="analysis-callout reveal">
+      <h4>Attempt 3 · fixed-batch L-BFGS — the fix</h4>
+      <p>Sample one large batch of points <em>once</em>, before calling L-BFGS, and reuse that exact batch for every internal evaluation of the closure during refinement. That single change makes the objective deterministic, which is what the line search and the quasi-Newton curvature estimate both require. 1000 L-BFGS iterations on 40k fixed collocation points then brought the loss to <code>4.29 × 10⁻⁴</code> and the relative L2 error to <strong style="color:var(--fg-0)">2.04%</strong>, clearing the 5% target.</p>
+    </div>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
     <div class="section-eyebrow reveal">// Skills demonstrated</div>
     <h2 class="reveal">What skills it certifies</h2>
 

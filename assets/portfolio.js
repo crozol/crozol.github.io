@@ -61,4 +61,68 @@
     });
     card.addEventListener("mouseleave", () => { card.style.transform = ""; });
   });
+
+  // Ising-model background: a faint, mouse-reactive 2D spin lattice, echoing
+  // the Ising Bayesian project. The ambient temperature slowly drifts across
+  // the ordered / critical / disordered regimes (real phase-ordering physics,
+  // not a scripted pattern) so the texture is sometimes clean large domains,
+  // sometimes the fractal clustering seen right at Tc ≈ 2.269, sometimes fine
+  // disordered speckle.
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const canvas = document.createElement("canvas");
+    canvas.className = "ising-bg";
+    canvas.setAttribute("aria-hidden", "true");
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext("2d");
+
+    const CELL = 14;
+    const PERIOD = 1100; // ticks for one full temperature cycle (~2 min at 110ms/tick)
+    let cols, rows, spins, tick = 0;
+    let mouseX = -9999, mouseY = -9999;
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      cols = Math.ceil(canvas.width / CELL);
+      rows = Math.ceil(canvas.height / CELL);
+      spins = new Int8Array(cols * rows);
+      for (let i = 0; i < spins.length; i++) spins[i] = Math.random() < 0.5 ? 1 : -1;
+    }
+    resize();
+    window.addEventListener("resize", resize);
+    window.addEventListener("mousemove", (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+
+    function step() {
+      tick++;
+      const phase = (tick % PERIOD) / PERIOD;
+      const T = 2.2 + 1.0 * Math.sin(phase * Math.PI * 2); // drifts ~1.2 (ordered) .. 3.2 (disordered) through Tc
+      const hotCol = mouseX / CELL, hotRow = mouseY / CELL;
+      const sweeps = Math.floor(spins.length / 6);
+      for (let n = 0; n < sweeps; n++) {
+        const x = (Math.random() * cols) | 0, y = (Math.random() * rows) | 0;
+        const i = y * cols + x;
+        const left = spins[y * cols + (x - 1 + cols) % cols];
+        const right = spins[y * cols + (x + 1) % cols];
+        const up = spins[((y - 1 + rows) % rows) * cols + x];
+        const down = spins[((y + 1) % rows) * cols + x];
+        const dE = 2 * spins[i] * (left + right + up + down);
+        const dist = Math.hypot(x - hotCol, y - hotRow);
+        const localT = dist < 6 ? T * 1.6 : T;
+        if (dE <= 0 || Math.random() < Math.exp(-dE / localT)) spins[i] *= -1;
+      }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.globalAlpha = 0.12;
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          if (spins[y * cols + x] !== 1) continue;
+          // cyan with a minority of hot-pink flecks — higher-contrast pairing than cyan/purple
+          ctx.fillStyle = (x * 31 + y * 17) % 5 === 0 ? "#f472b6" : "#22d3ee";
+          ctx.fillRect(x * CELL, y * CELL, CELL - 1, CELL - 1);
+        }
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    setInterval(step, 110);
+  }
 })();

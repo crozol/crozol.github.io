@@ -54,7 +54,7 @@
           <li><strong style="color:var(--fg-0)">1D heat equation</strong>: linear case with a known analytical solution. Serves as a sanity check.</li>
           <li><strong style="color:var(--fg-0)">1D Burgers equation</strong>: classic nonlinear case with a thin, physically sharp internal layer that is genuinely hard to fit — this is where the method gets stress-tested.</li>
         </ul>
-        <p>Adam alone gets the heat equation to 0.45% relative L2 error, well past the target. Burgers is a different story: Adam plateaus around 9%, above the 5% target. Following Raissi et al.'s own recipe — L-BFGS fine-tuning on top of Adam, on a <em>fixed</em> batch of points rather than resampling every step — brings it down to 2.04%.</p>
+        <p>Adam alone gets the heat equation to 0.45% relative L2 error, well past the target — a short L-BFGS pass pushes the frozen run shown here to 0.23%. Burgers is a different story: Adam plateaus around 8.8%, above the 5% target. Following Raissi et al.'s own recipe — L-BFGS fine-tuning on top of Adam, on a <em>fixed</em> batch of points rather than resampling every step — brings it down to 1.92%.</p>
       </div>
       <div class="theory-card reveal">
         <h3>Mathematical formulation</h3>
@@ -75,19 +75,28 @@
   <div class="container">
     <div class="section-eyebrow reveal">// Debugging story</div>
     <h2 class="reveal">Why Burgers took two optimizers</h2>
-    <p class="section-intro reveal">The heat equation converges cleanly with Adam alone (0.45% error, no fine-tuning). Burgers didn't — and the first fix attempt failed silently before the real fix worked.</p>
+    <p class="section-intro reveal">The heat equation converges cleanly with Adam alone (0.45% error, no fine-tuning needed). Burgers didn't — and the first fix attempt failed silently before the real fix worked.</p>
 
     <div class="analysis-callout reveal">
       <h4>Attempt 1 · Adam alone</h4>
       <p>Same recipe as the heat equation — 8000 epochs, 10k resampled collocation points — applied to the harder problem. Relative L2 error against the Chebyshev-spectral reference: <strong style="color:var(--fg-0)">≈ 8.8%</strong>, above the 5% target. The loss curve below shows why: it decays smoothly at first, then stops improving past roughly step 5000 and oscillates around 0.01 instead of continuing down.</p>
     </div>
 
-    <div class="results-grid reveal" style="grid-template-columns: 1fr; margin: 20px 0;">
-      <div class="result-figure">
-        <img src="../assets/results/04-burgers-loss-curve.png" alt="Burgers PINN training loss: Adam plateaus around step 6000-8000, L-BFGS drops it an order of magnitude further" />
-        <div class="caption">Adam (cyan, steps 0-8000) plateaus. L-BFGS (pink, steps 8000-9000) on a fixed point batch drops the loss by more than an order of magnitude in a tenth as many steps.</div>
+    <div class="chart-container reveal">
+      <div id="chart-burgers-loss" style="width:100%; height:420px;">
+        <div class="chart-loading">Loading training loss…</div>
       </div>
+      <div class="chart-caption"><strong>Fig 1 · Training loss, full resolution.</strong> Adam (cyan) plateaus; switching to L-BFGS on a fixed point batch (pink) drops the loss by more than an order of magnitude in a fraction of the steps. Hover for exact values at any step.</div>
     </div>
+
+    <noscript>
+      <div class="results-grid" style="grid-template-columns: 1fr; margin-top: 24px;">
+        <div class="result-figure">
+          <img src="../assets/results/04-burgers-loss-curve.png" alt="Burgers PINN training loss: Adam plateaus, L-BFGS drops it further" />
+          <div class="caption">Static fallback (enable JavaScript for the interactive chart)</div>
+        </div>
+      </div>
+    </noscript>
 
     <div class="analysis-callout reveal">
       <h4>Attempt 2 · L-BFGS — looked like it worked, hadn't</h4>
@@ -97,7 +106,7 @@
 
     <div class="analysis-callout reveal">
       <h4>Attempt 3 · fixed-batch L-BFGS — the fix</h4>
-      <p>Sample one large batch of points <em>once</em>, before calling L-BFGS, and reuse that exact batch for every internal evaluation of the closure during refinement. That single change makes the objective deterministic, which is what the line search and the quasi-Newton curvature estimate both require. 1000 L-BFGS iterations on 40k fixed collocation points then brought the loss to <code>4.29 × 10⁻⁴</code> and the relative L2 error to <strong style="color:var(--fg-0)">2.04%</strong>, clearing the 5% target.</p>
+      <p>Sample one large batch of points <em>once</em>, before calling L-BFGS, and reuse that exact batch for every internal evaluation of the closure during refinement. That single change makes the objective deterministic, which is what the line search and the quasi-Newton curvature estimate both require. 1000 L-BFGS iterations on 40k fixed collocation points then brought the loss to <code>4.53 × 10⁻⁴</code> and the relative L2 error to <strong style="color:var(--fg-0)">1.92%</strong>, clearing the 5% target.</p>
     </div>
   </div>
 </section>
@@ -150,8 +159,10 @@
 │   ├── <span class="file">physics.py</span>     <span class="comment"># heat and Burgers residuals via autograd</span>
 │   ├── <span class="file">reference.py</span>   <span class="comment"># Chebyshev-spectral reference solution for Burgers</span>
 │   └── <span class="file">train.py</span>       <span class="comment"># Adam + L-BFGS, composite loss (PDE + BC + IC)</span>
+├── <span class="folder">scripts/</span>
+│   └── <span class="file">export_json.py</span> <span class="comment"># arrays → JSON for the portfolio page's interactive charts</span>
 ├── <span class="folder">tests/</span>         <span class="comment"># pytest: residuals, reference sanity, training smoke test</span>
-└── <span class="folder">figures/</span>       <span class="comment"># PINN-vs-reference comparison plots</span></pre>
+└── <span class="folder">figures/</span>       <span class="comment"># PINN-vs-reference comparison plots + loss curve</span></pre>
   </div>
 </section>
 
@@ -179,12 +190,12 @@
     <div class="two-col">
       <div class="info-card reveal">
         <h3>Heat equation</h3>
-        <p style="margin-bottom:0;">Target: relative L² error &lt; 1% vs. analytical solution. <strong style="color:var(--fg-0)">Achieved: 0.45%</strong>, Adam only, no fine-tuning needed.</p>
+        <p style="margin-bottom:0;">Target: relative L² error &lt; 1% vs. analytical solution. <strong style="color:var(--fg-0)">Achieved: 0.45%</strong> with Adam alone (no fine-tuning needed); <strong style="color:var(--fg-0)">0.23%</strong> in the frozen run with a short L-BFGS pass added for consistency.</p>
       </div>
       <div class="info-card reveal">
         <h3>Burgers equation</h3>
-        <p>Target: relative L² error &lt; 5% vs. high-resolution numerical reference. <strong style="color:var(--fg-0)">Achieved: 2.04%</strong>, after L-BFGS fine-tuning.</p>
-        <p style="margin-bottom:0;">Adam alone plateaus at ~9% — above target. The remaining error after L-BFGS concentrates almost entirely in the thin internal layer at x = 0, not spread across the domain.</p>
+        <p>Target: relative L² error &lt; 5% vs. high-resolution numerical reference. <strong style="color:var(--fg-0)">Achieved: 1.92%</strong>, after L-BFGS fine-tuning.</p>
+        <p style="margin-bottom:0;">Adam alone plateaus at ~8.8% — above target. The remaining error after L-BFGS concentrates almost entirely in the thin internal layer at x = 0, not spread across the domain.</p>
       </div>
     </div>
   </div>
@@ -198,32 +209,59 @@
 
     <div class="results-grid reveal" style="margin-bottom: 28px;">
       <div class="result-metric">
-        <div class="value">0.45%</div>
+        <div class="value">0.23%</div>
         <div class="label">heat equation · relative L² error vs. the exact analytical solution</div>
       </div>
       <div class="result-metric">
-        <div class="value">2.04%</div>
+        <div class="value">1.92%</div>
         <div class="label">Burgers equation · relative L² error vs. the spectral reference, after L-BFGS</div>
       </div>
       <div class="result-metric">
-        <div class="value">~9%</div>
+        <div class="value">~8.8%</div>
         <div class="label">Burgers · Adam only, no fine-tuning — the honest number before L-BFGS</div>
       </div>
     </div>
 
-    <div class="results-grid reveal" style="grid-template-columns: 1fr; margin-bottom: 20px;">
-      <div class="result-figure">
-        <img src="../assets/results/04-heat-comparison.png" alt="Heat equation: PINN vs. analytical solution, space-time heatmaps" />
-        <div class="caption">Fig 1 · Heat equation — reference, PINN, and pointwise difference. The error panel is essentially blank: this is the easy case.</div>
+    <div class="chart-container reveal">
+      <div id="chart-heat-field" style="width:100%; height:460px;">
+        <div class="chart-loading">Loading heat equation field…</div>
       </div>
+      <div class="chart-caption"><strong>Fig 2 · Heat equation, full space-time field.</strong> Use the buttons above the plot to switch between the reference solution, the PINN output, and the pointwise error. Hover any point for its exact value.</div>
     </div>
 
-    <div class="results-grid reveal" style="grid-template-columns: 1fr;">
-      <div class="result-figure">
-        <img src="../assets/results/04-burgers-comparison.png" alt="Burgers equation: PINN vs. Chebyshev-spectral reference, space-time heatmaps" />
-        <div class="caption">Fig 2 · Burgers equation — reference, PINN, and pointwise difference. The error concentrates in a thin vertical band right at the internal layer (x = 0), exactly where the solution is hardest to fit — not scattered randomly across the domain.</div>
+    <div class="chart-container reveal" style="margin-top: 24px;">
+      <div id="chart-heat-slices" style="width:100%; height:420px;">
+        <div class="chart-loading">Loading snapshots…</div>
       </div>
+      <div class="chart-caption"><strong>Fig 3 · Heat equation, snapshots at fixed t.</strong> Solid = reference, dotted = PINN — at this error level (0.23%) the two curves sit almost exactly on top of each other at every snapshot.</div>
     </div>
+
+    <div class="chart-container reveal" style="margin-top: 36px;">
+      <div id="chart-burgers-field" style="width:100%; height:460px;">
+        <div class="chart-loading">Loading Burgers field…</div>
+      </div>
+      <div class="chart-caption"><strong>Fig 4 · Burgers equation, full space-time field.</strong> Switch to "PINN − Reference" to see the error concentrate in a thin band right at the internal layer (x = 0) — not scattered across the domain, the signature of a hard local feature rather than a broken model.</div>
+    </div>
+
+    <div class="chart-container reveal" style="margin-top: 24px;">
+      <div id="chart-burgers-slices" style="width:100%; height:420px;">
+        <div class="chart-loading">Loading snapshots…</div>
+      </div>
+      <div class="chart-caption"><strong>Fig 5 · Burgers equation, snapshots at fixed t.</strong> Solid = reference, dotted = PINN. The steepening front near x = 0 is visible growing sharper from t = 0 to t = 1 — the PINN tracks it closely but is visibly where the small remaining error concentrates.</div>
+    </div>
+
+    <noscript>
+      <div class="results-grid" style="grid-template-columns: 1fr 1fr; margin-top: 24px;">
+        <div class="result-figure">
+          <img src="../assets/results/04-heat-comparison.png" alt="Heat equation: PINN vs. analytical solution, space-time heatmaps" />
+          <div class="caption">Heat equation — static fallback (enable JavaScript for interactive charts)</div>
+        </div>
+        <div class="result-figure">
+          <img src="../assets/results/04-burgers-comparison.png" alt="Burgers equation: PINN vs. Chebyshev-spectral reference, space-time heatmaps" />
+          <div class="caption">Burgers equation — static fallback (enable JavaScript for interactive charts)</div>
+        </div>
+      </div>
+    </noscript>
   </div>
 </section>
 
@@ -235,5 +273,7 @@
 </footer>
 
 <script src="../assets/portfolio.js"></script>
+<script src="https://cdn.plot.ly/plotly-cartesian-2.35.0.min.js" charset="utf-8"></script>
+<script src="../assets/charts/04-pinns.js" defer></script>
 </body>
 </html>

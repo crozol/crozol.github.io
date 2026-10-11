@@ -319,7 +319,7 @@
         <div class="num">01</div>
         <div class="domain">Statistical mechanics · Bayesian</div>
         <h3>Bayesian Inference on the 2D Ising Model</h3>
-        <p>Metropolis simulator with Numba for a lattice of spins, plus a Bayesian model that infers the critical temperature and critical exponent via MCMC. Validated against the exact Onsager (1944) solution.</p>
+        <p>Metropolis simulator (Numba) plus a Bayesian model that infers the critical temperature and exponent via MCMC. Benchmarked against the exact Onsager (1944) solution: β = 1/8 falls inside its 95% HDI; Tc sits 4.1% high, the expected finite-size shift on a 32×32 lattice.</p>
         <div class="project-tags">
           <span class="tag">Python</span><span class="tag">PyMC</span><span class="tag">NumPy</span><span class="tag">ArviZ</span><span class="tag">Monte Carlo</span>
         </div>
@@ -331,7 +331,7 @@
         <div class="num">02</div>
         <div class="domain">Deep learning · Dynamical systems</div>
         <h3>Neural ODEs for dynamical systems</h3>
-        <p>An MLP parametrises the right-hand side of an ODE and is integrated end-to-end with a differentiable Dormand-Prince solver. Learns the vector field of a damped pendulum and a Lotka-Volterra system from short noisy trajectories, then is rolled forward beyond the training horizon to test extrapolation.</p>
+        <p>Neural ODEs fit to short noisy trajectories of a damped pendulum and a Lotka-Volterra system, trained end-to-end through a differentiable Dormand-Prince solver. Ablation: a Hamiltonian Neural Network with the same parameter budget (~19k) cuts the drift of the conserved quantity from 9.0 ± 3.3% to 2.4%, with no clear gain in extrapolation error.</p>
         <div class="project-tags">
           <span class="tag">PyTorch</span><span class="tag">torchdiffeq</span><span class="tag">ODEs</span><span class="tag">Autograd</span>
         </div>
@@ -355,7 +355,7 @@
         <div class="num">04</div>
         <div class="domain">ML for science · PDEs</div>
         <h3>Physics-Informed Neural Networks (PINNs)</h3>
-        <p>Implementation of PINNs (Raissi et al. 2019) solving the heat equation (0.23% L2 error vs. analytical solution) and the Burgers equation (1.92% vs. a Chebyshev-spectral reference, after L-BFGS fine-tuning on top of Adam).</p>
+        <p>PINNs (Raissi et al. 2019) in PyTorch. Heat equation: 0.14 ± 0.05% relative L2 error vs. the analytical solution; Burgers: 1.64 ± 0.34% vs. a Chebyshev-spectral reference (Adam + L-BFGS, 5 seeds). The original paper reports 0.067% on Burgers with a deeper network trained fully with L-BFGS.</p>
         <div class="project-tags">
           <span class="tag">PyTorch</span><span class="tag">PDEs</span><span class="tag">Autograd</span><span class="tag">L-BFGS</span>
         </div>

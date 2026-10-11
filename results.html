@@ -55,7 +55,7 @@
   <div class="container">
     <div class="section-eyebrow reveal">01 · Statistical mechanics · Bayesian</div>
     <h2 class="reveal">Bayesian inference on the 2D Ising model</h2>
-    <p class="section-intro reveal">Simulate a lattice of spins with Metropolis Monte Carlo, then infer the critical temperature and critical exponent with MCMC — validated against the exact Onsager (1944) solution.</p>
+    <p class="section-intro reveal">Simulate a lattice of spins with Metropolis Monte Carlo, then infer the critical temperature and critical exponent with MCMC — benchmarked against the exact Onsager (1944) solution.</p>
 
     <div class="results-grid reveal" style="margin-bottom: 22px;">
       <div class="result-metric">
@@ -146,16 +146,16 @@
 
     <div class="results-grid reveal" style="margin-bottom: 22px;">
       <div class="result-metric">
-        <div class="value">0.23%</div>
-        <div class="label">heat equation · relative L2 error vs. the exact analytical solution</div>
+        <div class="value">0.14 ± 0.05%</div>
+        <div class="label">heat equation · relative L2 error vs. the exact analytical solution (5 seeds)</div>
       </div>
       <div class="result-metric">
-        <div class="value">1.92%</div>
-        <div class="label">Burgers equation · relative L2 error vs. a Chebyshev-spectral reference, after L-BFGS fine-tuning</div>
+        <div class="value">1.64 ± 0.34%</div>
+        <div class="label">Burgers equation · relative L2 error vs. a Chebyshev-spectral reference, after L-BFGS fine-tuning (5 seeds)</div>
       </div>
       <div class="result-metric">
         <div class="value">~8.8% → 1.92%</div>
-        <div class="label">Burgers · Adam alone plateaus above target; L-BFGS on a fixed point batch gets it there</div>
+        <div class="label">Burgers, seed 0 · Adam alone plateaus above target; L-BFGS on a fixed point batch gets it there</div>
       </div>
     </div>
 

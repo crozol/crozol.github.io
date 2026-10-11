@@ -9,6 +9,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/styles.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false})"></script>
 </head>
 <body class="text-balanced">
 
@@ -52,19 +55,19 @@
       <div class="reveal">
         <p>The project pairs a model trained on a real public benchmark with the deployment artefacts around it: a typed REST API, an interactive Streamlit demo, and a two-service Docker stack.</p>
         <p>The core idea is <strong style="color:var(--fg-0)">reconstruction-based anomaly detection</strong>. An LSTM autoencoder is fitted only on healthy sliding windows of the CMAPSS turbofan dataset; at inference time, anomalous windows are reconstructed poorly and the per-window MSE serves as the anomaly score. The decision threshold is the 99th-percentile of the score on a healthy validation set — by construction a <code>1 %</code> false-alarm rate budget on truly healthy data.</p>
-        <p>Engine-wise splits prevent leakage: distinct turbofans feed training, calibration, and evaluation. The test split labels each window <code>anomaly = (RUL ≤ 30)</code> from the run-to-failure ground truth, giving a clean binary task to score against.</p>
-        <p>Physically, <code>τ</code> is a degradation line, not just a statistic. Since the autoencoder only ever sees nominal operation, the reconstruction error measures how far a window's sensor signature has drifted from healthy behaviour; as the high-pressure compressor degrades that drift grows and the error climbs past <code>τ</code>. This is why most false alarms sit at <code>RUL</code> 30–60 — real early degradation the binary label has not yet called anomalous.</p>
+        <p>Engine-wise splits prevent leakage: distinct turbofans feed training, calibration, and evaluation. The test split labels each window \(\text{anomaly} = (\text{RUL} \le 30)\) from the run-to-failure ground truth, giving a clean binary task to score against.</p>
+        <p>Physically, \(\tau\) is a degradation line, not just a statistic. Since the autoencoder only ever sees nominal operation, the reconstruction error measures how far a window's sensor signature has drifted from healthy behaviour; as the high-pressure compressor degrades that drift grows and the error climbs past \(\tau\). This is why most false alarms sit at \(\text{RUL}\) 30–60 — real early degradation the binary label has not yet called anomalous.</p>
       </div>
       <div class="theory-card reveal">
         <h3>Core formulas</h3>
         <p style="margin-top: 0;">Reconstruction-based score:</p>
-        <div class="formula">score(x) = ‖x − D<sub>θ</sub>(E<sub>θ</sub>(x))‖²</div>
+        <div class="formula">\[ \operatorname{score}(x) = \big\| x - D_\theta\big(E_\theta(x)\big) \big\|^2 \]</div>
         <p>Training objective (healthy windows only):</p>
-        <div class="formula">min<sub>θ</sub> 𝔼<sub>x∈H</sub>[‖x − D<sub>θ</sub>(E<sub>θ</sub>(x))‖²]</div>
+        <div class="formula">\[ \min_\theta\; \mathbb{E}_{x \in \mathcal{H}} \Big[ \big\| x - D_\theta\big(E_\theta(x)\big) \big\|^2 \Big] \]</div>
         <p>Threshold calibration:</p>
-        <div class="formula">τ = quantile<sub>0.99</sub>(score(x), x ∈ val<sub>healthy</sub>)</div>
+        <div class="formula">\[ \tau = q_{0.99}\big\{ \operatorname{score}(x) : x \in \text{val}_{\text{healthy}} \big\} \]</div>
         <p>Decision rule:</p>
-        <div class="formula">flag(x) = 1 ⇔ score(x) &gt; τ</div>
+        <div class="formula">\[ \operatorname{flag}(x) = 1 \iff \operatorname{score}(x) &gt; \tau \]</div>
       </div>
     </div>
   </div>
@@ -85,17 +88,17 @@
       <div class="info-card reveal">
         <h3>2 · LSTM autoencoder</h3>
         <p><strong style="color:var(--fg-0)">Goal:</strong> a sequence-to-sequence reconstructor with an explicit information bottleneck.</p>
-        <p><strong style="color:var(--fg-0)">How:</strong> encoder LSTM <code>(14 → 64)</code>, linear bottleneck <code>(64 → 16)</code>, decoder LSTM driven by the bottleneck broadcast across 30 steps, linear head back to 14 channels. <strong>44 510 trainable parameters</strong>. Defined in <code>src/autoencoder.py</code>.</p>
+        <p><strong style="color:var(--fg-0)">How:</strong> encoder LSTM \((14 \to 64)\), linear bottleneck \((64 \to 16)\), decoder LSTM driven by the bottleneck broadcast across 30 steps, linear head back to 14 channels. <strong>44 510 trainable parameters</strong>. Defined in <code>src/autoencoder.py</code>.</p>
       </div>
       <div class="info-card reveal">
         <h3>3 · Training loop</h3>
         <p><strong style="color:var(--fg-0)">Goal:</strong> fit the autoencoder on healthy windows only, monitor validation, save a portable checkpoint.</p>
-        <p><strong style="color:var(--fg-0)">How:</strong> <code>src/train.py</code> — Adam (<code>lr = 2·10⁻³</code>, weight decay <code>10⁻⁵</code>), cosine LR to zero across 80 epochs, gradient norm clipped at 1.0. The checkpoint persists weights, normalisation stats, and sensor list together so inference never has to re-derive them.</p>
+        <p><strong style="color:var(--fg-0)">How:</strong> <code>src/train.py</code> — Adam (\(\text{lr} = 2\cdot10^{-3}\), weight decay \(10^{-5}\)), cosine LR to zero across 80 epochs, gradient norm clipped at 1.0. The checkpoint persists weights, normalisation stats, and sensor list together so inference never has to re-derive them.</p>
       </div>
       <div class="info-card reveal">
         <h3>4 · Threshold + metrics</h3>
         <p><strong style="color:var(--fg-0)">Goal:</strong> turn the score into a binary decision and quantify it.</p>
-        <p><strong style="color:var(--fg-0)">How:</strong> <code>src/evaluate.py</code> — q99 of the val healthy errors gives <code>τ ≈ 0.5515</code>. Precision, recall, F1, accuracy, full ROC and PR sweeps and the confusion matrix are computed in NumPy (no scikit-learn dependency).</p>
+        <p><strong style="color:var(--fg-0)">How:</strong> <code>src/evaluate.py</code> — q99 of the val healthy errors gives \(\tau \approx 0.5515\). Precision, recall, F1, accuracy, full ROC and PR sweeps and the confusion matrix are computed in NumPy (no scikit-learn dependency).</p>
       </div>
       <div class="info-card reveal">
         <h3>5 · FastAPI service</h3>
@@ -211,7 +214,7 @@
   <div class="container">
     <div class="section-eyebrow reveal">// Results</div>
     <h2 class="reveal">Outputs and final metrics</h2>
-    <p class="section-intro reveal">Engine-disjoint splits on CMAPSS FD001: train/val on engines 1-80 (healthy windows only), test on engines 81-100 (all windows, labelled <code>anomaly = RUL ≤ 30</code>). Hover any chart for values, zoom with the toolbar, toggle traces in the legend.</p>
+    <p class="section-intro reveal">Engine-disjoint splits on CMAPSS FD001: train/val on engines 1-80 (healthy windows only), test on engines 81-100 (all windows, labelled \(\text{anomaly} = \text{RUL} \le 30\)). Hover any chart for values, zoom with the toolbar, toggle traces in the legend.</p>
 
     <div class="results-grid reveal" style="margin-bottom: 28px;">
       <div class="result-metric">
@@ -250,14 +253,14 @@
       <div id="chart-roc" style="width:100%; height:520px;">
         <div class="chart-loading">Loading ROC curve…</div>
       </div>
-      <div class="chart-caption"><strong>Fig 3 · ROC and operating point.</strong> Full sweep of threshold values; the q99 calibration sits on the steep upper-left of the curve at <code>FPR ≈ 0.11</code>, <code>TPR ≈ 0.94</code>. AUC of <code>0.969</code> means the score itself ranks anomalous windows above healthy ones almost perfectly — the operating point is just where one decides to cut.</div>
+      <div class="chart-caption"><strong>Fig 3 · ROC and operating point.</strong> Full sweep of threshold values; the q99 calibration sits on the steep upper-left of the curve at \(\text{FPR} \approx 0.11\), \(\text{TPR} \approx 0.94\). AUC of <code>0.969</code> means the score itself ranks anomalous windows above healthy ones almost perfectly — the operating point is just where one decides to cut.</div>
     </div>
 
     <div class="chart-container reveal" style="margin-top: 24px;">
       <div id="chart-engine" style="width:100%; height:460px;">
         <div class="chart-loading">Loading engine trajectory…</div>
       </div>
-      <div class="chart-caption"><strong>Fig 4 · Per-engine reconstruction trajectory.</strong> Reconstruction MSE along one test engine's full life. A long flat segment at the healthy floor (≈ 0.45), an early-degradation deflection around RUL ≈ 50, and a near-exponential blow-up inside the labelled anomaly band (<code>RUL ≤ 30</code>). The deflection-before-the-band phase is the source of most false positives — and the most useful behaviour for a maintenance-scheduling use case.</div>
+      <div class="chart-caption"><strong>Fig 4 · Per-engine reconstruction trajectory.</strong> Reconstruction MSE along one test engine's full life. A long flat segment at the healthy floor (≈ 0.45), an early-degradation deflection around \(\text{RUL} \approx 50\), and a near-exponential blow-up inside the labelled anomaly band (\(\text{RUL} \le 30\)). The deflection-before-the-band phase is the source of most false positives — and the most useful behaviour for a maintenance-scheduling use case.</div>
     </div>
 
     <noscript>

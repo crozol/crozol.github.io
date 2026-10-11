@@ -9,6 +9,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/styles.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false})"></script>
 </head>
 <body class="text-balanced">
 
@@ -49,20 +52,20 @@
     <h2 class="reveal">About this project</h2>
     <div class="two-col">
       <div class="reveal">
-        <p>Classical methods for detecting regime changes in finance (rolling volatility, rolling correlations, HMMs) look at statistical moments. <strong style="color:var(--fg-0)">Topological Data Analysis</strong> proposes a complementary angle: look at the <strong style="color:var(--fg-0)">shape</strong> of the return cloud in ℝ<sup>d</sup> through <strong style="color:var(--fg-0)">persistent homology</strong>, extracting invariants that are robust to reparameterization.</p>
+        <p>Classical methods for detecting regime changes in finance (rolling volatility, rolling correlations, HMMs) look at statistical moments. <strong style="color:var(--fg-0)">Topological Data Analysis</strong> proposes a complementary angle: look at the <strong style="color:var(--fg-0)">shape</strong> of the return cloud in \(\mathbb{R}^d\) through <strong style="color:var(--fg-0)">persistent homology</strong>, extracting invariants that are robust to reparameterization.</p>
         <p>Idea: in a normal regime, returns form a "round" low-correlation cloud; during a crisis, the cloud collapses toward a single direction (systemic co-movement) and its topology changes. Persistence bars detect that change earlier than traditional aggregate metrics.</p>
         <p>This project uses training in <strong style="color:var(--fg-0)">algebraic topology</strong> — a tool no other junior ML engineer will have — on a financial problem with real impact.</p>
       </div>
       <div class="theory-card reveal">
         <h3>Mathematical pipeline</h3>
         <p>Log returns:</p>
-        <div class="formula">r<sub>t</sub> = log(p<sub>t</sub> / p<sub>t−1</sub>) ∈ ℝ<sup>d</sup></div>
+        <div class="formula">\[ r_t = \log\!\left(p_t / p_{t-1}\right) \in \mathbb{R}^d \]</div>
         <p>Sliding window:</p>
-        <div class="formula">W<sub>t</sub> = {r<sub>s</sub> : t − h ≤ s ≤ t} ⊂ ℝ<sup>d</sup></div>
+        <div class="formula">\[ W_t = \{\, r_s : t - h \le s \le t \,\} \subset \mathbb{R}^d \]</div>
         <p>Vietoris-Rips persistent homology:</p>
-        <div class="formula">PD<sub>0</sub>(W<sub>t</sub>), PD<sub>1</sub>(W<sub>t</sub>)</div>
+        <div class="formula">\[ \mathrm{PD}_0(W_t),\quad \mathrm{PD}_1(W_t) \]</div>
         <p>Features:</p>
-        <div class="formula">φ(W<sub>t</sub>) = [entropy, landscape, # components, max persistence]</div>
+        <div class="formula">\[ \varphi(W_t) = \big[\, \text{entropy},\ \text{landscape},\ \#\text{components},\ \text{max persistence} \,\big] \]</div>
       </div>
     </div>
   </div>
@@ -127,7 +130,7 @@
     <ul class="roadmap reveal">
       <li>Download daily prices (SP500, NASDAQ, sector ETFs) via yfinance</li>
       <li>Preprocessing: log returns, normalization, gap handling</li>
-      <li>Sliding windows → point clouds in ℝ<sup>d</sup></li>
+      <li>Sliding windows → point clouds in \(\mathbb{R}^d\)</li>
       <li>Compute persistent homology (dim 0 and 1) with Giotto-TDA</li>
       <li>Convert diagrams into persistence landscapes and entropy</li>
       <li>Train Random Forest with walk-forward temporal validation</li>

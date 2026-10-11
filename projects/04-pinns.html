@@ -9,6 +9,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/styles.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false})"></script>
 </head>
 <body class="text-balanced">
 
@@ -48,24 +51,24 @@
     <h2 class="reveal">About this project</h2>
     <div class="two-col">
       <div class="reveal">
-        <p>A PINN is a neural network <em>u<sub>θ</sub>(x, t)</em> whose loss combines three pieces: <strong style="color:var(--fg-0)">initial conditions</strong>, <strong style="color:var(--fg-0)">boundary conditions</strong>, and the <strong style="color:var(--fg-0)">PDE residual</strong> evaluated at collocation points in the domain. Partial derivatives are computed with <code>torch.autograd.grad</code> — no finite differences, no mesh.</p>
+        <p>A PINN is a neural network \(u_\theta(x, t)\) whose loss combines three pieces: <strong style="color:var(--fg-0)">initial conditions</strong>, <strong style="color:var(--fg-0)">boundary conditions</strong>, and the <strong style="color:var(--fg-0)">PDE residual</strong> evaluated at collocation points in the domain. Partial derivatives are computed with <code>torch.autograd.grad</code> — no finite differences, no mesh.</p>
         <p>This project implements two classic cases:</p>
         <ul>
           <li><strong style="color:var(--fg-0)">1D heat equation</strong>: linear case with a known analytical solution. Serves as a sanity check.</li>
           <li><strong style="color:var(--fg-0)">1D Burgers equation</strong>: classic nonlinear case with a thin, physically sharp internal layer that is genuinely hard to fit — this is where the method gets stress-tested.</li>
         </ul>
-        <p>Adam alone gets the heat equation to 0.45% relative L2 error, well past the target — a short L-BFGS pass pushes the frozen run shown here to 0.23%. Burgers is a different story: Adam plateaus around 8.8%, above the 5% target. Following Raissi et al.'s own recipe — L-BFGS fine-tuning on top of Adam, on a <em>fixed</em> batch of points rather than resampling every step — brings it down to 1.92%.</p>
+        <p>Adam alone gets the heat equation to 0.45% relative \(L^2\) error, well past the target — a short L-BFGS pass pushes the frozen run shown here to 0.23%. Burgers is a different story: Adam plateaus around 8.8%, above the 5% target. Following Raissi et al.'s own recipe — L-BFGS fine-tuning on top of Adam, on a <em>fixed</em> batch of points rather than resampling every step — brings it down to 1.92%.</p>
       </div>
       <div class="theory-card reveal">
         <h3>Mathematical formulation</h3>
         <p>Generic PDE:</p>
-        <div class="formula">ℱ[u](x, t) = 0</div>
+        <div class="formula">\[ \mathcal{F}[u](x, t) = 0 \]</div>
         <p>Heat equation:</p>
-        <div class="formula">u<sub>t</sub> − α u<sub>xx</sub> = 0</div>
+        <div class="formula">\[ u_t - \alpha\, u_{xx} = 0 \]</div>
         <p>Burgers equation:</p>
-        <div class="formula">u<sub>t</sub> + u · u<sub>x</sub> − ν u<sub>xx</sub> = 0</div>
+        <div class="formula">\[ u_t + u\, u_x - \nu\, u_{xx} = 0 \]</div>
         <p>Composite PINN loss:</p>
-        <div class="formula">L = L<sub>PDE</sub> + λ<sub>B</sub> L<sub>boundary</sub> + λ<sub>I</sub> L<sub>initial</sub></div>
+        <div class="formula">\[ \mathcal{L} = \mathcal{L}_{\text{PDE}} + \lambda_B\, \mathcal{L}_{\text{boundary}} + \lambda_I\, \mathcal{L}_{\text{initial}} \]</div>
       </div>
     </div>
   </div>
@@ -79,7 +82,7 @@
 
     <div class="analysis-callout reveal">
       <h4>Attempt 1 · Adam alone</h4>
-      <p>Same recipe as the heat equation — 8000 epochs, 10k resampled collocation points — applied to the harder problem. Relative L2 error against the Chebyshev-spectral reference: <strong style="color:var(--fg-0)">≈ 8.8%</strong>, above the 5% target. The loss curve below shows why: it decays smoothly at first, then stops improving past roughly step 5000 and oscillates around 0.01 instead of continuing down.</p>
+      <p>Same recipe as the heat equation — 8000 epochs, 10k resampled collocation points — applied to the harder problem. Relative \(L^2\) error against the Chebyshev-spectral reference: <strong style="color:var(--fg-0)">≈ 8.8%</strong>, above the 5% target. The loss curve below shows why: it decays smoothly at first, then stops improving past roughly step 5000 and oscillates around 0.01 instead of continuing down.</p>
     </div>
 
     <div class="chart-container reveal">
@@ -100,13 +103,13 @@
 
     <div class="analysis-callout reveal">
       <h4>Attempt 2 · L-BFGS — looked like it worked, hadn't</h4>
-      <p>Raissi et al.'s own paper follows Adam with L-BFGS fine-tuning, so that was the obvious next step. The first run reported a lower loss (<code>6.46 × 10⁻³</code> vs. Adam's <code>1.04 × 10⁻²</code>) — but the relative L2 error against the reference came back <strong style="color:var(--fg-0)">identical to 15 significant figures</strong> to the pre-refinement number. The model hadn't actually changed at all.</p>
+      <p>Raissi et al.'s own paper follows Adam with L-BFGS fine-tuning, so that was the obvious next step. The first run reported a lower loss (\(6.46 \times 10^{-3}\) vs. Adam's \(1.04 \times 10^{-2}\)) — but the relative \(L^2\) error against the reference came back <strong style="color:var(--fg-0)">identical to 15 significant figures</strong> to the pre-refinement number. The model hadn't actually changed at all.</p>
       <p>The cause: <code>torch.optim.LBFGS</code>'s line search assumes the loss is a <em>deterministic</em> function of the parameters — evaluating it twice at the same point must give the same value. The training loop resamples a fresh batch of collocation/boundary/initial points on every call, which is correct for Adam's stochastic mini-batches but turns the objective into a noisy function under L-BFGS. The line search's step-size probes land on different random realizations of the loss, can never reliably satisfy the Wolfe conditions, and the step gets rejected — silently, with no exception and no warning.</p>
     </div>
 
     <div class="analysis-callout reveal">
       <h4>Attempt 3 · fixed-batch L-BFGS — the fix</h4>
-      <p>Sample one large batch of points <em>once</em>, before calling L-BFGS, and reuse that exact batch for every internal evaluation of the closure during refinement. That single change makes the objective deterministic, which is what the line search and the quasi-Newton curvature estimate both require. 1000 L-BFGS iterations on 40k fixed collocation points then brought the loss to <code>4.53 × 10⁻⁴</code> and the relative L2 error to <strong style="color:var(--fg-0)">1.92%</strong>, clearing the 5% target.</p>
+      <p>Sample one large batch of points <em>once</em>, before calling L-BFGS, and reuse that exact batch for every internal evaluation of the closure during refinement. That single change makes the objective deterministic, which is what the line search and the quasi-Newton curvature estimate both require. 1000 L-BFGS iterations on 40k fixed collocation points then brought the loss to \(4.53 \times 10^{-4}\) and the relative \(L^2\) error to <strong style="color:var(--fg-0)">1.92%</strong>, clearing the 5% target.</p>
     </div>
   </div>
 </section>
@@ -122,11 +125,11 @@
       <div class="skill-name">Numerical PDEs</div>
       <div class="skill-how">Formulate residuals in smooth form, convert physical constraints into loss terms.</div>
       <div class="skill-name">Optimization</div>
-      <div class="skill-how">Balance composite loss weights λ, learning rate schedulers, Adam → L-BFGS.</div>
+      <div class="skill-how">Balance composite loss weights \(\lambda\), learning rate schedulers, Adam → L-BFGS.</div>
       <div class="skill-name">Paper implementation</div>
       <div class="skill-how">Translate Raissi et al. (JCP 2019) directly into clean, testable PyTorch code.</div>
       <div class="skill-name">Validation</div>
-      <div class="skill-how">Relative L² error against the analytical solution (heat) and high-resolution numerical reference (Burgers).</div>
+      <div class="skill-how">Relative \(L^2\) error against the analytical solution (heat) and high-resolution numerical reference (Burgers).</div>
       <div class="skill-name">2D visualization</div>
       <div class="skill-how">Space-time heatmaps, snapshots of u(x) at various t, side-by-side comparison with classical solver.</div>
       <div class="skill-name">Technical writing</div>
@@ -180,7 +183,7 @@
       <li class="done">L-BFGS fine-tuning on a fixed batch (Adam alone plateaus above target on Burgers)</li>
       <li class="done">Validation: heat vs. analytical solution, Burgers vs. Chebyshev-spectral solver</li>
       <li class="done">Space-time comparison figures</li>
-      <li class="done">5-seed robustness check (mean ± std relative L² error, both equations)</li>
+      <li class="done">5-seed robustness check (mean ± std relative \(L^2\) error, both equations)</li>
     </ul>
   </div>
 </section>
@@ -192,12 +195,12 @@
     <div class="two-col">
       <div class="info-card reveal">
         <h3>Heat equation</h3>
-        <p style="margin-bottom:0;">Target: relative L² error &lt; 1% vs. analytical solution. <strong style="color:var(--fg-0)">Achieved: 0.45%</strong> with Adam alone (no fine-tuning needed); <strong style="color:var(--fg-0)">0.23%</strong> in the frozen run with a short L-BFGS pass added for consistency.</p>
+        <p style="margin-bottom:0;">Target: relative \(L^2\) error &lt; 1% vs. analytical solution. <strong style="color:var(--fg-0)">Achieved: 0.45%</strong> with Adam alone (no fine-tuning needed); <strong style="color:var(--fg-0)">0.23%</strong> in the frozen run with a short L-BFGS pass added for consistency.</p>
       </div>
       <div class="info-card reveal">
         <h3>Burgers equation</h3>
-        <p>Target: relative L² error &lt; 5% vs. high-resolution numerical reference. <strong style="color:var(--fg-0)">Achieved: 1.92%</strong>, after L-BFGS fine-tuning.</p>
-        <p style="margin-bottom:0;">Adam alone plateaus at ~8.8% — above target. The remaining error after L-BFGS concentrates almost entirely in the thin internal layer at x = 0, not spread across the domain.</p>
+        <p>Target: relative \(L^2\) error &lt; 5% vs. high-resolution numerical reference. <strong style="color:var(--fg-0)">Achieved: 1.92%</strong>, after L-BFGS fine-tuning.</p>
+        <p style="margin-bottom:0;">Adam alone plateaus at ~8.8% — above target. The remaining error after L-BFGS concentrates almost entirely in the thin internal layer at \(x = 0\), not spread across the domain.</p>
       </div>
     </div>
   </div>
@@ -259,11 +262,11 @@
     <div class="results-grid reveal" style="margin-bottom: 28px;">
       <div class="result-metric">
         <div class="value">0.23%</div>
-        <div class="label">heat equation · relative L² error vs. the exact analytical solution</div>
+        <div class="label">heat equation · relative \(L^2\) error vs. the exact analytical solution</div>
       </div>
       <div class="result-metric">
         <div class="value">1.92%</div>
-        <div class="label">Burgers equation · relative L² error vs. the spectral reference, after L-BFGS</div>
+        <div class="label">Burgers equation · relative \(L^2\) error vs. the spectral reference, after L-BFGS</div>
       </div>
       <div class="result-metric">
         <div class="value">~8.8%</div>
@@ -282,21 +285,21 @@
       <div id="chart-heat-slices" style="width:100%; height:420px;">
         <div class="chart-loading">Loading snapshots…</div>
       </div>
-      <div class="chart-caption"><strong>Fig 3 · Heat equation, snapshots at fixed t.</strong> Solid = reference, dotted = PINN — at this error level (0.23%) the two curves sit almost exactly on top of each other at every snapshot.</div>
+      <div class="chart-caption"><strong>Fig 3 · Heat equation, snapshots at fixed \(t\).</strong> Solid = reference, dotted = PINN — at this error level (0.23%) the two curves sit almost exactly on top of each other at every snapshot.</div>
     </div>
 
     <div class="chart-container reveal" style="margin-top: 36px;">
       <div id="chart-burgers-field" style="width:100%; height:460px;">
         <div class="chart-loading">Loading Burgers field…</div>
       </div>
-      <div class="chart-caption"><strong>Fig 4 · Burgers equation, full space-time field.</strong> Switch to "PINN − Reference" to see the error concentrate in a thin band right at the internal layer (x = 0) — not scattered across the domain, the signature of a hard local feature rather than a broken model.</div>
+      <div class="chart-caption"><strong>Fig 4 · Burgers equation, full space-time field.</strong> Switch to "PINN − Reference" to see the error concentrate in a thin band right at the internal layer (\(x = 0\)) — not scattered across the domain, the signature of a hard local feature rather than a broken model.</div>
     </div>
 
     <div class="chart-container reveal" style="margin-top: 24px;">
       <div id="chart-burgers-slices" style="width:100%; height:420px;">
         <div class="chart-loading">Loading snapshots…</div>
       </div>
-      <div class="chart-caption"><strong>Fig 5 · Burgers equation, snapshots at fixed t.</strong> Solid = reference, dotted = PINN. The steepening front near x = 0 is visible growing sharper from t = 0 to t = 1 — the PINN tracks it closely but is visibly where the small remaining error concentrates.</div>
+      <div class="chart-caption"><strong>Fig 5 · Burgers equation, snapshots at fixed \(t\).</strong> Solid = reference, dotted = PINN. The steepening front near \(x = 0\) is visible growing sharper from \(t = 0\) to \(t = 1\) — the PINN tracks it closely but is visibly where the small remaining error concentrates.</div>
     </div>
 
     <noscript>

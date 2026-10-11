@@ -9,6 +9,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/styles.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false})"></script>
 </head>
 <body class="text-balanced">
 
@@ -51,22 +54,22 @@
     <div class="two-col">
       <div class="reveal">
         <p>This project combines <strong style="color:var(--fg-0)">real statistical physics</strong>, <strong style="color:var(--fg-0)">applied Bayesian statistics</strong> and <strong style="color:var(--fg-0)">end-to-end scientific Python code</strong>. The 2D Ising model is ideal: it has a nontrivial phase transition and, at the same time, an exact analytical solution against which any numerical code can be validated.</p>
-        <p>A Numba-accelerated Metropolis simulator generates the M(T) curve of the system, and a probabilistic model in PyMC with physically motivated priors infers the critical parameters from that noisy curve. The comparison against Onsager is the ultimate test: if inference recovers `Tc ≈ 2.2692` and `β = 1/8` with reasonable uncertainty, the full pipeline is sound.</p>
+        <p>A Numba-accelerated Metropolis simulator generates the \(M(T)\) curve of the system, and a probabilistic model in PyMC with physically motivated priors infers the critical parameters from that noisy curve. The comparison against Onsager is the ultimate test: if inference recovers \(T_c \approx 2.2692\) and \(\beta = 1/8\) with reasonable uncertainty, the full pipeline is sound.</p>
         <p>Everything runs in a single command: <code>python main.py</code> executes simulation, inference, and generates all final figures.</p>
       </div>
       <div class="theory-card reveal">
         <h3>Core formulas</h3>
         <p style="margin-top: 0;">System energy:</p>
-        <div class="formula">E = −J ∑⟨i,j⟩ sᵢ · sⱼ</div>
+        <div class="formula">\[ E = -J \sum_{\langle i,j \rangle} s_i\, s_j \]</div>
         <p>Metropolis acceptance rule:</p>
-        <div class="formula">P(flip) = min(1, e<sup>−ΔE/T</sup>)</div>
-        <p>Power law near Tc:</p>
-        <div class="formula">M(T) ≈ (1 − T/Tc)<sup>β</sup></div>
+        <div class="formula">\[ P(\text{flip}) = \min\!\left(1,\; e^{-\Delta E/T}\right) \]</div>
+        <p>Power law near \(T_c\):</p>
+        <div class="formula">\[ M(T) \approx \left(1 - T/T_c\right)^{\beta} \]</div>
         <p>Bayes theorem applied:</p>
-        <div class="formula">P(Tc, β | data) ∝ P(data | Tc, β) · P(Tc, β)</div>
+        <div class="formula">\[ P(T_c, \beta \mid \text{data}) \;\propto\; P(\text{data} \mid T_c, \beta)\; P(T_c, \beta) \]</div>
         <p>Onsager's exact solution:</p>
-        <div class="formula">Tc = 2 / ln(1 + √2) ≈ 2.2692</div>
-        <div class="formula">β = 1/8 = 0.125</div>
+        <div class="formula">\[ T_c = \frac{2}{\ln\!\left(1 + \sqrt{2}\right)} \approx 2.2692 \]</div>
+        <div class="formula">\[ \beta = \tfrac{1}{8} = 0.125 \]</div>
       </div>
     </div>
   </div>
@@ -81,33 +84,33 @@
     <div class="two-col">
       <div class="info-card reveal">
         <h3>1 · Metropolis simulator</h3>
-        <p><strong style="color:var(--fg-0)">Goal:</strong> sample equilibrium spin configurations at a given temperature T.</p>
-        <p><strong style="color:var(--fg-0)">How:</strong> each step picks a random site, proposes flipping its spin (s → −s) and accepts with probability <code>min(1, exp(−ΔE/T))</code>. A sweep = N² proposed flips. The hot kernel is JIT-compiled via <code>@numba.njit</code> (~50× faster than plain NumPy, with pure-Python fallback).</p>
+        <p><strong style="color:var(--fg-0)">Goal:</strong> sample equilibrium spin configurations at a given temperature \(T\).</p>
+        <p><strong style="color:var(--fg-0)">How:</strong> each step picks a random site, proposes flipping its spin (\(s \to -s\)) and accepts with probability \(\min(1, e^{-\Delta E/T})\). A sweep = \(N^2\) proposed flips. The hot kernel is JIT-compiled via <code>@numba.njit</code> (~50× faster than plain NumPy, with pure-Python fallback).</p>
       </div>
       <div class="info-card reveal">
         <h3>2 · Temperature sweep</h3>
-        <p><strong style="color:var(--fg-0)">Input:</strong> 30 temperatures in <code>T ∈ [1.5, 3.5]</code>, covering both ordered and disordered regimes.</p>
-        <p><strong style="color:var(--fg-0)">Process:</strong> at each T, 2000 thermalization sweeps (discarded) + 3000 measurement sweeps (averaged). <strong style="color:var(--fg-0)">Output:</strong> a CSV <code>T, M_mean, M_std</code> — the "observed dataset" fed to the Bayesian model.</p>
+        <p><strong style="color:var(--fg-0)">Input:</strong> 30 temperatures in \(T \in [1.5,\, 3.5]\), covering both ordered and disordered regimes.</p>
+        <p><strong style="color:var(--fg-0)">Process:</strong> at each \(T\), 2000 thermalization sweeps (discarded) + 3000 measurement sweeps (averaged). <strong style="color:var(--fg-0)">Output:</strong> a CSV <code>T, M_mean, M_std</code> — the "observed dataset" fed to the Bayesian model.</p>
       </div>
       <div class="info-card reveal">
         <h3>3 · Probabilistic model (PyMC)</h3>
-        <p><strong style="color:var(--fg-0)">Priors:</strong> <code>Tc ~ Normal(2.3, 0.3)</code>, <code>β ~ Normal(0.12, 0.05)</code>, <code>σ ~ HalfNormal(0.1)</code>. Deliberately wide — the data should dominate.</p>
-        <p><strong style="color:var(--fg-0)">Likelihood:</strong> <code>M_obs ~ Normal((1 − T/Tc)^β, σ)</code> when <code>T &lt; Tc</code>; exactly 0 above. The piecewise form captures the broken-symmetry ordered phase.</p>
+        <p><strong style="color:var(--fg-0)">Priors:</strong> \(T_c \sim \mathcal{N}(2.3,\, 0.3)\), \(\beta \sim \mathcal{N}(0.12,\, 0.05)\), \(\sigma \sim \text{HalfNormal}(0.1)\). Deliberately wide — the data should dominate.</p>
+        <p><strong style="color:var(--fg-0)">Likelihood:</strong> \(M_{\text{obs}} \sim \mathcal{N}\big((1 - T/T_c)^{\beta},\, \sigma\big)\) when \(T &lt; T_c\); exactly 0 above. The piecewise form captures the broken-symmetry ordered phase.</p>
       </div>
       <div class="info-card reveal">
         <h3>4 · MCMC sampling</h3>
         <p><strong style="color:var(--fg-0)">Config:</strong> 4 chains × (1000 tune + 5000 draws) = 20 000 posterior samples, drawn by the default random-walk Metropolis-Hastings sampler (NumPy); a PyMC NUTS backend is also available.</p>
-        <p><strong style="color:var(--fg-0)">Output:</strong> the full joint posterior <code>P(Tc, β, σ | data)</code> — distributions, not point estimates. Convergence checks via ArviZ: <code>R̂ ≤ 1.01</code>; ESS is a few hundred for every parameter (≈ 770 for <code>Tc</code>, ≈ 740 for <code>σ</code>, ≈ 300 for the slower-mixing <code>β</code>).</p>
+        <p><strong style="color:var(--fg-0)">Output:</strong> the full joint posterior \(P(T_c, \beta, \sigma \mid \text{data})\) — distributions, not point estimates. Convergence checks via ArviZ: \(\hat{R} \le 1.01\); ESS is a few hundred for every parameter (≈ 770 for \(T_c\), ≈ 740 for \(\sigma\), ≈ 300 for the slower-mixing \(\beta\)).</p>
       </div>
       <div class="info-card reveal">
         <h3>5 · Validation against Onsager</h3>
-        <p>Overlay the exact values (<code>Tc = 2/ln(1+√2) ≈ 2.2692</code>, <code>β = 1/8</code>) on the posteriors. Success criterion: the 95% HDI of each posterior brackets its exact value. If not → the prior is too tight, the simulator has a bug, or the sampler hasn't converged.</p>
+        <p>Overlay the exact values (\(T_c = 2/\ln(1+\sqrt{2}) \approx 2.2692\), \(\beta = 1/8\)) on the posteriors. Success criterion: the 95% HDI of each posterior brackets its exact value. If not → the prior is too tight, the simulator has a bug, or the sampler hasn't converged.</p>
       </div>
       <div class="info-card reveal">
         <h3>6 · Final figures</h3>
         <p>Three PNGs auto-saved to <code>results/</code> by <code>src/plots.py</code>:</p>
         <ul style="margin: 8px 0 0; padding-left: 18px; color: var(--fg-1); font-size: 14px;">
-          <li><code>magnetization.png</code> — M(T) + Onsager's Tc</li>
+          <li><code>magnetization.png</code> — \(M(T)\) + Onsager's \(T_c\)</li>
           <li><code>posteriors.png</code> — marginal posteriors with exact values</li>
           <li><code>trace.png</code> — per-chain trace plots</li>
         </ul>
@@ -132,11 +135,11 @@
       <div class="skill-name">Bayesian inference</div>
       <div class="skill-how">PyMC model with Normal/HalfNormal priors and Gaussian likelihood over the power law.</div>
       <div class="skill-name">MCMC (MH + NUTS)</div>
-      <div class="skill-how">Sampling of 4 chains × 5000 draws with R̂, ESS, and trace plot diagnostics via ArviZ.</div>
+      <div class="skill-how">Sampling of 4 chains × 5000 draws with \(\hat{R}\), ESS, and trace plot diagnostics via ArviZ.</div>
       <div class="skill-name">Technical visualization</div>
-      <div class="skill-how">M(T) curve with errors, posteriors with exact values overlaid, convergence trace plots.</div>
+      <div class="skill-how">\(M(T)\) curve with errors, posteriors with exact values overlaid, convergence trace plots.</div>
       <div class="skill-name">Scientific rigor</div>
-      <div class="skill-how">Quantitative validation against Onsager (1944): Tc = 2.2692 exact, β = 1/8 exact.</div>
+      <div class="skill-how">Quantitative validation against Onsager (1944): \(T_c = 2.2692\) exact, \(\beta = 1/8\) exact.</div>
       <div class="skill-name">Reproducibility</div>
       <div class="skill-how"><code>python main.py</code> runs the full pipeline end-to-end without manual intervention.</div>
     </div>
@@ -188,8 +191,8 @@
       <li class="done">Argparse CLI per module and end-to-end pipeline in <code>main.py</code></li>
       <li class="done">Dual sampler: pure-NumPy MH (default) + PyMC NUTS backend</li>
       <li class="done">Visualization module with all three publication-style figures</li>
-      <li class="done">Full simulation (32×32 lattice · 25 temperatures · 5000 sweeps per T)</li>
-      <li class="done">MCMC run — diagnostics verified (R̂ ≤ 1.01, ESS &gt; 290)</li>
+      <li class="done">Full simulation (32×32 lattice · 25 temperatures · 5000 sweeps per \(T\))</li>
+      <li class="done">MCMC run — diagnostics verified (\(\hat{R} \le 1.01\), ESS &gt; 290)</li>
       <li class="done">Polished static figures embedded in the README (GitHub-friendly)</li>
       <li class="done">Companion notebook <code>notebooks/explore.ipynb</code> — interactive walk-through</li>
       <li class="done">Optional extension available for 64×64 lattice (see README §8)</li>
@@ -219,7 +222,7 @@
       </div>
       <div class="result-metric">
         <div class="value">ESS_bulk ≥ 297</div>
-        <div class="label">β is the slowest-mixing parameter; Tc and σ clear ~750</div>
+        <div class="label">\(\beta\) is the slowest-mixing parameter; \(T_c\) and \(\sigma\) clear ~750</div>
       </div>
     </div>
 
@@ -228,7 +231,7 @@
       <div id="chart-magnetization" style="width:100%; height:480px;">
         <div class="chart-loading">Loading magnetization curve…</div>
       </div>
-      <div class="chart-caption"><strong>Fig 1</strong> · Simulated ⟨|M|⟩ vs. temperature on a 32×32 lattice, with 1σ error bars per temperature. Amber dashed line: Onsager's exact Tc. The curve shows the characteristic second-order phase transition — sharp drop around T ≈ 2.3 with largest fluctuations at the transition.</div>
+      <div class="chart-caption"><strong>Fig 1</strong> · Simulated \(\langle |M| \rangle\) vs. temperature on a 32×32 lattice, with \(1\sigma\) error bars per temperature. Amber dashed line: Onsager's exact \(T_c\). The curve shows the characteristic second-order phase transition — sharp drop around \(T \approx 2.3\) with largest fluctuations at the transition.</div>
     </div>
 
     <!-- Chart 2: Posteriors -->
@@ -236,7 +239,7 @@
       <div id="chart-posteriors" style="width:100%; height:480px;">
         <div class="chart-loading">Loading posteriors…</div>
       </div>
-      <div class="chart-caption"><strong>Fig 2</strong> · Marginal posteriors of Tc (left) and β (right) built from 20 000 MCMC samples (4 chains × 5000 draws). Shaded band: 95% HDI. Pink solid line: posterior mean. Amber dashed line: Onsager's exact value. β's HDI brackets its exact value; Tc's does not — the gap is the finite-size effect.</div>
+      <div class="chart-caption"><strong>Fig 2</strong> · Marginal posteriors of \(T_c\) (left) and \(\beta\) (right) built from 20 000 MCMC samples (4 chains × 5000 draws). Shaded band: 95% HDI. Pink solid line: posterior mean. Amber dashed line: Onsager's exact value. \(\beta\)'s HDI brackets its exact value; \(T_c\)'s does not — the gap is the finite-size effect.</div>
     </div>
 
     <!-- Chart 3: Trace plots -->
@@ -266,7 +269,7 @@
 
     <!-- Subsection: What kind of problem -->
     <h3 class="reveal" style="margin-top: 12px;">What type of problem is this?</h3>
-    <p class="reveal" style="color: var(--fg-1); max-width: 820px;">The natural reflex is to ask for accuracy, precision/recall, or a confusion matrix. None of those apply here. This project isn't a classifier — it's a <strong style="color:var(--fg-0)">parameter inference</strong> problem: given a noisy M(T) curve, what is the joint probability distribution of the physical parameters (Tc, β, σ)?</p>
+    <p class="reveal" style="color: var(--fg-1); max-width: 820px;">The natural reflex is to ask for accuracy, precision/recall, or a confusion matrix. None of those apply here. This project isn't a classifier — it's a <strong style="color:var(--fg-0)">parameter inference</strong> problem: given a noisy \(M(T)\) curve, what is the joint probability distribution of the physical parameters \((T_c, \beta, \sigma)\)?</p>
 
     <table class="analysis-table reveal">
       <thead>
@@ -290,7 +293,7 @@
         <tr>
           <td class="highlight">Parameter inference (this project)</td>
           <td>posterior distribution over parameters</td>
-          <td>HDI, R̂, ESS, posterior predictive checks, ground-truth validation</td>
+          <td>HDI, \(\hat{R}\), ESS, posterior predictive checks, ground-truth validation</td>
         </tr>
       </tbody>
     </table>
@@ -302,7 +305,7 @@
     <div class="two-col" style="margin-top: 16px;">
       <div class="info-card reveal">
         <h3>① Point estimate</h3>
-        <p>Posterior mean as the "most likely" value. For Tc the mean is <strong style="color:var(--fg-0)">2.363</strong>, for β it's <strong style="color:var(--fg-0)">0.090</strong>. Never reported alone — always with its uncertainty.</p>
+        <p>Posterior mean as the "most likely" value. For \(T_c\) the mean is <strong style="color:var(--fg-0)">2.363</strong>, for \(\beta\) it's <strong style="color:var(--fg-0)">0.090</strong>. Never reported alone — always with its uncertainty.</p>
       </div>
       <div class="info-card reveal">
         <h3>② Uncertainty quantification</h3>
@@ -310,7 +313,7 @@
       </div>
       <div class="info-card reveal">
         <h3>③ MCMC convergence</h3>
-        <p><strong style="color:var(--fg-0)">R̂ (Gelman-Rubin)</strong> compares between-chain vs. within-chain variance (target: ≤ 1.01). <strong style="color:var(--fg-0)">ESS</strong> is the effective number of independent samples after accounting for autocorrelation. <strong style="color:var(--fg-0)">Acceptance rate</strong> of MH proposals (target: 20–40% for ℝ³).</p>
+        <p><strong style="color:var(--fg-0)">\(\hat{R}\) (Gelman-Rubin)</strong> compares between-chain vs. within-chain variance (target: ≤ 1.01). <strong style="color:var(--fg-0)">ESS</strong> is the effective number of independent samples after accounting for autocorrelation. <strong style="color:var(--fg-0)">Acceptance rate</strong> of MH proposals (target: 20–40% for \(\mathbb{R}^3\)).</p>
       </div>
       <div class="info-card reveal">
         <h3>④ Ground-truth validation</h3>
@@ -331,7 +334,7 @@
       </thead>
       <tbody>
         <tr>
-          <td>R̂ max</td>
+          <td>\(\hat{R}\) max</td>
           <td>chain convergence (Gelman-Rubin)</td>
           <td>≤ 1.01 ideal · ≤ 1.05 tolerable</td>
           <td class="check">1.01 ✓</td>
@@ -351,17 +354,17 @@
         <tr>
           <td>Acceptance rate</td>
           <td>MH proposals accepted</td>
-          <td>20–40% optimal (for ℝ³)</td>
+          <td>20–40% optimal (for \(\mathbb{R}^3\))</td>
           <td class="check">within the 20–40% target ✓</td>
         </tr>
         <tr>
-          <td>β · 95% HDI contains exact?</td>
+          <td>\(\beta\) · 95% HDI contains exact?</td>
           <td>ground-truth validation</td>
           <td>must contain 0.125</td>
           <td class="check">[0.054, 0.130] ✓</td>
         </tr>
         <tr>
-          <td>Tc · 95% HDI contains exact?</td>
+          <td>\(T_c\) · 95% HDI contains exact?</td>
           <td>ground-truth validation</td>
           <td>must contain 2.2692</td>
           <td class="warn">[2.333, 2.416] — shifted +4.1% (finite-size)</td>
@@ -375,18 +378,18 @@
 
     <div class="analysis-callout reveal">
       <h4>1 · β recovered correctly</h4>
-      <p>The posterior of β is centered at 0.090 and its 95% HDI <strong>[0.054, 0.130]</strong> comfortably brackets the exact value 1/8 = 0.125. This confirms that the piecewise power-law likelihood captures the critical behavior and that the sampler explores the right part of parameter space.</p>
+      <p>The posterior of \(\beta\) is centered at 0.090 and its 95% HDI <strong>[0.054, 0.130]</strong> comfortably brackets the exact value \(1/8 = 0.125\). This confirms that the piecewise power-law likelihood captures the critical behavior and that the sampler explores the right part of parameter space.</p>
     </div>
 
     <div class="analysis-callout reveal">
-      <h4>2 · Tc shifted upward by a finite-size effect</h4>
-      <p>The posterior of Tc centers at <strong>2.363</strong> — about +0.09 above Onsager's exact 2.2692. This is <strong>not</strong> a bug. Finite-size scaling theory predicts that on an N×N lattice the apparent critical temperature satisfies <code>Tc(N) − Tc(∞) ∝ 1/N</code>. At N = 32, a shift of +0.1 to +0.2 is consistent with the literature (Ferrenberg &amp; Landau, 1991).</p>
+      <h4>2 · \(T_c\) shifted upward by a finite-size effect</h4>
+      <p>The posterior of \(T_c\) centers at <strong>2.363</strong> — about +0.09 above Onsager's exact 2.2692. This is <strong>not</strong> a bug. Finite-size scaling theory predicts that on an \(N \times N\) lattice the apparent critical temperature satisfies \(T_c(N) - T_c(\infty) \propto 1/N\). At \(N = 32\), a shift of +0.1 to +0.2 is consistent with the literature (Ferrenberg &amp; Landau, 1991).</p>
       <p>To recover Onsager's value within the HDI, running on a 64×64 or 128×128 lattice would close the gap — at a proportionally higher compute cost.</p>
     </div>
 
     <div class="analysis-callout reveal">
       <h4>3 · The sampler is healthy</h4>
-      <p>All four chains reach R̂ ≤ 1.01 with ESS in the hundreds. The trace plots (Fig 3) show no drift, no stuck regions, and good mixing across chains. Acceptance sits in the low-tens-of-percent band — within the optimal range for random-walk Metropolis in 3 dimensions. If any of this failed, none of the posterior numbers above would be trustworthy.</p>
+      <p>All four chains reach \(\hat{R} \le 1.01\) with ESS in the hundreds. The trace plots (Fig 3) show no drift, no stuck regions, and good mixing across chains. Acceptance sits in the low-tens-of-percent band — within the optimal range for random-walk Metropolis in 3 dimensions. If any of this failed, none of the posterior numbers above would be trustworthy.</p>
     </div>
 
   </div>
@@ -396,7 +399,7 @@
   <div class="container">
     <div class="section-eyebrow reveal">// Live demo</div>
     <h2 class="reveal">Run the simulation in your browser</h2>
-    <p class="section-intro reveal">The Monte Carlo half of this project, made interactive. The same Numba-accelerated Metropolis sampler runs live as a Streamlit app on Hugging Face Spaces — nothing is pre-computed. Set a <strong style="color:var(--fg-0)">temperature</strong> and a <strong style="color:var(--fg-0)">lattice size</strong> and watch the spins settle into an ordered or disordered phase; then sample several temperatures with <strong style="color:var(--fg-0)">Add point to M(T)</strong> and trace the magnetization collapsing across the Onsager critical temperature <code>Tc ≈ 2.269</code>.</p>
+    <p class="section-intro reveal">The Monte Carlo half of this project, made interactive. The same Numba-accelerated Metropolis sampler runs live as a Streamlit app on Hugging Face Spaces — nothing is pre-computed. Set a <strong style="color:var(--fg-0)">temperature</strong> and a <strong style="color:var(--fg-0)">lattice size</strong> and watch the spins settle into an ordered or disordered phase; then sample several temperatures with <strong style="color:var(--fg-0)">Add point to \(M(T)\)</strong> and trace the magnetization collapsing across the Onsager critical temperature \(T_c \approx 2.269\).</p>
     <div class="cta-row reveal" style="margin: 12px 0 24px;">
       <a href="https://huggingface.co/spaces/crozol/ising-bayesian-demo" class="btn btn-primary" target="_blank" rel="noopener">Open in new tab ↗</a>
       <a href="https://github.com/crozol/01-ising-bayesian" class="btn btn-ghost" target="_blank" rel="noopener">Source code →</a>

@@ -160,7 +160,8 @@
 │   ├── <span class="file">reference.py</span>   <span class="comment"># Chebyshev-spectral reference solution for Burgers</span>
 │   └── <span class="file">train.py</span>       <span class="comment"># Adam + L-BFGS, composite loss (PDE + BC + IC)</span>
 ├── <span class="folder">scripts/</span>
-│   └── <span class="file">export_json.py</span> <span class="comment"># arrays → JSON for the portfolio page's interactive charts</span>
+│   ├── <span class="file">export_json.py</span> <span class="comment"># arrays → JSON for the portfolio page's interactive charts</span>
+│   └── <span class="file">seed_sweep.py</span> <span class="comment"># n=5 seed robustness check (mean ± std rel. L² error)</span>
 ├── <span class="folder">tests/</span>         <span class="comment"># pytest: residuals, reference sanity, training smoke test</span>
 └── <span class="folder">figures/</span>       <span class="comment"># PINN-vs-reference comparison plots + loss curve</span></pre>
   </div>
@@ -179,6 +180,7 @@
       <li class="done">L-BFGS fine-tuning on a fixed batch (Adam alone plateaus above target on Burgers)</li>
       <li class="done">Validation: heat vs. analytical solution, Burgers vs. Chebyshev-spectral solver</li>
       <li class="done">Space-time comparison figures</li>
+      <li class="done">5-seed robustness check (mean ± std relative L² error, both equations)</li>
     </ul>
   </div>
 </section>
@@ -197,6 +199,53 @@
         <p>Target: relative L² error &lt; 5% vs. high-resolution numerical reference. <strong style="color:var(--fg-0)">Achieved: 1.92%</strong>, after L-BFGS fine-tuning.</p>
         <p style="margin-bottom:0;">Adam alone plateaus at ~8.8% — above target. The remaining error after L-BFGS concentrates almost entirely in the thin internal layer at x = 0, not spread across the domain.</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Robustness</div>
+    <h2 class="reveal">Does it hold across seeds?</h2>
+    <p class="section-intro reveal">Every number above comes from one frozen run (seed 0). Training is genuinely stochastic — collocation points resample every Adam step, the L-BFGS batch is itself a random draw — so a single run could be a lucky one. Both PINNs were retrained end-to-end across 5 independent seeds.</p>
+
+    <table class="analysis-table reveal">
+      <thead>
+        <tr>
+          <th>Seed</th>
+          <th>0 (featured)</th>
+          <th>1</th>
+          <th>2</th>
+          <th>3</th>
+          <th>4</th>
+          <th>Mean ± std</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Heat — rel. L² error</td>
+          <td class="highlight">0.23%</td>
+          <td>0.13%</td>
+          <td>0.10%</td>
+          <td>0.14%</td>
+          <td>0.12%</td>
+          <td class="highlight">0.14% ± 0.05%</td>
+        </tr>
+        <tr>
+          <td>Burgers — rel. L² error</td>
+          <td class="highlight">1.92%</td>
+          <td>1.86%</td>
+          <td>1.43%</td>
+          <td>1.86%</td>
+          <td>1.14%</td>
+          <td class="highlight">1.64% ± 0.34%</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="analysis-callout reveal" style="margin-top: 24px;">
+      <h4>Every seed clears the target</h4>
+      <p>All 10 runs (5 seeds × 2 equations) stay well under their respective targets (&lt;1% heat, &lt;5% Burgers) — this isn't a one-off. Seed 0, used for every figure and headline number on this page, happens to be the <strong style="color:var(--fg-0)">worst</strong> of the five seeds for <em>both</em> equations. If anything, the numbers quoted throughout this page undersell the typical case rather than flatter it.</p>
     </div>
   </div>
 </section>

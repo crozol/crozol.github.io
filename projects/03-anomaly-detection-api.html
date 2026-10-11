@@ -195,7 +195,8 @@
       <li class="done">LSTM autoencoder (44 510 params) trained on healthy windows only — 80 epochs, ~46 s on CPU</li>
       <li class="done">Threshold calibration on the healthy validation distribution (q99 ≈ 0.551)</li>
       <li class="done">Binary-classification metrics: precision, recall, F1, ROC-AUC, average precision, confusion matrix</li>
-      <li class="done">Baselines on the same split (cycle count, PCA, Isolation Forest), 95% intervals by bootstrap over test engines, per-engine lead time</li>
+      <li class="done">Baselines on the same split (cycle count, PCA, Isolation Forest, One-Class SVM), 95% intervals by bootstrap over test engines, per-engine lead time</li>
+      <li class="done">Encoder ablation, 3 seeds each: MLP, 1D-CNN, Transformer, LSTM-VAE vs the LSTM</li>
       <li class="done">Polished figures in the dark portfolio palette (sensors, loss, error histograms, ROC, confusion, per-engine trajectory, demo preview)</li>
       <li class="done">FastAPI service (<code>/health</code>, <code>/info</code>, <code>/predict</code>) with Pydantic validation and lifespan model load</li>
       <li class="done">Streamlit demo: CSV upload + built-in test engine, score/threshold chart, sensor traces, raw-score table</li>
@@ -267,6 +268,56 @@
         </div>
       </div>
     </noscript>
+  </div>
+</section>
+
+<section class="content-section" id="baselines">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Baselines &amp; ablation</div>
+    <h2 class="reveal">What the autoencoder is measured against</h2>
+    <p class="section-intro reveal">The 3 913 test windows overlap 29/30 and come from only 20 engines, so the effective sample size is about 20. Intervals are 95% bootstrap intervals over test engines. Lead time is the RUL at which an engine's score crosses the q99 threshold and stays above it, one number per engine.</p>
+
+    <table class="analysis-table reveal">
+      <thead>
+        <tr>
+          <th>Score</th>
+          <th>ROC-AUC [95% CI]</th>
+          <th>Average precision</th>
+          <th>Lead time, median [IQR]</th>
+          <th>Engines missed</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Cycle index (trivial)</td><td>0.839 [0.803, 0.897]</td><td>0.484</td><td>88 [57, 144] · 26% false alarms on healthy windows</td><td>0 / 20</td></tr>
+        <tr><td>PCA reconstruction (16 comp.)</td><td>0.895 [0.841, 0.944]</td><td>0.743</td><td>16 [4, 24]</td><td>4 / 20</td></tr>
+        <tr><td>One-Class SVM</td><td>0.960 [0.936, 0.981]</td><td>0.859</td><td>52 [31, 79]</td><td>0 / 20</td></tr>
+        <tr><td>Isolation Forest</td><td>0.970 [0.955, 0.985]</td><td>0.885</td><td>34 [24, 54]</td><td>0 / 20</td></tr>
+        <tr><td>LSTM autoencoder</td><td class="highlight">0.969 [0.954, 0.985]</td><td class="highlight">0.882</td><td class="highlight">46 [28, 67]</td><td>0 / 20</td></tr>
+      </tbody>
+    </table>
+
+    <p class="reveal" style="margin-top: 22px;">The autoencoder has learned degradation rather than elapsed time — its interval does not overlap the cycle-count one — and the non-linear model matters: a linear reconstruction of the same latent size misses 4 engines. An Isolation Forest on the same windows, however, is statistically indistinguishable in ranking quality. The autoencoder is kept because it reconstructs each sensor, so an alarm can be traced to the sensors that drift — not because it ranks better.</p>
+
+    <table class="analysis-table reveal" style="margin-top: 28px;">
+      <thead>
+        <tr>
+          <th>Encoder (16-dim latent, 3 seeds)</th>
+          <th>Parameters</th>
+          <th>ROC-AUC</th>
+          <th>Average precision</th>
+          <th>Training time</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1D-CNN (untuned)</td><td>46 526</td><td>0.814 ± 0.023</td><td>0.612 ± 0.026</td><td>27 s</td></tr>
+        <tr><td>MLP on flattened window</td><td>112 308</td><td>0.916 ± 0.002</td><td>0.785 ± 0.007</td><td>11 s</td></tr>
+        <tr><td>LSTM-VAE</td><td>45 550</td><td>0.969 ± 0.001</td><td>0.868 ± 0.006</td><td>55 s</td></tr>
+        <tr><td>Transformer</td><td>72 862</td><td>0.972 ± 0.001</td><td>0.893 ± 0.004</td><td>177 s</td></tr>
+        <tr><td>LSTM (chosen)</td><td>44 510</td><td class="highlight">0.968 ± 0.001</td><td class="highlight">0.884 ± 0.007</td><td>64 s</td></tr>
+      </tbody>
+    </table>
+
+    <p class="reveal" style="margin-top: 22px;">Seed-to-seed variation (± 0.001) is about thirty times smaller than the engine-level uncertainty (± 0.015), so the Transformer's +0.004 over the LSTM is not an established gain; the LSTM is kept as the smaller and faster model. The CNN result is about this untuned design, not about CNNs in general.</p>
   </div>
 </section>
 

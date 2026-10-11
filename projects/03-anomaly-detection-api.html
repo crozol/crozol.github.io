@@ -194,7 +194,8 @@
       <li class="done">CMAPSS FD001 download + preprocessing pipeline (sensor selection, normalisation, sliding windows)</li>
       <li class="done">LSTM autoencoder (44 510 params) trained on healthy windows only — 80 epochs, ~46 s on CPU</li>
       <li class="done">Threshold calibration on the healthy validation distribution (q99 ≈ 0.551)</li>
-      <li class="done">Binary-classification metrics: precision, recall, F1, ROC-AUC, PR-AUC, confusion matrix</li>
+      <li class="done">Binary-classification metrics: precision, recall, F1, ROC-AUC, average precision, confusion matrix</li>
+      <li class="done">Baselines on the same split (cycle count, PCA, Isolation Forest), 95% intervals by bootstrap over test engines, per-engine lead time</li>
       <li class="done">Polished figures in the dark portfolio palette (sensors, loss, error histograms, ROC, confusion, per-engine trajectory, demo preview)</li>
       <li class="done">FastAPI service (<code>/health</code>, <code>/info</code>, <code>/predict</code>) with Pydantic validation and lifespan model load</li>
       <li class="done">Streamlit demo: CSV upload + built-in test engine, score/threshold chart, sensor traces, raw-score table</li>
@@ -214,7 +215,7 @@
     <div class="results-grid reveal" style="margin-bottom: 28px;">
       <div class="result-metric">
         <div class="value">0.969</div>
-        <div class="label">ROC-AUC on the test split · score-only ranking quality</div>
+        <div class="label">ROC-AUC on the test split · 95% CI [0.954, 0.985], bootstrap over 20 test engines</div>
       </div>
       <div class="result-metric">
         <div class="value">93.7 %</div>

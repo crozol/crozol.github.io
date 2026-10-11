@@ -384,7 +384,7 @@
     <div class="two-col" style="margin-top: 24px;">
       <div class="analysis-callout reveal">
         <h4>What this rules out</h4>
-        <p>The 7.9 % <code>H</code>-drift of the MLP is not a fundamental limit of Neural ODEs on this problem — it is a consequence of the unconstrained architecture. The same training data, schedule and parameter budget under a Hamiltonian prior shrinks the drift by an order of magnitude.</p>
+        <p>The 9.0 ± 3.3 % <code>H</code>-drift of the MLP (5 seeds) is not a fundamental limit of Neural ODEs on this problem — it is a consequence of the unconstrained architecture. The same training data, schedule and parameter budget under a Hamiltonian prior shrinks the drift to 2.4 % — a factor of ~3.7, below every one of the five MLP seeds (min 6.0 %), though based on a single HNN run.</p>
       </div>
       <div class="analysis-callout reveal">
         <h4>What it doesn't</h4>
@@ -556,7 +556,7 @@
     <div class="analysis-callout reveal">
       <h4>2 · The pendulum doesn't fully internalise friction</h4>
       <p>Inside the training window the predicted energy tracks the true dissipation envelope. Past it, the predicted oscillation keeps its amplitude instead of continuing to decay — the network learns the period and phase but only an approximate <code>γ</code>. The 137 % final-time drift is the snapshot consequence; the qualitative summary is "the envelope is right, the late-time decay rate is not".</p>
-      <p>The architectural fix is not more training — it is encoding the structure. A <em>Hamiltonian Neural Network</em> (Greydanus et al., 2019) cannot, by construction, drift in <code>H</code>. A dissipation-aware variant does the same for <code>dE/dt</code>. Both are listed as the natural next step in the README.</p>
+      <p>The architectural fix is not more training — it is encoding the structure. A <em>Hamiltonian Neural Network</em> (Greydanus et al., 2019) conserves its learned <code>H<sub>θ</sub></code> by construction; it is the right prior for conservative systems and is tested on Lotka-Volterra above. The pendulum is dissipative, so the matching prior is a Hamiltonian-plus-dissipation model such as Dissipative SymODEN (Zhong et al., 2020) — the natural next step.</p>
     </div>
 
     <div class="analysis-callout reveal">

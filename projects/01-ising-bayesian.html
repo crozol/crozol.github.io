@@ -50,7 +50,7 @@
     <h2 class="reveal">About this project</h2>
     <div class="two-col">
       <div class="reveal">
-        <p>This project combines three things rarely seen together in a junior ML portfolio: <strong style="color:var(--fg-0)">real statistical physics</strong>, <strong style="color:var(--fg-0)">applied Bayesian statistics</strong> and <strong style="color:var(--fg-0)">end-to-end scientific Python code</strong>. The 2D Ising model is ideal: it has a nontrivial phase transition and, at the same time, an exact analytical solution against which any numerical code can be validated.</p>
+        <p>This project combines <strong style="color:var(--fg-0)">real statistical physics</strong>, <strong style="color:var(--fg-0)">applied Bayesian statistics</strong> and <strong style="color:var(--fg-0)">end-to-end scientific Python code</strong>. The 2D Ising model is ideal: it has a nontrivial phase transition and, at the same time, an exact analytical solution against which any numerical code can be validated.</p>
         <p>A Numba-accelerated Metropolis simulator generates the M(T) curve of the system, and a probabilistic model in PyMC with physically motivated priors infers the critical parameters from that noisy curve. The comparison against Onsager is the ultimate test: if inference recovers `Tc ≈ 2.2692` and `β = 1/8` with reasonable uncertainty, the full pipeline is sound.</p>
         <p>Everything runs in a single command: <code>python main.py</code> executes simulation, inference, and generates all final figures.</p>
       </div>

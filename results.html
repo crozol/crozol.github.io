@@ -84,16 +84,16 @@
   <div class="container">
     <div class="section-eyebrow reveal">02 · Deep learning · Dynamical systems</div>
     <h2 class="reveal">Neural ODEs with a Hamiltonian prior</h2>
-    <p class="section-intro reveal">Learn the right-hand side of conservative ODEs from short noisy trajectories. A Hamiltonian Neural Network builds the symplectic structure into the architecture; on Lotka-Volterra it reduces the drift of the invariant <code>H</code> from 9.0 ± 3.3% (MLP, 5 seeds) to 2.4% (single HNN run).</p>
+    <p class="section-intro reveal">Learn the right-hand side of conservative ODEs from short noisy trajectories. A Hamiltonian Neural Network builds the symplectic structure into the architecture. A controlled ablation on Lotka-Volterra (5 seeds, with a coordinate control) shows when that helps: on orbits the models never saw, once the training data cover more than one orbit.</p>
 
     <div class="results-grid reveal" style="margin-bottom: 22px;">
       <div class="result-metric">
-        <div class="value">9.0 ± 3.3 % → 2.4 %</div>
-        <div class="label">invariant-<code>H</code> drift on Lotka-Volterra · unconstrained MLP → Hamiltonian NN, same parameter budget</div>
+        <div class="value">5.0 % → 2.4 %</div>
+        <div class="label">relative error on five unseen Lotka-Volterra orbits, trained on three trajectories · MLP in log-coordinates → Hamiltonian NN, same parameter budget (5 seeds)</div>
       </div>
       <div class="result-metric">
-        <div class="value">0.96 ± 0.57 %</div>
-        <div class="label">relative extrapolation error past the training window (Lotka-Volterra baseline)</div>
+        <div class="value">8.6 % → 2.2 %</div>
+        <div class="label">drift of the conserved <code>H</code> on the same unseen orbits; with a single training trajectory no model generalises (17–18 % error)</div>
       </div>
       <div class="result-metric">
         <div class="value">8.3 ± 2.4 %</div>

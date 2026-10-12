@@ -331,7 +331,7 @@
         <div class="num">02</div>
         <div class="domain">Deep learning · Dynamical systems</div>
         <h3>Neural ODEs for dynamical systems</h3>
-        <p>Neural ODEs fit to short noisy trajectories of a damped pendulum and a Lotka-Volterra system, trained end-to-end through a differentiable Dormand-Prince solver. Ablation: a Hamiltonian Neural Network with the same parameter budget (~19k) cuts the drift of the conserved quantity from 9.0 ± 3.3% to 2.4%, with no clear gain in extrapolation error.</p>
+        <p>Neural ODEs fit to short noisy trajectories of a damped pendulum and a Lotka-Volterra system, trained end-to-end through a differentiable Dormand-Prince solver. Controlled ablation (5 seeds, with a coordinate control): a Hamiltonian Neural Network of the same size generalises to unseen Lotka-Volterra orbits with 2.4% error and 2.2% drift in the conserved quantity, against 5.0% and 8.6% for the MLP, once trained on three trajectories; trained on one, no model generalises.</p>
         <div class="project-tags">
           <span class="tag tag-live">● Live demo</span><span class="tag">PyTorch</span><span class="tag">torchdiffeq</span><span class="tag">ODEs</span><span class="tag">Autograd</span>
         </div>

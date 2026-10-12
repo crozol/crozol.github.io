@@ -317,8 +317,8 @@
 <section class="content-section" id="ablation">
   <div class="container">
     <div class="section-eyebrow reveal">// Ablation · physics-informed prior</div>
-    <h2 class="reveal">Hamiltonian Neural Network on Lotka-Volterra</h2>
-    <p class="section-intro reveal">The unconstrained MLP recovers \(H\) to within ≈ 8 % by absorbing the structure into 19 106 free parameters. A natural question is whether <em>encoding</em> the Hamiltonian structure into the architecture itself shrinks that drift — and by how much. Lotka-Volterra is canonically Hamiltonian in log-coordinates \((q, p) = (\ln x, \ln z)\) with \(H(q, p) = b\,e^{p} + d\,e^{q} - a\,p - c\,q\); an HNN parametrises a scalar \(H_\theta\) and computes the dynamics as the symplectic gradient via autograd, so every predicted orbit preserves \(H_\theta\) by construction.</p>
+    <h2 class="reveal">Hamiltonian prior: what it buys, and when</h2>
+    <p class="section-intro reveal">The unconstrained MLP keeps the Lotka-Volterra orbit closed only to within ≈ 9 % drift in the conserved quantity \(H\). Two questions follow: does <em>encoding</em> the Hamiltonian structure into the architecture shrink that drift, and does it help the model generalise beyond the one orbit it was trained on? Lotka-Volterra is canonically Hamiltonian in log-coordinates \((q, p) = (\ln x, \ln z)\) with \(H(q, p) = b\,e^{p} + d\,e^{q} - a\,p - c\,q\); an HNN parametrises a scalar \(H_\theta\) and computes the dynamics as the symplectic gradient via autograd, so every predicted orbit preserves \(H_\theta\) by construction.</p>
 
     <div class="two-col">
       <div class="info-card reveal">
@@ -332,33 +332,30 @@
       </div>
     </div>
 
-    <table class="analysis-table reveal" style="margin-top: 28px;">
+    <h3 class="reveal" style="margin-top: 32px;">First comparison: one orbit, one HNN run</h3>
+    <p class="reveal" style="color: var(--fg-1); max-width: 820px;">The HNN trained on the same single trajectory as the MLP, scored on the forward extrapolation of that orbit.</p>
+    <table class="analysis-table reveal" style="margin-top: 16px;">
       <thead>
         <tr>
           <th>Quantity</th>
           <th>unconstrained MLP</th>
-          <th>Hamiltonian NN</th>
-          <th>Reduction</th>
+          <th>Hamiltonian NN (single run)</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>Trainable parameters</td>
           <td>19 106</td>
-          <td>19 009</td>
-          <td>—</td>
-        </tr>
+          <td>19 009</td></tr>
         <tr>
           <td>Relative extrapolation error  \(\sqrt{\text{MSE}} / \max|y|\)</td>
-          <td>1.6 %</td>
+          <td>0.96 % ± 0.57 % (5 seeds)</td>
           <td><span data-metric="hnn_rel_err">_filled by run_</span></td>
-          <td><span data-metric="hnn_rel_err_ratio">—</span></td>
         </tr>
         <tr>
           <td class="highlight">Drift of \(H\) along orbit  \(\operatorname{std}(H)/\langle H \rangle\)</td>
-          <td>7.9 %</td>
+          <td>8.99 % ± 3.30 % (5 seeds)</td>
           <td class="highlight"><span data-metric="hnn_h_drift">_filled by run_</span></td>
-          <td class="highlight"><span data-metric="hnn_h_drift_ratio">—</span></td>
         </tr>
       </tbody>
     </table>
@@ -381,18 +378,55 @@
       <div id="chart-hnn-invariant" style="width:100%; height:480px;">
         <div class="chart-loading">Loading invariant drift…</div>
       </div>
-      <div class="chart-caption"><strong>Fig 10 · Conserved quantity along the predicted trajectory.</strong> \(H\) evaluated point-by-point on each predicted trajectory. The ground truth is flat (cyan reference). The MLP wobbles around it (≈ 7.9 % relative std); the HNN is almost flat — the residual is dominated by <code>dopri5</code> truncation, not by an architectural inability to conserve. The annotated reduction factor is the headline of this ablation.</div>
+      <div class="chart-caption"><strong>Fig 10 · Conserved quantity along the predicted trajectory.</strong> \(H\) evaluated point-by-point on each predicted trajectory. The ground truth is flat (cyan reference). The MLP wobbles around it (≈ 7.9 % relative std for this seed); the HNN is almost flat. Its residual 2.4 % is not solver error: it is unchanged when the tolerance is tightened from \(10^{-5}\) to \(10^{-8}\), while the network's own \(H_\theta\) is conserved to \(3 \cdot 10^{-5}\). It measures how far the learned \(H_\theta\) is from the true \(H\).</div>
     </div>
 
-    <div class="two-col" style="margin-top: 24px;">
-      <div class="analysis-callout reveal">
-        <h4>What this rules out</h4>
-        <p>The 9.0 ± 3.3 % \(H\)-drift of the MLP (5 seeds) is not a fundamental limit of Neural ODEs on this problem — it is a consequence of the unconstrained architecture. The same training data, schedule and parameter budget under a Hamiltonian prior shrinks the drift to 2.4 % — a factor of ~3.7, below every one of the five MLP seeds (min 6.0 %), though based on a single HNN run.</p>
+    <div class="analysis-callout reveal" style="margin-top: 24px;">
+      <h4>Three weaknesses of this comparison</h4>
+      <p>The HNN was trained once; it changes the architecture <em>and</em> the coordinates at the same time (the MLP works in \((x, z)\), the HNN in \((\ln x, \ln z)\)); and it only tests the orbit the models were trained on, which cannot tell whether a model learned the vector field or one closed curve. The controlled ablation below addresses all three.</p>
+    </div>
+
+    <h3 class="reveal" style="margin-top: 40px;">Controlled ablation on unseen orbits</h3>
+    <p class="reveal" style="color: var(--fg-1); max-width: 820px;">Three models with the same width, depth and schedule — the MLP in \((x, z)\), <strong style="color:var(--fg-0)">the same MLP in \((\ln x, \ln z)\)</strong> as a coordinate control, and the HNN — trained on one trajectory or on three, with the initial state of each training trajectory fitted jointly with the network. Each is scored on five orbits it never saw, over \(t \in [0, 22]\). Five seeds per configuration, 30 runs; the \(H\) drift is normalised by the height of each orbit above the fixed point.</p>
+
+    <table class="analysis-table reveal" style="margin-top: 16px;">
+      <thead>
+        <tr>
+          <th>Training</th>
+          <th>Model</th>
+          <th>Unseen orbits · rel. error</th>
+          <th>Unseen orbits · \(H\) drift</th>
+          <th>Training orbit · \(H\) drift</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1 trajectory</td><td>MLP \((x, z)\)</td><td>16.6 % ± 1.9 %</td><td>82.7 % ± 15.7 %</td><td>6.45 % ± 1.51 %</td></tr>
+        <tr><td>1 trajectory</td><td>MLP \((\ln x, \ln z)\)</td><td>17.3 % ± 1.2 %</td><td>60.1 % ± 1.6 %</td><td class="highlight">2.14 % ± 0.30 %</td></tr>
+        <tr><td>1 trajectory</td><td>HNN</td><td>18.5 % ± 2.2 %</td><td>11.7 % ± 0.9 %</td><td>2.36 % ± 0.29 %</td></tr>
+        <tr><td>3 trajectories</td><td>MLP \((x, z)\)</td><td>5.35 % ± 0.37 %</td><td>32.5 % ± 1.3 %</td><td>12.8 % ± 1.4 %</td></tr>
+        <tr><td>3 trajectories</td><td>MLP \((\ln x, \ln z)\)</td><td>5.03 % ± 0.23 %</td><td>8.60 % ± 0.33 %</td><td>5.51 % ± 0.15 %</td></tr>
+        <tr><td>3 trajectories</td><td>HNN</td><td class="highlight">2.38 % ± 0.41 %</td><td class="highlight">2.18 % ± 0.32 %</td><td>1.52 % ± 0.18 %</td></tr>
+      </tbody>
+    </table>
+
+    <div class="results-grid reveal" style="grid-template-columns: 1fr; margin-top: 24px;">
+      <div class="result-figure">
+        <img src="../assets/results/02-hnn-ablation-ic.png" alt="Relative error and H drift on unseen orbits for three models and two training regimes, and the predicted unseen orbits" />
+        <div class="caption"><strong>Fig 11 · Ablation on unseen orbits.</strong> (a) Relative error and (b) drift of the true \(H\), averaged over the five unseen orbits; bars are means, dots are seeds. (c) The unseen orbits predicted by the log-coordinate MLP (dashed) and the HNN (solid), both trained on three trajectories (thin grey), against the truth (cyan).</div>
       </div>
-      <div class="analysis-callout reveal">
-        <h4>What it doesn't</h4>
-        <p>The HNN is <em>only</em> applicable when the system is known to be Hamiltonian and one knows the right canonical coordinates. For dissipative systems — like the damped pendulum of Section "Results · damped pendulum" — a plain HNN would force conservation that does not hold and would extrapolate worse, not better. The natural next step there is a <em>dissipation-aware</em> split flow (Sosanya &amp; Greydanus, 2022), listed as future work.</p>
-      </div>
+    </div>
+
+    <div class="analysis-callout reveal" style="margin-top: 24px;">
+      <h4>1 · On the training orbit, the coordinates do most of the work</h4>
+      <p>With one trajectory, the MLP in log-coordinates conserves \(H\) as well as the HNN (2.14 % vs 2.36 %) and tracks the orbit more closely (0.43 % vs 3.06 % relative error). The lower drift in the first comparison came mostly from the change to \((\ln x, \ln z)\), not from the Hamiltonian structure.</p>
+    </div>
+    <div class="analysis-callout reveal">
+      <h4>2 · One trajectory does not determine the vector field</h4>
+      <p>Trained on a single orbit, all three models miss unseen orbits by 17–18 %, the HNN included. The HNN's orbits still close (\(H\) drift 11.7 % against 60–83 %), but they are the wrong orbits: an \(H_\theta\) that is accurate along one curve need not be accurate anywhere else.</p>
+    </div>
+    <div class="analysis-callout reveal">
+      <h4>3 · With three trajectories, the prior pays off</h4>
+      <p>On unseen orbits the HNN's error is less than half that of the log-coordinate MLP (2.38 % vs 5.03 %) and its \(H\) drift four times smaller (2.18 % vs 8.60 %), with every seed better than every MLP seed on both metrics. The MLP's orbits spiral slowly in or out; the HNN's stay closed near the true ones, including the two orbits above the training range. The HNN remains applicable only to systems known to be Hamiltonian, in known canonical coordinates; for the damped pendulum the natural extension is a dissipation-aware split flow (Sosanya &amp; Greydanus, 2022).</p>
     </div>
 
     <noscript>

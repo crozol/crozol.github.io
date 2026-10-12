@@ -38,7 +38,7 @@
       <span class="badge status-done">Completed</span>
     </div>
     <h1 class="reveal"><span class="grad">Physics-Informed Neural Networks (PINNs)</span></h1>
-    <p class="tagline reveal">Solve partial differential equations (heat, Burgers) by training a neural network whose loss includes the PDE residual, computed with autograd. Implementation of the idea by Raissi, Perdikaris &amp; Karniadakis (2019), checked against the analytical solution (heat) and a Chebyshev-spectral reference (Burgers).</p>
+    <p class="tagline reveal">Solve partial differential equations (heat, Burgers) by training a neural network whose loss includes the PDE residual, computed with autograd. Implementation of the idea by Raissi, Perdikaris &amp; Karniadakis (2019), checked against the closed-form solution (heat) and the exact Cole-Hopf solution (Burgers).</p>
     <div class="cta-row reveal">
       <a href="https://github.com/crozol/04-pinns" class="btn btn-primary" target="_blank" rel="noopener">Code on GitHub →</a>
     </div>
@@ -57,7 +57,7 @@
           <li><strong style="color:var(--fg-0)">1D heat equation</strong>: linear case with a known analytical solution. Serves as a sanity check.</li>
           <li><strong style="color:var(--fg-0)">1D Burgers equation</strong>: classic nonlinear case with a thin, physically sharp internal layer that is genuinely hard to fit — this is where the method gets stress-tested.</li>
         </ul>
-        <p>Adam alone gets the heat equation to 0.45% relative \(L^2\) error, well past the target — a short L-BFGS pass pushes the frozen run shown here to 0.23%. Burgers is a different story: Adam plateaus around 8.8%, above the 5% target. Following Raissi et al.'s own recipe — L-BFGS fine-tuning on top of Adam, on a <em>fixed</em> batch of points rather than resampling every step — brings it down to 1.92%.</p>
+        <p>Adam alone gets the heat equation to 0.45% relative \(L^2\) error, well past the target — a short L-BFGS pass pushes the frozen run shown here to 0.23%, a global figure that hides how the error behaves late in time (see below). Burgers is a different story: Adam plateaus around 8.8%, above the 5% target. Following Raissi et al.'s own recipe — L-BFGS fine-tuning on top of Adam, on a <em>fixed</em> batch of points rather than resampling every step — brings it down to 1.78% against the exact solution.</p>
       </div>
       <div class="theory-card reveal">
         <h3>Mathematical formulation</h3>
@@ -69,6 +69,7 @@
         <div class="formula">\[ u_t + u\, u_x - \nu\, u_{xx} = 0 \]</div>
         <p>Composite PINN loss:</p>
         <div class="formula">\[ \mathcal{L} = \mathcal{L}_{\text{PDE}} + \lambda_B\, \mathcal{L}_{\text{boundary}} + \lambda_I\, \mathcal{L}_{\text{initial}} \]</div>
+        <p style="margin-bottom:0;">Each term is a mean squared error over its own points, with \(\lambda_I = 1\) and \(\lambda_B = 2\) for both equations (not tuned; sensitivity below).</p>
       </div>
     </div>
   </div>
@@ -82,7 +83,7 @@
 
     <div class="analysis-callout reveal">
       <h4>Attempt 1 · Adam alone</h4>
-      <p>Same recipe as the heat equation — 8000 epochs, 10k resampled collocation points — applied to the harder problem. Relative \(L^2\) error against the Chebyshev-spectral reference: <strong style="color:var(--fg-0)">≈ 8.8%</strong>, above the 5% target. The loss curve below shows why: it decays smoothly at first, then stops improving past roughly step 5000 and oscillates around 0.01 instead of continuing down.</p>
+      <p>Same recipe as the heat equation — 8000 epochs, 10k resampled collocation points — applied to the harder problem. Relative \(L^2\) error against the Chebyshev-spectral solver used for validation at the time: <strong style="color:var(--fg-0)">≈ 8.8%</strong>, above the 5% target. The loss curve below shows why: it decays smoothly at first, then stops improving past roughly step 5000 and oscillates around 0.01 instead of continuing down.</p>
     </div>
 
     <div class="chart-container reveal">
@@ -109,7 +110,7 @@
 
     <div class="analysis-callout reveal">
       <h4>Attempt 3 · fixed-batch L-BFGS — the fix</h4>
-      <p>Sample one large batch of points <em>once</em>, before calling L-BFGS, and reuse that exact batch for every internal evaluation of the closure during refinement. That single change makes the objective deterministic, which is what the line search and the quasi-Newton curvature estimate both require. 1000 L-BFGS iterations on 40k fixed collocation points then brought the loss to \(4.53 \times 10^{-4}\) and the relative \(L^2\) error to <strong style="color:var(--fg-0)">1.92%</strong>, clearing the 5% target.</p>
+      <p>Sample one large batch of points <em>once</em>, before calling L-BFGS, and reuse that exact batch for every internal evaluation of the closure during refinement. That single change makes the objective deterministic, which is what the line search and the quasi-Newton curvature estimate both require. 1000 L-BFGS iterations on 40k fixed collocation points then brought the loss to \(4.53 \times 10^{-4}\) and the relative \(L^2\) error to <strong style="color:var(--fg-0)">1.92%</strong> against that spectral solver (1.78% against the exact solution), clearing the 5% target.</p>
     </div>
   </div>
 </section>
@@ -125,11 +126,11 @@
       <div class="skill-name">Numerical PDEs</div>
       <div class="skill-how">Formulate residuals in smooth form, convert physical constraints into loss terms.</div>
       <div class="skill-name">Optimization</div>
-      <div class="skill-how">Balance composite loss weights \(\lambda\), learning rate schedulers, Adam → L-BFGS.</div>
+      <div class="skill-how">Composite loss with explicit weights \(\lambda\) and a sensitivity sweep; Adam → fixed-batch L-BFGS.</div>
       <div class="skill-name">Paper implementation</div>
       <div class="skill-how">Translate Raissi et al. (JCP 2019) directly into clean, testable PyTorch code.</div>
       <div class="skill-name">Validation</div>
-      <div class="skill-how">Relative \(L^2\) error against the analytical solution (heat) and high-resolution numerical reference (Burgers).</div>
+      <div class="skill-how">Relative \(L^2\) error against exact solutions (closed form for heat, Cole-Hopf for Burgers), resolved in time where a global figure misleads.</div>
       <div class="skill-name">2D visualization</div>
       <div class="skill-how">Space-time heatmaps, snapshots of u(x) at various t, side-by-side comparison with classical solver.</div>
       <div class="skill-name">Technical writing</div>
@@ -160,11 +161,14 @@
 ├── <span class="folder">src/</span>
 │   ├── <span class="file">pinn.py</span>        <span class="comment"># u_theta(x, t) network with Tanh activation</span>
 │   ├── <span class="file">physics.py</span>     <span class="comment"># heat and Burgers residuals via autograd</span>
-│   ├── <span class="file">reference.py</span>   <span class="comment"># Chebyshev-spectral reference solution for Burgers</span>
+│   ├── <span class="file">reference.py</span>   <span class="comment"># exact Cole-Hopf solution + Chebyshev-spectral cross-check</span>
 │   └── <span class="file">train.py</span>       <span class="comment"># Adam + L-BFGS, composite loss (PDE + BC + IC)</span>
 ├── <span class="folder">scripts/</span>
 │   ├── <span class="file">export_json.py</span> <span class="comment"># arrays → JSON for the portfolio page's interactive charts</span>
-│   └── <span class="file">seed_sweep.py</span> <span class="comment"># n=5 seed robustness check (mean ± std rel. L² error)</span>
+│   ├── <span class="file">seed_sweep.py</span> <span class="comment"># n=5 seed robustness check (mean ± std rel. L² error)</span>
+│   ├── <span class="file">heat_time_error.py</span> <span class="comment"># heat error per time slice</span>
+│   ├── <span class="file">bc_weight_sweep.py</span> <span class="comment"># sensitivity to the boundary weight λ_B</span>
+│   └── <span class="file">raissi_repro.py</span> <span class="comment"># the original paper's recipe (L-BFGS, float64)</span>
 ├── <span class="folder">tests/</span>         <span class="comment"># pytest: residuals, reference sanity, training smoke test</span>
 └── <span class="folder">figures/</span>       <span class="comment"># PINN-vs-reference comparison plots + loss curve</span></pre>
   </div>
@@ -181,9 +185,12 @@
       <li class="done">Sampling of collocation, boundary, and initial points</li>
       <li class="done">Training loop with composite loss (PDE + BC + IC)</li>
       <li class="done">L-BFGS fine-tuning on a fixed batch (Adam alone plateaus above target on Burgers)</li>
-      <li class="done">Validation: heat vs. analytical solution, Burgers vs. Chebyshev-spectral solver</li>
+      <li class="done">Validation: heat vs. closed-form solution, Burgers vs. exact Cole-Hopf solution (Chebyshev-spectral solver as cross-check)</li>
       <li class="done">Space-time comparison figures</li>
       <li class="done">5-seed robustness check (mean ± std relative \(L^2\) error, both equations)</li>
+      <li class="done">Heat error resolved in time</li>
+      <li class="done">Sensitivity of Burgers to the boundary weight \(\lambda_B\)</li>
+      <li class="done">Reproduction of the original paper's Burgers recipe (3 seeds)</li>
     </ul>
   </div>
 </section>
@@ -195,11 +202,11 @@
     <div class="two-col">
       <div class="info-card reveal">
         <h3>Heat equation</h3>
-        <p style="margin-bottom:0;">Target: relative \(L^2\) error &lt; 1% vs. analytical solution. <strong style="color:var(--fg-0)">Achieved: 0.45%</strong> with Adam alone (no fine-tuning needed); <strong style="color:var(--fg-0)">0.23%</strong> in the frozen run with a short L-BFGS pass added for consistency.</p>
+        <p style="margin-bottom:0;">Target: relative \(L^2\) error &lt; 1% vs. analytical solution. <strong style="color:var(--fg-0)">Achieved: 0.45%</strong> with Adam alone (no fine-tuning needed); <strong style="color:var(--fg-0)">0.23%</strong> in the frozen run with a short L-BFGS pass added for consistency. Both are global over \(t \in [0, 1]\); per time slice the relative error exceeds 10% after \(t \approx 0.6\).</p>
       </div>
       <div class="info-card reveal">
         <h3>Burgers equation</h3>
-        <p>Target: relative \(L^2\) error &lt; 5% vs. high-resolution numerical reference. <strong style="color:var(--fg-0)">Achieved: 1.92%</strong>, after L-BFGS fine-tuning.</p>
+        <p>Target: relative \(L^2\) error &lt; 5% vs. the exact solution. <strong style="color:var(--fg-0)">Achieved: 1.78%</strong>, after L-BFGS fine-tuning.</p>
         <p style="margin-bottom:0;">Adam alone plateaus at ~8.8% — above target. The remaining error after L-BFGS concentrates almost entirely in the thin internal layer at \(x = 0\), not spread across the domain.</p>
       </div>
     </div>
@@ -235,20 +242,20 @@
           <td class="highlight">0.14% ± 0.05%</td>
         </tr>
         <tr>
-          <td>Burgers — rel. L² error</td>
-          <td class="highlight">1.92%</td>
-          <td>1.86%</td>
-          <td>1.43%</td>
-          <td>1.86%</td>
-          <td>1.14%</td>
-          <td class="highlight">1.64% ± 0.34%</td>
+          <td>Burgers — rel. L² error vs. exact</td>
+          <td class="highlight">1.88%</td>
+          <td>1.66%</td>
+          <td>1.34%</td>
+          <td>2.33%</td>
+          <td>1.05%</td>
+          <td class="highlight">1.66% ± 0.49%</td>
         </tr>
       </tbody>
     </table>
 
     <div class="analysis-callout reveal" style="margin-top: 24px;">
       <h4>Every seed clears the target</h4>
-      <p>All 10 runs (5 seeds × 2 equations) stay well under their respective targets (&lt;1% heat, &lt;5% Burgers) — this isn't a one-off. Seed 0, used for every figure and headline number on this page, happens to be the <strong style="color:var(--fg-0)">worst</strong> of the five seeds for <em>both</em> equations. If anything, the numbers quoted throughout this page undersell the typical case rather than flatter it.</p>
+      <p>All 10 runs (5 seeds × 2 equations) stay well under their respective targets (&lt;1% heat, &lt;5% Burgers) — this isn't a one-off. For heat, seed 0 (used for every figure on this page) is the worst of the five; for Burgers it sits in the middle, and the frozen run (1.78%) is close to the mean. Retrained, seed 0 gives 1.88% rather than 1.78% because training is not bit-for-bit reproducible; the difference is well inside the seed-to-seed spread. Heat errors are global over \(t \in [0, 1]\) (see Limits below).</p>
     </div>
   </div>
 </section>
@@ -262,11 +269,11 @@
     <div class="results-grid reveal" style="margin-bottom: 28px;">
       <div class="result-metric">
         <div class="value">0.23%</div>
-        <div class="label">heat equation · relative \(L^2\) error vs. the exact analytical solution</div>
+        <div class="label">heat equation · relative \(L^2\) error vs. the closed-form solution, global over \(t \in [0, 1]\)</div>
       </div>
       <div class="result-metric">
-        <div class="value">1.92%</div>
-        <div class="label">Burgers equation · relative \(L^2\) error vs. the spectral reference, after L-BFGS</div>
+        <div class="value">1.78%</div>
+        <div class="label">Burgers equation · relative \(L^2\) error vs. the exact solution, after L-BFGS</div>
       </div>
       <div class="result-metric">
         <div class="value">~8.8%</div>
@@ -285,7 +292,7 @@
       <div id="chart-heat-slices" style="width:100%; height:420px;">
         <div class="chart-loading">Loading snapshots…</div>
       </div>
-      <div class="chart-caption"><strong>Fig 3 · Heat equation, snapshots at fixed \(t\).</strong> Solid = reference, dotted = PINN — at this error level (0.23%) the two curves sit almost exactly on top of each other at every snapshot.</div>
+      <div class="chart-caption"><strong>Fig 3 · Heat equation, snapshots at fixed \(t\).</strong> Solid = reference, dotted = PINN. On the scale of the initial amplitude the two curves overlap at every snapshot; at late times the solution itself is smaller than the PINN's absolute error (Fig 6).</div>
     </div>
 
     <div class="chart-container reveal" style="margin-top: 36px;">
@@ -309,11 +316,62 @@
           <div class="caption">Heat equation — static fallback (enable JavaScript for interactive charts)</div>
         </div>
         <div class="result-figure">
-          <img src="../assets/results/04-burgers-comparison.png" alt="Burgers equation: PINN vs. Chebyshev-spectral reference, space-time heatmaps" />
+          <img src="../assets/results/04-burgers-comparison.png" alt="Burgers equation: PINN vs. exact solution, space-time heatmaps" />
           <div class="caption">Burgers equation — static fallback (enable JavaScript for interactive charts)</div>
         </div>
       </div>
     </noscript>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Limits</div>
+    <h2 class="reveal">What the headline numbers do not show</h2>
+
+    <div class="analysis-callout reveal">
+      <h4>Heat · the error is fixed in absolute, not relative, terms</h4>
+      <p>The solution decays by a factor \(e^{-\pi^2} \approx 5 \times 10^{-5}\) over \(t \in [0, 1]\), so a relative \(L^2\) error over the whole space-time grid is dominated by early times. Resolved in time, the PINN's absolute error stays below \(1.9 \times 10^{-3}\) at every \(t\), while the relative error per time slice grows from 0.07% at \(t = 0\) to 2.4% at \(t = 0.5\), crosses 10% at \(t \approx 0.59\) and exceeds 100% from \(t \approx 0.8\), where \(|u|\) falls below the network's error floor.</p>
+    </div>
+
+    <div class="results-grid reveal" style="grid-template-columns: 1fr; margin-top: 24px;">
+      <div class="result-figure">
+        <img src="../assets/results/04-heat-error-vs-time.png" alt="Heat equation: solution amplitude, PINN absolute error and relative error per time slice, against t" />
+        <div class="caption"><strong>Fig 6 · Heat equation, error resolved in time.</strong> Solution amplitude, maximum absolute error and relative \(L^2\) error per time slice (log scale); dotted line at 10%.</div>
+      </div>
+    </div>
+
+    <div class="analysis-callout reveal" style="margin-top: 24px;">
+      <h4>Burgers · sensitivity to the boundary weight</h4>
+      <p>The weight \(\lambda_B = 2\) was not tuned. Retraining seed 0 with other values shows it matters: lower weights help here. This is a single seed, and the frozen configuration stays at \(\lambda_B = 2\), since choosing it by the reported test error would bias that error downward.</p>
+    </div>
+
+    <table class="analysis-table reveal">
+      <thead>
+        <tr><th><span style="text-transform:none;">\(\lambda_B\)</span></th><th>0.5</th><th>1</th><th>2 (used)</th><th>4</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Rel. L² error vs. exact (seed 0)</td><td>0.80%</td><td>1.34%</td><td class="highlight">1.88%</td><td>1.67%</td></tr>
+      </tbody>
+    </table>
+
+    <div class="analysis-callout reveal" style="margin-top: 24px;">
+      <h4>Burgers · comparison with the original paper</h4>
+      <p>Raissi et al. (2019) report \(6.7 \times 10^{-4}\) on this benchmark, with a deeper, narrower tanh network (20 neurons per layer), 100 initial/boundary points, 10&nbsp;000 Latin-hypercube collocation points, and full-batch L-BFGS in float64 for up to 50&nbsp;000 iterations, with no Adam phase. Following that recipe and scoring against the same exact solution on the same 256&nbsp;×&nbsp;100 grid gives:</p>
+    </div>
+
+    <table class="analysis-table reveal">
+      <thead>
+        <tr><th>Seed</th><th>0</th><th>1</th><th>2</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Rel. L² error vs. exact</td><td>\(2.2 \times 10^{-2}\)</td><td class="highlight">\(7.1 \times 10^{-4}\)</td><td>\(1.15 \times 10^{-3}\)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="analysis-callout reveal" style="margin-top: 24px;">
+      <p style="margin-bottom:0;">One seed matches the published number, the median is \(1.15 \times 10^{-3}\), and one seed stalls at 2.2%. All three used their full budget (about 8 h each on one CPU core). The published figure is reproducible but closer to a good draw than to a typical outcome; the gap to this project's pipeline (about 14× against the median) comes from optimization budget and precision, not from a different formulation.</p>
+    </div>
   </div>
 </section>
 

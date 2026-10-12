@@ -355,7 +355,7 @@
         <div class="num">04</div>
         <div class="domain">ML for science · PDEs</div>
         <h3>Physics-Informed Neural Networks (PINNs)</h3>
-        <p>PINNs (Raissi et al. 2019) in PyTorch. Heat equation: 0.14 ± 0.05% relative L2 error vs. the analytical solution; Burgers: 1.64 ± 0.34% vs. a Chebyshev-spectral reference (Adam + L-BFGS, 5 seeds). The original paper reports 0.067% on Burgers with a deeper network trained fully with L-BFGS.</p>
+        <p>PINNs (Raissi et al. 2019) in PyTorch. Heat equation: 0.14 ± 0.05% relative L2 error vs. the closed-form solution (global; larger late in time); Burgers: 1.66 ± 0.49% vs. the exact solution (Adam + L-BFGS, 5 seeds). The paper's 0.067% reproduces on 1 of 3 seeds with its full L-BFGS recipe.</p>
         <div class="project-tags">
           <span class="tag">PyTorch</span><span class="tag">PDEs</span><span class="tag">Autograd</span><span class="tag">L-BFGS</span>
         </div>

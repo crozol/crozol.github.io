@@ -147,14 +147,14 @@
     <div class="results-grid reveal" style="margin-bottom: 22px;">
       <div class="result-metric">
         <div class="value">0.14 ± 0.05%</div>
-        <div class="label">heat equation · relative L2 error vs. the exact analytical solution (5 seeds)</div>
+        <div class="label">heat equation · relative L2 error vs. the closed-form solution, global over t ∈ [0, 1] (5 seeds); per time slice it exceeds 10% after t ≈ 0.6</div>
       </div>
       <div class="result-metric">
-        <div class="value">1.64 ± 0.34%</div>
-        <div class="label">Burgers equation · relative L2 error vs. a Chebyshev-spectral reference, after L-BFGS fine-tuning (5 seeds)</div>
+        <div class="value">1.66 ± 0.49%</div>
+        <div class="label">Burgers equation · relative L2 error vs. the exact Cole-Hopf solution, after L-BFGS fine-tuning (5 seeds)</div>
       </div>
       <div class="result-metric">
-        <div class="value">~8.8% → 1.92%</div>
+        <div class="value">~8.8% → 1.78%</div>
         <div class="label">Burgers, seed 0 · Adam alone plateaus above target; L-BFGS on a fixed point batch gets it there</div>
       </div>
     </div>

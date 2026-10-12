@@ -319,7 +319,7 @@
         <div class="num">01</div>
         <div class="domain">Statistical mechanics · Bayesian</div>
         <h3>Bayesian Inference on the 2D Ising Model</h3>
-        <p>Metropolis simulator (Numba) plus a Bayesian model that infers the critical temperature and exponent via MCMC. Benchmarked against the exact Onsager (1944) solution: β = 1/8 falls inside its 95% HDI; Tc sits 4.1% high, the expected finite-size shift on a 32×32 lattice.</p>
+        <p>Metropolis simulator (Numba) plus Bayesian inference of the critical point. A power-law fit to one lattice misses Tc by 0.1; a finite-size-scaling fit of the Binder cumulant across L = 16–64 gives Tc = 2.268, ν = 0.98 and β = 0.113, with Onsager's exact values inside the 95% HDIs.</p>
         <div class="project-tags">
           <span class="tag tag-live">● Live demo</span><span class="tag">Python</span><span class="tag">PyMC</span><span class="tag">NumPy</span><span class="tag">ArviZ</span><span class="tag">Monte Carlo</span>
         </div>

@@ -205,16 +205,16 @@
         <div class="label">trainable parameters in <code>f<sub>θ</sub></code> · 3 hidden layers × width 96</div>
       </div>
       <div class="result-metric">
-        <div class="value">1.4 · 10⁻⁴</div>
-        <div class="label">MSE on the clean training horizon · ~6× the noise floor (0.005)²</div>
+        <div class="value">3.0 · 10⁻⁴</div>
+        <div class="label">MSE on the clean training horizon · mean over 5 seeds (± 2.8 · 10⁻⁴), ≈ 12× the noise floor (0.005)²</div>
       </div>
       <div class="result-metric">
         <div class="value">8.3 ± 2.4 %</div>
         <div class="label">relative extrapolation error (\(\sqrt{\text{MSE}} / \max|y|\)) on \(t &gt; 12\) · mean ± std over 5 seeds</div>
       </div>
       <div class="result-metric">
-        <div class="value">137 %</div>
-        <div class="label">final-time energy drift |ΔE/E| at <code>t = 20</code> · interpreted below</div>
+        <div class="value">106 ± 41 %</div>
+        <div class="label">final-time energy drift |ΔE/E| at <code>t = 20</code> · mean ± std over 5 seeds, interpreted below</div>
       </div>
     </div>
 
@@ -243,7 +243,7 @@
       <div id="chart-pendulum-energy" style="width:100%; height:480px;">
         <div class="chart-loading">Loading energy curve…</div>
       </div>
-      <div class="chart-caption"><strong>Fig 4 · Mechanical energy decay.</strong> Pink shading = gap between predicted and true energy. Within the training window the predicted energy tracks the dissipation envelope tightly; in the extrapolation half the prediction <em>retains its oscillation amplitude</em> instead of continuing to decay — the network has not fully internalised the friction coefficient \(\gamma\). The 137 % drift is a single-point snapshot at \(t = 20\); the curve as a whole is the more honest summary.</div>
+      <div class="chart-caption"><strong>Fig 4 · Mechanical energy decay.</strong> Pink shading = gap between predicted and true energy. Within the training window the predicted energy tracks the dissipation envelope tightly; in the extrapolation half the prediction <em>retains its oscillation amplitude</em> instead of continuing to decay — the network has not fully internalised the friction coefficient \(\gamma\). The 137 % drift of the seed shown (106 % ± 41 % over 5 seeds) is a single-point snapshot at \(t = 20\); the curve as a whole is the more honest summary.</div>
     </div>
 
     <noscript>
@@ -286,7 +286,7 @@
       <div id="chart-lotka-loss" style="width:100%; height:480px;">
         <div class="chart-loading">Loading training loss…</div>
       </div>
-      <div class="chart-caption"><strong>Fig 5 · Training loss.</strong> Same curriculum-induced bumps as for the pendulum. The plateau is higher because species amplitudes are an order of magnitude larger — absolute MSE scales with \(\|y\|^2\), not with the dimensionless quality of the fit. The relative extrapolation error of 1.6 % is the scale-free version.</div>
+      <div class="chart-caption"><strong>Fig 5 · Training loss.</strong> Same curriculum-induced bumps as for the pendulum. The plateau is higher because species amplitudes are an order of magnitude larger — absolute MSE scales with \(\|y\|^2\), not with the dimensionless quality of the fit. The relative extrapolation error (1.6 % for this seed, 0.96 % ± 0.57 % over 5 seeds) is the scale-free version.</div>
     </div>
 
     <div class="chart-container reveal" style="margin-top: 24px;">
@@ -300,7 +300,7 @@
       <div id="chart-lotka-phase" style="width:100%; height:600px;">
         <div class="chart-loading">Loading phase plane…</div>
       </div>
-      <div class="chart-caption"><strong>Fig 7 · Closed orbit and learned field.</strong> The orbit traces the ground-truth loop almost exactly within the training horizon and remains close on the extrapolation half. A correct fit produces a single closed loop that does not spiral; any ratio mismatch between the four \((a, b, c, d)\) parameters of the true system would manifest as a slow inward or outward drift — quantified by the 7.9 % standard deviation of \(H\) along the predicted trajectory.</div>
+      <div class="chart-caption"><strong>Fig 7 · Closed orbit and learned field.</strong> The orbit traces the ground-truth loop almost exactly within the training horizon and remains close on the extrapolation half. A correct fit produces a single closed loop that does not spiral; any ratio mismatch between the four \((a, b, c, d)\) parameters of the true system would manifest as a slow inward or outward drift — quantified by the 7.9 % standard deviation (this seed; 9.0 % ± 3.3 % over 5 seeds) of \(H\) along the predicted trajectory.</div>
     </div>
 
     <noscript>
@@ -547,37 +547,37 @@
           <td>Pendulum · train MSE</td>
           <td>fit on the noisy training horizon</td>
           <td>≲ noise² · 10 = 2.5·10⁻⁴</td>
-          <td class="check">1.4·10⁻⁴ ✓</td>
+          <td class="check">3.0·10⁻⁴ ± 2.8·10⁻⁴ · 4/5 seeds ✓</td>
         </tr>
         <tr>
           <td>Pendulum · rel-err extrap</td>
           <td>scale-free error past \(T_{\text{train}}\)</td>
           <td>≤ 10 %</td>
-          <td class="check">5.4 % ✓</td>
+          <td class="warn">8.3 % ± 2.4 % · 3/5 seeds (two at 10.4 % and 10.8 %)</td>
         </tr>
         <tr>
           <td>Pendulum · final |ΔE/E|</td>
           <td>energy drift at \(t = T_{\text{full}}\)</td>
           <td>&lt; 5 % (ideal) · &gt; 100 % (failure)</td>
-          <td class="warn">137 % — see below</td>
+          <td class="warn">106 % ± 41 % · 4/5 seeds above 100 % — see below</td>
         </tr>
         <tr>
           <td>Lotka · train MSE</td>
           <td>fit on the noisy training horizon</td>
           <td>≲ noise² · 10 = 9·10⁻³</td>
-          <td class="check">5.6·10⁻³ ✓</td>
+          <td class="check">6.3·10⁻³ ± 2.3·10⁻³ · 5/5 seeds ✓</td>
         </tr>
         <tr>
           <td>Lotka · rel-err extrap</td>
           <td>scale-free error past \(T_{\text{train}}\)</td>
           <td>≤ 5 %</td>
-          <td class="check">1.6 % ✓</td>
+          <td class="check">0.96 % ± 0.57 % · 5/5 seeds ✓</td>
         </tr>
         <tr>
           <td>Lotka · drift in \(H\)</td>
           <td>structural-invariant deviation along orbit</td>
           <td>≤ 10 %</td>
-          <td class="check">7.9 % ✓</td>
+          <td class="warn">9.0 % ± 3.3 % · 4/5 seeds (one at 14.6 %)</td>
         </tr>
       </tbody>
     </table>
@@ -587,12 +587,12 @@
 
     <div class="analysis-callout reveal">
       <h4>1 · Both systems extrapolate within a few percent of the trajectory amplitude</h4>
-      <p>Relative extrapolation error of 5.4 % for the pendulum and 1.6 % for Lotka-Volterra. Closed orbits make Lotka strictly harder per period, but the amplitude is preserved across multiple cycles into the held-out window — the orbit stays bounded despite the network never being told the dynamics are conservative.</p>
+      <p>Relative extrapolation error of 8.3 % ± 2.4 % for the pendulum and 0.96 % ± 0.57 % for Lotka-Volterra (5 seeds). Closed orbits make Lotka strictly harder per period, but the amplitude is preserved across multiple cycles into the held-out window — the orbit stays bounded despite the network never being told the dynamics are conservative.</p>
     </div>
 
     <div class="analysis-callout reveal">
       <h4>2 · The pendulum doesn't fully internalise friction</h4>
-      <p>Inside the training window the predicted energy tracks the true dissipation envelope. Past it, the predicted oscillation keeps its amplitude instead of continuing to decay — the network learns the period and phase but only an approximate \(\gamma\). The 137 % final-time drift is the snapshot consequence; the qualitative summary is "the envelope is right, the late-time decay rate is not".</p>
+      <p>Inside the training window the predicted energy tracks the true dissipation envelope. Past it, the predicted oscillation keeps its amplitude instead of continuing to decay — the network learns the period and phase but only an approximate \(\gamma\). The final-time drift of 106 % ± 41 % (individual seeds from 37 % to 137 %) is the snapshot consequence; the qualitative summary is "the envelope is right, the late-time decay rate is not".</p>
       <p>The architectural fix is not more training — it is encoding the structure. A <em>Hamiltonian Neural Network</em> (Greydanus et al., 2019) conserves its learned \(H_\theta\) by construction; it is the right prior for conservative systems and is tested on Lotka-Volterra above. The pendulum is dissipative, so the matching prior is a Hamiltonian-plus-dissipation model such as Dissipative SymODEN (Zhong et al., 2020) — the natural next step.</p>
     </div>
 

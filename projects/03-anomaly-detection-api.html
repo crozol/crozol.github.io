@@ -98,7 +98,7 @@
       <div class="info-card reveal">
         <h3>4 · Threshold + metrics</h3>
         <p><strong style="color:var(--fg-0)">Goal:</strong> turn the score into a binary decision and quantify it.</p>
-        <p><strong style="color:var(--fg-0)">How:</strong> <code>src/evaluate.py</code> — q99 of the val healthy errors gives \(\tau \approx 0.5515\). Precision, recall, F1, accuracy, full ROC and PR sweeps and the confusion matrix are computed in NumPy (no scikit-learn dependency).</p>
+        <p><strong style="color:var(--fg-0)">How:</strong> <code>src/evaluate.py</code> — q99 of the val healthy errors gives \(\tau \approx 0.5515\). Precision, recall, F1, accuracy, full ROC and PR sweeps and the confusion matrix are computed in NumPy and checked against scikit-learn in the tests.</p>
       </div>
       <div class="info-card reveal">
         <h3>5 · FastAPI service</h3>
@@ -134,7 +134,7 @@
       <div class="skill-name">Feature engineering</div>
       <div class="skill-how">Per-sensor normalisation fitted on healthy rows only, sliding windows, low-variance sensor pruning.</div>
       <div class="skill-name">Calibration</div>
-      <div class="skill-how">99th-percentile threshold from healthy val errors. ROC + PR sweeps in NumPy without scikit-learn.</div>
+      <div class="skill-how">99th-percentile threshold from healthy val errors. ROC + PR sweeps in NumPy, checked against scikit-learn in the tests.</div>
       <div class="skill-name">Software engineering</div>
       <div class="skill-how">Typed FastAPI + Pydantic, <code>lifespan</code>-driven model load, OpenAPI auto-generated.</div>
       <div class="skill-name">Containerisation</div>

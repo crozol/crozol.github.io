@@ -299,7 +299,7 @@
       </tbody>
     </table>
 
-    <p class="reveal" style="margin-top: 22px;">The autoencoder has learned degradation rather than elapsed time — its interval does not overlap the cycle-count one — and the non-linear model matters: a linear reconstruction of the same latent size misses 4 engines. An Isolation Forest on the same windows, however, is statistically indistinguishable in ranking quality. The autoencoder is kept because it reconstructs each sensor, so an alarm can be traced to the sensors that drift — not because it ranks better.</p>
+    <p class="reveal" style="margin-top: 22px;">The autoencoder has learned degradation rather than elapsed time — its interval does not overlap the cycle-count one — and the non-linear model matters: a linear reconstruction of the same latent size misses 4 engines. An Isolation Forest on the same windows, however, is statistically indistinguishable in ranking quality. So is its lead time: the medians (46 vs 34 cycles) suggest an earlier alarm, but engine by engine the autoencoder alarms a median of 1 cycle before the forest (95% bootstrap interval [−1, +5.5]; first on 11 engines, the forest on 7, 2 ties; sign test p = 0.48). The autoencoder is kept because it reconstructs each sensor, so an alarm can be traced to the sensors that drift — not because it ranks better.</p>
 
     <table class="analysis-table reveal" style="margin-top: 28px;">
       <thead>

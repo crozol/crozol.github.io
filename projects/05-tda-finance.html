@@ -38,7 +38,7 @@
       <span class="badge status-planned">Planned</span>
     </div>
     <h1 class="reveal"><span class="grad">TDA on financial time series</span><br /><span class="grad">Regime change detection</span></h1>
-    <p class="tagline reveal">Use persistent homology over sliding windows of multi-asset returns to detect transitions between normal regime and market crises (2008, 2011, 2015, 2020). Topological descriptors feed a supervised classifier.</p>
+    <p class="tagline reveal">Use persistent homology over sliding windows of multi-asset returns to detect transitions between normal regime and market crises (2008, 2011, 2015, 2020, 2022), and test whether topological descriptors add anything beyond volatility and correlation on leakage-free folds.</p>
     <div class="cta-row reveal">
       <a href="https://github.com/crozol/05-tda-finance" class="btn btn-primary" target="_blank" rel="noopener">Code on GitHub →</a>
       <a href="#" class="btn btn-ghost">Demo (pending)</a>
@@ -53,8 +53,8 @@
     <div class="two-col">
       <div class="reveal">
         <p>Classical methods for detecting regime changes in finance (rolling volatility, rolling correlations, HMMs) look at statistical moments. <strong style="color:var(--fg-0)">Topological Data Analysis</strong> proposes a complementary angle: look at the <strong style="color:var(--fg-0)">shape</strong> of the return cloud in \(\mathbb{R}^d\) through <strong style="color:var(--fg-0)">persistent homology</strong>, extracting invariants that are robust to reparameterization.</p>
-        <p>Idea: in a normal regime, returns form a "round" low-correlation cloud; during a crisis, the cloud collapses toward a single direction (systemic co-movement) and its topology changes. Persistence bars detect that change earlier than traditional aggregate metrics.</p>
-        <p>This project uses training in <strong style="color:var(--fg-0)">algebraic topology</strong> — a tool no other junior ML engineer will have — on a financial problem with real impact.</p>
+        <p>Idea: in a normal regime, returns form a "round" low-correlation cloud; during a crisis, the cloud collapses toward a single direction (systemic co-movement) and its topology changes. Gidea &amp; Katz (2018) found that the norms of persistence landscapes grow in the run-up to the 2000 and 2008 crashes.</p>
+        <p>The question here is narrower: do topological features detect crisis regimes <em>better than</em> realised volatility and the leading eigenvalue of the correlation matrix — the two things a crisis also changes — when all are scored on the same leakage-free folds?</p>
       </div>
       <div class="theory-card reveal">
         <h3>Mathematical pipeline</h3>
@@ -64,8 +64,8 @@
         <div class="formula">\[ W_t = \{\, r_s : t - h \le s \le t \,\} \subset \mathbb{R}^d \]</div>
         <p>Vietoris-Rips persistent homology:</p>
         <div class="formula">\[ \mathrm{PD}_0(W_t),\quad \mathrm{PD}_1(W_t) \]</div>
-        <p>Features:</p>
-        <div class="formula">\[ \varphi(W_t) = \big[\, \text{entropy},\ \text{landscape},\ \#\text{components},\ \text{max persistence} \,\big] \]</div>
+        <p>Topological features and baselines:</p>
+        <div class="formula">\[ \varphi(W_t) = \big[\, \|\lambda\|_1,\ \|\lambda\|_2,\ \text{entropy} \,\big], \qquad b(W_t) = \big[\, \sigma_t,\ \lambda_{\max}(C_t)/d \,\big] \]</div>
       </div>
     </div>
   </div>
@@ -79,14 +79,14 @@
     <div class="skill-matrix reveal" style="margin-bottom: 32px;">
       <div class="skill-name">Applied algebraic topology</div>
       <div class="skill-how">Vietoris-Rips persistent homology computation in dimensions 0 and 1 over point clouds.</div>
-      <div class="skill-name">Exotic feature engineering</div>
-      <div class="skill-how">Convert persistence diagrams into vectors (persistence landscapes, entropy, images) as input to classical ML.</div>
+      <div class="skill-name">Topological feature engineering</div>
+      <div class="skill-how">Persistence landscapes, their \(L^p\) norms and entropy as input to classical ML, on per-window standardised returns so the topology does not just re-measure volatility.</div>
       <div class="skill-name">Time series</div>
       <div class="skill-how">Sliding windows, temporal alignment, handling missing ticks and holidays.</div>
       <div class="skill-name">Quantitative finance</div>
-      <div class="skill-how">Log returns, realized volatility, rolling correlations as comparison baselines.</div>
-      <div class="skill-name">Classical ML</div>
-      <div class="skill-how">Random Forest / SVM over topological features with temporal cross-validation (walk-forward).</div>
+      <div class="skill-how">Log returns; realised volatility and the leading eigenvalue of the correlation matrix as baselines scored on the same folds.</div>
+      <div class="skill-name">Leakage-free validation</div>
+      <div class="skill-how">Purged walk-forward and leave-one-crisis-out splits for overlapping windows, with a test showing that shuffled k-fold inflates ROC-AUC from ~0.5 to ~0.97 on a feature unrelated to the label.</div>
       <div class="skill-name">Domain validation</div>
       <div class="skill-how">Confirm score peaks coincide with real macro events (Lehman 2008, COVID 2020).</div>
       <div class="skill-name">Visual storytelling</div>
@@ -96,7 +96,6 @@
     <div class="skill-chip-row reveal">
       <span class="skill-chip">Python</span>
       <span class="skill-chip">Giotto-TDA</span>
-      <span class="skill-chip">Ripser</span>
       <span class="skill-chip">NumPy</span>
       <span class="skill-chip">Pandas</span>
       <span class="skill-chip">scikit-learn</span>
@@ -115,11 +114,12 @@
 ├── <span class="file">README.md</span>
 ├── <span class="file">requirements.txt</span>
 ├── <span class="folder">src/</span>
-│   ├── <span class="file">data.py</span>          <span class="comment"># download prices and compute log returns</span>
-│   ├── <span class="file">persistence.py</span>   <span class="comment"># persistent homology over sliding windows</span>
-│   ├── <span class="file">features.py</span>      <span class="comment"># persistence landscapes / images / entropy</span>
-│   └── <span class="file">classify.py</span>      <span class="comment"># supervised classifier normal vs. crisis</span>
-└── <span class="folder">notebooks/</span>        <span class="comment"># historical analysis + visualizations</span></pre>
+│   ├── <span class="file">data.py</span>          <span class="comment"># prices, log returns, crisis periods and labels</span>
+│   ├── <span class="file">persistence.py</span>   <span class="comment"># sliding windows, standardisation, Vietoris-Rips</span>
+│   ├── <span class="file">features.py</span>      <span class="comment"># landscapes, landscape norms, baselines</span>
+│   ├── <span class="file">validation.py</span>    <span class="comment"># purged walk-forward, leave-one-crisis-out</span>
+│   └── <span class="file">classify.py</span>      <span class="comment"># feature-set comparison on shared folds</span>
+└── <span class="folder">tests/</span>            <span class="comment"># splits, labels, baselines, leakage demonstration</span></pre>
   </div>
 </section>
 
@@ -128,14 +128,14 @@
     <div class="section-eyebrow reveal">// Roadmap</div>
     <h2 class="reveal">Project status</h2>
     <ul class="roadmap reveal">
-      <li>Download daily prices (SP500, NASDAQ, sector ETFs) via yfinance</li>
-      <li>Preprocessing: log returns, normalization, gap handling</li>
-      <li>Sliding windows → point clouds in \(\mathbb{R}^d\)</li>
-      <li>Compute persistent homology (dim 0 and 1) with Giotto-TDA</li>
-      <li>Convert diagrams into persistence landscapes and entropy</li>
-      <li>Train Random Forest with walk-forward temporal validation</li>
-      <li>Plot temporal score with annotations of real crises</li>
-      <li>README with narrative + interactive notebook</li>
+      <li class="done">Crisis labels fixed in advance; each window labelled by its last day</li>
+      <li class="done">Leakage-free validation (purged walk-forward, leave-one-crisis-out) with tests</li>
+      <li class="done">Baselines: realised volatility and leading eigenvalue of the correlation matrix</li>
+      <li>Download daily prices (sector ETFs, indices) via yfinance; log returns</li>
+      <li>Persistent homology (dimensions 0 and 1) on standardised windows with giotto-tda</li>
+      <li>Landscape norms, landscapes and entropy as features</li>
+      <li>Compare feature sets on both split schemes</li>
+      <li>Time series of the features annotated with the crisis periods</li>
     </ul>
   </div>
 </section>
@@ -147,13 +147,13 @@
     <div class="two-col">
       <div class="info-card reveal">
         <h3>Classification</h3>
-        <p>ROC-AUC &gt; 0.85 separating normal regime from crisis.</p>
-        <p style="margin-bottom:0;">Hypothesis to test: topological features carry information beyond realized volatility and the leading eigenvalue of the correlation matrix.</p>
+        <p>Topology plus baselines must beat the baselines alone, in ROC-AUC and average precision, under both purged walk-forward and leave-one-crisis-out.</p>
+        <p style="margin-bottom:0;">A gain over a model without baselines would not count: a crisis raises volatility and co-movement, and both also change a persistence diagram.</p>
       </div>
       <div class="info-card reveal">
         <h3>Interpretability</h3>
-        <p>Temporal peaks of the "topological anomaly score" coinciding with:</p>
-        <p style="margin-bottom:0;">subprime 2008 · European default 2011 · China selloff 2015 · COVID 2020.</p>
+        <p>Whether the topological features move with the labelled crisis periods, which are fixed in advance and not tuned:</p>
+        <p style="margin-bottom:0;">2008–09 · 2011 · 2015 · 2020 · 2022.</p>
       </div>
     </div>
   </div>

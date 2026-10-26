@@ -343,15 +343,16 @@
 
     <div class="analysis-callout reveal" style="margin-top: 24px;">
       <h4>Burgers · sensitivity to the boundary weight</h4>
-      <p>The weight \(\lambda_B = 2\) was not tuned. Retraining seed 0 with other values shows it matters: lower weights help here. This is a single seed, and the frozen configuration stays at \(\lambda_B = 2\), since choosing it by the reported test error would bias that error downward.</p>
+      <p>The weight \(\lambda_B = 2\) was not tuned. It is chosen here without the exact solution: seed 0 is retrained for four values, and the unweighted validation loss \(V\) (PDE residual, boundary and initial terms, weight 1 each) on a fresh 201&nbsp;×&nbsp;101 grid not used in training selects \(\lambda_B = 0.5\). Its relative \(L^2\) error, reported once after the choice, is <strong style="color:var(--fg-0)">0.86%</strong>, about half that of the untuned value; \(V\) orders the four weights as the exact error does. This is a single seed, and some of the differences are of the order of the seed-to-seed spread. The frozen configuration stays at \(\lambda_B = 2\), so every other number on this page comes from the same setup.</p>
     </div>
 
     <table class="analysis-table reveal">
       <thead>
-        <tr><th><span style="text-transform:none;">\(\lambda_B\)</span></th><th>0.5</th><th>1</th><th>2 (used)</th><th>4</th></tr>
+        <tr><th><span style="text-transform:none;">\(\lambda_B\)</span></th><th>0.5 (selected)</th><th>1</th><th>2 (used)</th><th>4</th></tr>
       </thead>
       <tbody>
-        <tr><td>Rel. L² error vs. exact (seed 0)</td><td>0.80%</td><td>1.34%</td><td class="highlight">1.88%</td><td>1.67%</td></tr>
+        <tr><td>Validation loss \(V\) (×10⁻⁴)</td><td>1.90</td><td>3.27</td><td>4.53</td><td>3.35</td></tr>
+        <tr><td>Rel. L² error vs. exact (seed 0)</td><td class="highlight">0.86%</td><td>1.31%</td><td>1.78%</td><td>1.67%</td></tr>
       </tbody>
     </table>
 

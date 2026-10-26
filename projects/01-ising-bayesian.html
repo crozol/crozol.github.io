@@ -38,7 +38,7 @@
       <span class="badge status-done">Completed</span>
     </div>
     <h1 class="reveal"><span class="grad">Bayesian Inference on the 2D Ising Model</span></h1>
-    <p class="tagline reveal">A pipeline that simulates the Ising spin lattice with Monte Carlo, infers the critical temperature and exponents with MCMC, first from a single lattice and then by finite-size scaling across four lattice sizes, and benchmarks the results against the exact Onsager (1944) solution.</p>
+    <p class="tagline reveal">A pipeline that simulates the Ising spin lattice with Monte Carlo, infers the critical temperature and exponents with MCMC, first from a single lattice and then by finite-size scaling of Wolff cluster data across several lattice sizes, and benchmarks the results against the exact Onsager (1944) solution.</p>
     <div class="cta-row reveal">
       <a href="#live-demo" class="btn btn-primary">Try the live demo ↓</a>
       <a href="https://github.com/crozol/01-ising-bayesian" class="btn btn-ghost" target="_blank" rel="noopener">Code on GitHub →</a>
@@ -55,7 +55,7 @@
       <div class="reveal">
         <p>This project combines <strong style="color:var(--fg-0)">real statistical physics</strong>, <strong style="color:var(--fg-0)">applied Bayesian statistics</strong> and <strong style="color:var(--fg-0)">end-to-end scientific Python code</strong>. The 2D Ising model is ideal: it has a nontrivial phase transition and, at the same time, an exact analytical solution against which any numerical code can be validated.</p>
         <p>A Numba-accelerated Metropolis simulator generates the \(M(T)\) curve of a 32×32 lattice, and a Bayesian model fits the critical power law to it. That first fit turns out not to be a usable estimator: on the ordered side the simulation matches Onsager's exact magnetisation, but a pure power law does not describe it, and \(T_c\) comes out 0.1 too high while \(\beta\) moves with the fit window.</p>
-        <p>The second analysis uses what the finite lattice does rather than ignoring it. A joint Bayesian finite-size-scaling fit of the Binder cumulant and the magnetisation for \(L = 16, 32, 64\), with flat priors, recovers \(T_c\), \(\nu\) and \(\beta\) with the exact values inside their 95% intervals.</p>
+        <p>The second analysis uses what the finite lattice does rather than ignoring it. A joint Bayesian finite-size-scaling fit of the Binder cumulant and the magnetisation, on Wolff cluster data for \(L = 32, 64, 128\) with flat priors, recovers \(T_c\), \(\nu\) and \(\beta\) within their statistical and systematic errors; the fit range is the widest that passes a \(\chi^2\) goodness-of-fit test.</p>
         <p>Everything runs in a single command: <code>python main.py</code> executes both simulations, both inferences, and generates all final figures; every run is seeded.</p>
       </div>
       <div class="theory-card reveal">
@@ -112,8 +112,8 @@
       </div>
       <div class="info-card reveal">
         <h3>6 · Finite-size scaling</h3>
-        <p><strong style="color:var(--fg-0)">Data:</strong> \(L = 8, 16, 32, 64\) at 15 temperatures near \(T_c\), 200 000 sweeps each, with block-jackknife errors on \(\langle |m| \rangle\) and the Binder cumulant \(U\).</p>
-        <p><strong style="color:var(--fg-0)">Fit:</strong> both observables jointly as functions of \((T - T_c)L^{1/\nu}\), flat priors on \(T_c\), \(\nu\), \(\beta/\nu\); the scaling-function coefficients are integrated out analytically and the rest sampled with adaptive Metropolis.</p>
+        <p><strong style="color:var(--fg-0)">Data:</strong> \(L = 16, 32, 64, 128\) at 15 temperatures near \(T_c\) from the Wolff cluster algorithm, whose integrated autocorrelation time stays at 1.3–1.8 sweeps (Metropolis: about 1&nbsp;700 at \(L = 64\)); 200&nbsp;000 measurements each, with block-jackknife errors on \(\langle |m| \rangle\) and the Binder cumulant \(U\) from blocks of at least 20 autocorrelation times.</p>
+        <p><strong style="color:var(--fg-0)">Fit:</strong> both observables jointly as functions of \((T - T_c)L^{1/\nu}\), flat priors on \(T_c\), \(\nu\), \(\beta/\nu\); the scaling-function coefficients are integrated out analytically and the rest sampled with adaptive Metropolis. The window has a fixed width in the scaling variable, and its range (\(L \ge 32\), \(|x| \le 1\)) is the widest that passes a weighted least-squares \(\chi^2\) test (\(Q = 0.22\)).</p>
       </div>
       <div class="info-card reveal">
         <h3>7 · Final figures</h3>
@@ -140,13 +140,13 @@
       <div class="skill-name">Numba acceleration</div>
       <div class="skill-how"><code>@njit(cache=True)</code> kernel with transparent fallback if Numba isn't installed.</div>
       <div class="skill-name">Monte Carlo</div>
-      <div class="skill-how">Metropolis-Hastings with periodic boundaries and separated thermalization + measurement.</div>
+      <div class="skill-how">Metropolis and Wolff cluster updates with periodic boundaries, separated thermalization and measurement, and integrated autocorrelation times for the error bars.</div>
       <div class="skill-name">Bayesian inference</div>
       <div class="skill-how">Heteroscedastic likelihood with a model-discrepancy term; flat priors; sensitivity of the posterior to the fit window, likelihood and prior.</div>
       <div class="skill-name">MCMC (MH + adaptive MH)</div>
       <div class="skill-how">Random-walk and adaptive Metropolis written in NumPy, nuisance coefficients integrated out analytically; \(\hat{R}\), ESS and trace diagnostics via ArviZ.</div>
       <div class="skill-name">Finite-size scaling</div>
-      <div class="skill-how">Binder-cumulant crossing and data collapse across four lattice sizes, with a systematics table over size sets and windows.</div>
+      <div class="skill-how">Binder-cumulant crossing and data collapse, with the fit range set by a \(\chi^2\) goodness-of-fit test and statistical and systematic errors.</div>
       <div class="skill-name">Technical visualization</div>
       <div class="skill-how">\(M(T)\) curve with errors, posteriors with exact values overlaid, convergence trace plots.</div>
       <div class="skill-name">Scientific rigor</div>
@@ -179,13 +179,15 @@
 ├── <span class="folder">src/</span>
 │   ├── <span class="file">__init__.py</span>
 │   ├── <span class="file">metropolis.py</span>       <span class="comment"># Numba-accelerated Metropolis simulator</span>
+│   ├── <span class="file">wolff.py</span>            <span class="comment"># Wolff single-cluster updates</span>
+│   ├── <span class="file">autocorr.py</span>         <span class="comment"># integrated autocorrelation time</span>
 │   ├── <span class="file">bayesian.py</span>         <span class="comment"># single-size model: NumPy MH + PyMC NUTS</span>
-│   ├── <span class="file">fss.py</span>              <span class="comment"># finite-size-scaling data: ⟨|m|⟩, Binder cumulant</span>
-│   ├── <span class="file">fss_fit.py</span>          <span class="comment"># Bayesian finite-size-scaling fit</span>
+│   ├── <span class="file">fss.py</span>              <span class="comment"># finite-size-scaling data: ⟨|m|⟩, Binder cumulant, τ_int</span>
+│   ├── <span class="file">fss_fit.py</span>          <span class="comment"># Bayesian finite-size-scaling fit + χ² test</span>
 │   └── <span class="file">plots.py</span>            <span class="comment"># publication-style static figures</span>
 ├── <span class="folder">scripts/</span>
 │   ├── <span class="file">model_comparison.py</span> <span class="comment"># sensitivity of the single-size fit</span>
-│   ├── <span class="file">fss_systematics.py</span>  <span class="comment"># FSS fit over size sets and windows</span>
+│   ├── <span class="file">fss_systematics.py</span>  <span class="comment"># χ² test and systematics over sizes and windows</span>
 │   ├── <span class="file">summarize.py</span>        <span class="comment"># posterior summary → JSON</span>
 │   └── <span class="file">export_json.py</span>      <span class="comment"># samples + fit → JSON for portfolio charts</span>
 ├── <span class="folder">notebooks/</span>
@@ -209,7 +211,8 @@
       <li class="done">Full simulation (32×32 lattice · 25 temperatures · 5000 sweeps per \(T\))</li>
       <li class="done">MCMC run — diagnostics checked (\(\hat{R} = 1.00\); ESS of \(\beta\) 2&nbsp;074, the lowest of the three)</li>
       <li class="done">Sensitivity study of the single-size fit and comparison with Onsager's exact \(M(T)\)</li>
-      <li class="done">Finite-size scaling with the Binder cumulant (\(L = 8\)–\(64\)) and a systematics table</li>
+      <li class="done">Wolff cluster algorithm and integrated autocorrelation times for every point</li>
+      <li class="done">Finite-size scaling with the Binder cumulant (\(L = 16\)–\(128\)), a \(\chi^2\) goodness-of-fit test and statistical and systematic errors</li>
       <li class="done">Polished static figures embedded in the README (GitHub-friendly)</li>
       <li class="done">Companion notebook <code>notebooks/explore.ipynb</code> — interactive walk-through</li>
     </ul>
@@ -220,21 +223,21 @@
   <div class="container">
     <div class="section-eyebrow reveal">// Results</div>
     <h2 class="reveal">Outputs and final metrics</h2>
-    <p class="section-intro reveal">The first three tiles are the finite-size-scaling estimates (95% HDI); the fourth is the single-size fit. The interactive figures below show the single-size analysis, rendered from the actual MCMC samples; the finite-size-scaling figure follows them.</p>
+    <p class="section-intro reveal">The first three tiles are the finite-size-scaling estimates, with statistical and systematic errors; the fourth is the single-size fit. The interactive figures below show the single-size analysis, rendered from the actual MCMC samples; the finite-size-scaling figure follows them.</p>
 
     <!-- Headline metrics -->
     <div class="results-grid reveal" style="margin-bottom: 28px;">
       <div class="result-metric">
-        <div class="value">Tc = 2.268</div>
-        <div class="label">finite-size scaling, L = 16–64 · HDI [2.265, 2.271] · Onsager 2.2692</div>
+        <div class="value">Tc = 2.2691</div>
+        <div class="label">finite-size scaling, L = 32–128 · 2.2691(1)(1) · Onsager 2.26919</div>
       </div>
       <div class="result-metric">
-        <div class="value">β = 0.113</div>
-        <div class="label">finite-size scaling · HDI [0.101, 0.126] · exact 1/8</div>
+        <div class="value">β = 0.122</div>
+        <div class="label">finite-size scaling · 0.1220(15)(24) · exact 1/8</div>
       </div>
       <div class="result-metric">
         <div class="value">ν = 0.98</div>
-        <div class="label">finite-size scaling · HDI [0.92, 1.05] · exact 1</div>
+        <div class="label">finite-size scaling · 0.981(10)(20) · exact 1</div>
       </div>
       <div class="result-metric">
         <div class="value">Tc = 2.37</div>
@@ -268,8 +271,8 @@
 
     <div class="results-grid reveal" style="grid-template-columns: 1fr; margin-top: 24px;">
       <div class="result-figure">
-        <img src="../assets/results/01-fss.png" alt="Binder cumulant U(T) for L = 8 to 64 crossing at Tc, and data collapse of U and of the magnetisation" />
-        <div class="caption"><strong>Fig 4 · Finite-size scaling.</strong> (a) Binder cumulant against \(T\) for \(L = 8\)–\(64\): the curves cross at \(T_c\). (b, c) With the fitted \(T_c\), \(\nu\) and \(\beta/\nu\), the cumulant and the rescaled magnetisation from all sizes fall on one curve. Hollow points lie outside the fitted sizes or temperature window.</div>
+        <img src="../assets/results/01-fss.png" alt="Binder cumulant U(T) for L = 16 to 128 crossing at Tc, and data collapse of U and of the magnetisation" />
+        <div class="caption"><strong>Fig 4 · Finite-size scaling.</strong> (a) Binder cumulant against \(T\) for \(L = 16\)–\(128\) (Wolff): the curves cross at \(T_c\). (b, c) With the fitted \(T_c\), \(\nu\) and \(\beta/\nu\), the cumulant and the rescaled magnetisation from all sizes fall on one curve. Hollow points lie outside the fitted sizes or the window \(|x| \le 1\).</div>
       </div>
     </div>
 
@@ -328,7 +331,7 @@
     <div class="two-col" style="margin-top: 16px;">
       <div class="info-card reveal">
         <h3>① Point estimate</h3>
-        <p>Posterior mean as a summary value. From finite-size scaling, \(T_c\) is <strong style="color:var(--fg-0)">2.268</strong> and \(\beta\) is <strong style="color:var(--fg-0)">0.113</strong>. Never reported alone — always with its uncertainty.</p>
+        <p>Posterior mean as a summary value. From finite-size scaling, \(T_c\) is <strong style="color:var(--fg-0)">2.2691</strong> and \(\beta\) is <strong style="color:var(--fg-0)">0.1220</strong>. Never reported alone — always with its uncertainty.</p>
       </div>
       <div class="info-card reveal">
         <h3>② Uncertainty quantification</h3>
@@ -390,31 +393,37 @@
           <td class="warn">[0.049, 0.151] — contains it, but drops to [0.024, 0.065] on \(T &lt; 2.25\)</td>
         </tr>
         <tr>
-          <td colspan="4" class="highlight">Finite-size scaling, \(L = 16, 32, 64\)</td>
+          <td colspan="4" class="highlight">Finite-size scaling, \(L = 32, 64, 128\) (Wolff), \(|x| \le 1\)</td>
+        </tr>
+        <tr>
+          <td>\(\chi^2\) / dof, \(Q\)</td>
+          <td>goodness of fit (least squares, Monte Carlo errors)</td>
+          <td>\(Q &gt; 0.05\)</td>
+          <td class="check">21.1 / 17, \(Q = 0.22\) ✓</td>
         </tr>
         <tr>
           <td>\(\hat{R}\) / ESS_bulk</td>
           <td>chain convergence</td>
           <td>≤ 1.01 / ≥ 200</td>
-          <td class="check">1.00 / &gt; 3 000 ✓</td>
+          <td class="check">≤ 1.002 / &gt; 2&nbsp;600 ✓</td>
         </tr>
         <tr>
           <td>\(T_c\) · 95% HDI</td>
           <td>ground-truth validation</td>
-          <td>should contain 2.2692</td>
-          <td class="check">[2.265, 2.271] ✓</td>
+          <td>should contain 2.26919</td>
+          <td class="check">[2.2689, 2.2693] ✓</td>
         </tr>
         <tr>
           <td>\(\nu\) · 95% HDI</td>
           <td>ground-truth validation</td>
           <td>should contain 1</td>
-          <td class="check">[0.92, 1.05] ✓</td>
+          <td class="check">[0.960, 1.001] ✓</td>
         </tr>
         <tr>
           <td>\(\beta\) · 95% HDI</td>
           <td>ground-truth validation</td>
           <td>should contain 0.125</td>
-          <td class="check">[0.101, 0.126] ✓ (near the edge)</td>
+          <td class="warn">[0.1190, 0.1248] — excludes it; 1.1 σ with the systematic error</td>
         </tr>
       </tbody>
     </table>
@@ -430,12 +439,12 @@
 
     <div class="analysis-callout reveal">
       <h4>2 · Finite-size scaling recovers \(T_c\), \(\nu\) and \(\beta\)</h4>
-      <p>Modelling how the observables change with \(L\), instead of ignoring it, gives \(T_c = 2.268\) [2.265, 2.271], \(\nu = 0.98\) [0.92, 1.05] and \(\beta = 0.113\) [0.101, 0.126] with flat priors, and a Binder crossing value \(U^* = 0.613\) against the exact 0.6107. \(T_c\) is stable to ±0.005 across every size set and window tried; \(\nu\) and \(\beta\) move by more than their statistical intervals (\(\nu\) over 0.95–1.39, \(\beta\) over 0.088–0.146), so those intervals understate the uncertainty of the exponents from lattices up to \(L = 64\).</p>
+      <p>Modelling how the observables change with \(L\), instead of ignoring it, gives \(T_c = 2.2691(1)(1)\), \(\nu = 0.981(10)(20)\) and \(\beta = 0.1220(15)(24)\) from Wolff cluster data with flat priors, and a Binder crossing value \(U^* = 0.6112(3)(3)\) against the exact 0.6107. The fit range is set by a \(\chi^2\) test on the Monte Carlo errors: only \(L \ge 32\) with \(|x| \le 1\) passes (\(Q = 0.22\)); \(L = 16\) and wider windows fail, also with cubic and quartic scaling functions, because with errors of \(10^{-5}\) to \(10^{-3}\) the corrections to scaling are resolved. The systematic error is the largest shift among the variations that pass. The exact values lie within 0.5–1.2 combined standard deviations, while the statistical interval alone excludes \(\beta = 1/8\).</p>
     </div>
 
     <div class="analysis-callout reveal">
       <h4>3 · The samplers are healthy</h4>
-      <p>The single-size chains reach \(\hat{R} = 1.00\), with \(\beta\) mixing slowest (ESS 2&nbsp;074 with 50&nbsp;000 draws per chain); the finite-size-scaling chains reach \(\hat{R} = 1.00\) with ESS above 3 000, because the six scaling-function coefficients are integrated out analytically and only five parameters are sampled. Convergence shows the posteriors were sampled correctly — it says nothing about whether the model behind them is right, which is why both analyses are needed.</p>
+      <p>The single-size chains reach \(\hat{R} = 1.00\), with \(\beta\) mixing slowest (ESS 2&nbsp;074 with 50&nbsp;000 draws per chain); the finite-size-scaling chains reach \(\hat{R} \le 1.002\) with ESS above 2&nbsp;600, because the six scaling-function coefficients are integrated out analytically and only five parameters are sampled. Convergence shows the posteriors were sampled correctly — it says nothing about whether the model behind them is right, which is why both analyses are needed.</p>
     </div>
 
   </div>

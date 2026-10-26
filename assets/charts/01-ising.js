@@ -404,7 +404,7 @@
       const axSuffix = pi === 0 ? "" : String(pi + 1);
       chains.forEach((chain, ci) => {
         traces.push({
-          x: chain.map((_, i) => i),
+          x: chain.map((_, i) => i * (post.draw_step || 1)),
           y: chain,
           type: "scatter",
           mode: "lines",

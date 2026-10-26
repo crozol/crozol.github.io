@@ -103,8 +103,8 @@
       </div>
       <div class="info-card reveal">
         <h3>4 · MCMC sampling</h3>
-        <p><strong style="color:var(--fg-0)">Config:</strong> 4 chains × (1000 tune + 5000 draws) = 20 000 posterior samples, drawn by a random-walk Metropolis-Hastings sampler written in NumPy; a PyMC NUTS backend is also available.</p>
-        <p><strong style="color:var(--fg-0)">Output:</strong> the full joint posterior \(P(T_c, \beta, \sigma \mid \text{data})\). Convergence checks via ArviZ: \(\hat{R} \le 1.02\); ESS 332 for \(T_c\), 562 for \(\sigma\), and 187 for the slower-mixing \(\beta\), just under the usual 200.</p>
+        <p><strong style="color:var(--fg-0)">Config:</strong> 4 chains × (1000 tune + 50&nbsp;000 draws) = 200&nbsp;000 posterior samples, drawn by a random-walk Metropolis-Hastings sampler written in NumPy; a PyMC NUTS backend is also available.</p>
+        <p><strong style="color:var(--fg-0)">Output:</strong> the full joint posterior \(P(T_c, \beta, \sigma \mid \text{data})\). Convergence checks via ArviZ: \(\hat{R} = 1.00\); ESS 3&nbsp;983 for \(T_c\), 5&nbsp;628 for \(\sigma\) and 2&nbsp;074 for the slower-mixing \(\beta\), all above the usual 200.</p>
       </div>
       <div class="info-card reveal">
         <h3>5 · Is the single-size fit right?</h3>
@@ -207,7 +207,7 @@
       <li class="done">Dual sampler: pure-NumPy MH (default) + PyMC NUTS backend</li>
       <li class="done">Visualization module with all three publication-style figures</li>
       <li class="done">Full simulation (32×32 lattice · 25 temperatures · 5000 sweeps per \(T\))</li>
-      <li class="done">MCMC run — diagnostics checked (\(\hat{R} \le 1.02\); ESS of \(\beta\) 187, just under 200)</li>
+      <li class="done">MCMC run — diagnostics checked (\(\hat{R} = 1.00\); ESS of \(\beta\) 2&nbsp;074, the lowest of the three)</li>
       <li class="done">Sensitivity study of the single-size fit and comparison with Onsager's exact \(M(T)\)</li>
       <li class="done">Finite-size scaling with the Binder cumulant (\(L = 8\)–\(64\)) and a systematics table</li>
       <li class="done">Polished static figures embedded in the README (GitHub-friendly)</li>
@@ -238,7 +238,7 @@
       </div>
       <div class="result-metric">
         <div class="value">Tc = 2.37</div>
-        <div class="label">single 32×32 lattice, power-law fit · HDI [2.333, 2.439] excludes the exact value</div>
+        <div class="label">single 32×32 lattice, power-law fit · HDI [2.333, 2.434] excludes the exact value</div>
       </div>
     </div>
 
@@ -255,7 +255,7 @@
       <div id="chart-posteriors" style="width:100%; height:480px;">
         <div class="chart-loading">Loading posteriors…</div>
       </div>
-      <div class="chart-caption"><strong>Fig 2</strong> · Marginal posteriors of \(T_c\) (left) and \(\beta\) (right) built from 20 000 MCMC samples (4 chains × 5000 draws). Shaded band: 95% HDI. Pink solid line: posterior mean. Amber dashed line: Onsager's exact value. \(T_c\)'s HDI misses the exact value by about 0.1; \(\beta\)'s is wide and, as the analysis below shows, moves with the fit window.</div>
+      <div class="chart-caption"><strong>Fig 2</strong> · Marginal posteriors of \(T_c\) (left) and \(\beta\) (right) built from 200&nbsp;000 MCMC samples (4 chains × 50&nbsp;000 draws). Shaded band: 95% HDI. Pink solid line: posterior mean. Amber dashed line: Onsager's exact value. \(T_c\)'s HDI misses the exact value by about 0.1; \(\beta\)'s is wide and, as the analysis below shows, moves with the fit window.</div>
     </div>
 
     <!-- Chart 3: Trace plots -->
@@ -263,7 +263,7 @@
       <div id="chart-trace" style="width:100%; height:620px;">
         <div class="chart-loading">Loading trace plots…</div>
       </div>
-      <div class="chart-caption"><strong>Fig 3</strong> · Per-chain traces across 5000 post-burn iterations (4 chains overlaid). Chains exploring the same band = good mixing. Use the legend to isolate a chain. No visible drift or stuck regions.</div>
+      <div class="chart-caption"><strong>Fig 3</strong> · Per-chain traces across 50&nbsp;000 post-burn iterations (4 chains overlaid). Chains exploring the same band = good mixing. Use the legend to isolate a chain. No visible drift or stuck regions.</div>
     </div>
 
     <div class="results-grid reveal" style="grid-template-columns: 1fr; margin-top: 24px;">
@@ -363,13 +363,13 @@
           <td>\(\hat{R}\) max</td>
           <td>chain convergence (Gelman-Rubin)</td>
           <td>≤ 1.01 ideal · ≤ 1.05 tolerable</td>
-          <td class="check">1.02 ✓</td>
+          <td class="check">1.00 ✓</td>
         </tr>
         <tr>
           <td>ESS_bulk min</td>
           <td>effective independent samples</td>
           <td>≥ 200</td>
-          <td class="warn">187 (\(\beta\)) — just short</td>
+          <td class="check">2&nbsp;074 (\(\beta\)) ✓</td>
         </tr>
         <tr>
           <td>Acceptance rate</td>
@@ -381,13 +381,13 @@
           <td>\(T_c\) · 95% HDI</td>
           <td>ground-truth validation</td>
           <td>should contain 2.2692</td>
-          <td class="warn">[2.333, 2.439] — misses by ~0.1</td>
+          <td class="warn">[2.333, 2.434] — misses by ~0.1</td>
         </tr>
         <tr>
           <td>\(\beta\) · 95% HDI</td>
           <td>ground-truth validation</td>
           <td>should contain 0.125, robustly</td>
-          <td class="warn">[0.048, 0.152] — contains it, but drops to [0.025, 0.071] on \(T &lt; 2.25\)</td>
+          <td class="warn">[0.049, 0.151] — contains it, but drops to [0.024, 0.065] on \(T &lt; 2.25\)</td>
         </tr>
         <tr>
           <td colspan="4" class="highlight">Finite-size scaling, \(L = 16, 32, 64\)</td>
@@ -425,7 +425,7 @@
 
     <div class="analysis-callout reveal">
       <h4>1 · The single-size fit is not a usable estimator</h4>
-      <p>Its \(T_c\) is 0.1 too high, and its \(\beta\) depends on the fit window: over all temperatures \(\beta = 0.094\), on the ordered side alone \(\beta = 0.04\). The heteroscedastic likelihood and the flat prior barely change this, because the fitted discrepancy \(\sigma \approx 0.11\) dwarfs the Monte Carlo errors. The simulation is not at fault: below \(T = 2.25\) it matches Onsager's exact magnetisation to within 1.8 standard errors. The pure power law is only the leading term of that curve, and near \(T_c\) the finite lattice rounds the transition and leaves a \(1/L\) tail above it. With the amplitude fixed at its exact value and the first correction of Onsager's expansion, \(M = A t^eta (1 + bt)\), the ordered-side data give \(eta = 0.124\) [0.122, 0.127] and \(T_c = 2.262\). This is a consistency check, not a measurement: \(A\) and the form of the correction come from the exact solution.</p>
+      <p>Its \(T_c\) is 0.1 too high, and its \(\beta\) depends on the fit window: over all temperatures \(\beta = 0.095\), on the ordered side alone \(\beta = 0.04\). The heteroscedastic likelihood and the flat prior barely change this, because the fitted discrepancy \(\sigma \approx 0.11\) dwarfs the Monte Carlo errors. The simulation is not at fault: below \(T = 2.25\) it matches Onsager's exact magnetisation to within 1.8 standard errors. The pure power law is only the leading term of that curve, and near \(T_c\) the finite lattice rounds the transition and leaves a \(1/L\) tail above it. With the amplitude fixed at its exact value and the first correction of Onsager's expansion, \(M = A t^eta (1 + bt)\), the ordered-side data give \(eta = 0.124\) [0.122, 0.127] and \(T_c = 2.262\). This is a consistency check, not a measurement: \(A\) and the form of the correction come from the exact solution.</p>
     </div>
 
     <div class="analysis-callout reveal">
@@ -435,7 +435,7 @@
 
     <div class="analysis-callout reveal">
       <h4>3 · The samplers are healthy</h4>
-      <p>The single-size chains reach \(\hat{R} \le 1.02\), with \(\beta\) mixing slowest (ESS 187); the finite-size-scaling chains reach \(\hat{R} = 1.00\) with ESS above 3 000, because the six scaling-function coefficients are integrated out analytically and only five parameters are sampled. Convergence shows the posteriors were sampled correctly — it says nothing about whether the model behind them is right, which is why both analyses are needed.</p>
+      <p>The single-size chains reach \(\hat{R} = 1.00\), with \(\beta\) mixing slowest (ESS 2&nbsp;074 with 50&nbsp;000 draws per chain); the finite-size-scaling chains reach \(\hat{R} = 1.00\) with ESS above 3 000, because the six scaling-function coefficients are integrated out analytically and only five parameters are sampled. Convergence shows the posteriors were sampled correctly — it says nothing about whether the model behind them is right, which is why both analyses are needed.</p>
     </div>
 
   </div>

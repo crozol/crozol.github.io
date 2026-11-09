@@ -168,7 +168,8 @@
 │   ├── <span class="file">seed_sweep.py</span> <span class="comment"># n=5 seed robustness check (mean ± std rel. L² error)</span>
 │   ├── <span class="file">heat_time_error.py</span> <span class="comment"># heat error per time slice</span>
 │   ├── <span class="file">bc_weight_sweep.py</span> <span class="comment"># sensitivity to the boundary weight λ_B</span>
-│   └── <span class="file">raissi_repro.py</span> <span class="comment"># the original paper's recipe (L-BFGS, float64)</span>
+│   ├── <span class="file">raissi_repro.py</span> <span class="comment"># the original paper's recipe (SciPy L-BFGS-B, float32 + float64)</span>
+│   └── <span class="file">lbfgs_memory_test.py</span> <span class="comment"># torch.optim.LBFGS vs. L-BFGS-B from the recipe's stopping point</span>
 ├── <span class="folder">tests/</span>         <span class="comment"># pytest: residuals, reference sanity, training smoke test</span>
 └── <span class="folder">figures/</span>       <span class="comment"># PINN-vs-reference comparison plots + loss curve</span></pre>
   </div>
@@ -190,7 +191,7 @@
       <li class="done">5-seed robustness check (mean ± std relative \(L^2\) error, both equations)</li>
       <li class="done">Heat error resolved in time</li>
       <li class="done">Sensitivity of Burgers to the boundary weight \(\lambda_B\)</li>
-      <li class="done">Reproduction of the original paper's Burgers recipe (3 seeds)</li>
+      <li class="done">Reproduction of the original paper's Burgers recipe (20 seeds, float32 + float64)</li>
     </ul>
   </div>
 </section>
@@ -358,20 +359,30 @@
 
     <div class="analysis-callout reveal" style="margin-top: 24px;">
       <h4>Burgers · comparison with the original paper</h4>
-      <p>Raissi et al. (2019) report \(6.7 \times 10^{-4}\) on this benchmark, with a deeper, narrower tanh network (20 neurons per layer), 100 initial/boundary points, 10&nbsp;000 Latin-hypercube collocation points, and full-batch L-BFGS in float64 for up to 50&nbsp;000 iterations, with no Adam phase. Following that recipe and scoring against the same exact solution on the same 256&nbsp;×&nbsp;100 grid gives:</p>
+      <p>Raissi et al. (2019) report \(6.7 \times 10^{-4}\) on this benchmark. Their released code trains a tanh network with 8 hidden layers of 20 neurons in float32, on 100 initial/boundary points and 10&nbsp;000 Latin-hypercube collocation points, with SciPy's L-BFGS-B and their options (up to 50&nbsp;000 iterations, SciPy's default gradient tolerance) and no Adam phase. That recipe, rerun over 20 seeds in float32 and again in float64 and scored against the exact solution:</p>
     </div>
 
     <table class="analysis-table reveal">
       <thead>
-        <tr><th>Seed</th><th>0</th><th>1</th><th>2</th></tr>
+        <tr><th></th><th>float32 (authors' precision)</th><th>float64</th></tr>
       </thead>
       <tbody>
-        <tr><td>Rel. L² error vs. exact</td><td>\(2.2 \times 10^{-2}\)</td><td class="highlight">\(7.1 \times 10^{-4}\)</td><td>\(1.15 \times 10^{-3}\)</td></tr>
+        <tr><td>Runs above \(10^{-3}\)</td><td>18 / 20</td><td>8 / 20</td></tr>
+        <tr><td>Runs at or below \(6.7 \times 10^{-4}\)</td><td>0 / 20</td><td class="highlight">8 / 20</td></tr>
+        <tr><td>Median rel. L² error [IQR]</td><td>\(2.9 \times 10^{-3}\) [\(1.3 \times 10^{-3}\), \(6.4 \times 10^{-3}\)]</td><td>\(9.7 \times 10^{-4}\) [\(5.4 \times 10^{-4}\), \(1.8 \times 10^{-3}\)]</td></tr>
+        <tr><td>Stopped by</td><td>loss decrease below float32 resolution (20 / 20)</td><td>gradient tolerance (20 / 20)</td></tr>
       </tbody>
     </table>
 
     <div class="analysis-callout reveal" style="margin-top: 24px;">
-      <p style="margin-bottom:0;">One seed matches the published number, the median is \(1.15 \times 10^{-3}\), and one seed stalls at 2.2%. All three used their full budget (about 8 h each on one CPU core). The published figure is reproducible but closer to a good draw than to a typical outcome; the gap to this project's pipeline (about 14× against the median) comes from optimization budget and precision, not from a different formulation.</p>
+      <p style="margin-bottom:0;">In float32 every run stops when the decrease of the loss falls below what float32 can represent, long before it converges; in float64 the same recipe runs until the gradient test and reaches the published number on 8 of 20 seeds, although its final loss does not tell the good runs from the bad ones. An earlier version of this reproduction used <code>torch.optim.LBFGS</code>, whose absolute curvature test (\(y^\top s > 10^{-10}\)) silently freezes its memory near a loss of \(10^{-6}\): from the same point it lowers the loss about 400 times more slowly than L-BFGS-B (Fig 7). Details in <a href="https://github.com/crozol/04-pinns#9--comparison-with-the-original-paper" target="_blank" rel="noopener">Section 9 of the README</a>.</p>
+    </div>
+
+    <div class="results-grid reveal" style="grid-template-columns: 1fr; margin-top: 24px;">
+      <div class="result-figure">
+        <img src="../assets/results/04-lbfgs-memory-test.png" alt="torch.optim.LBFGS against SciPy L-BFGS-B from the point where the float64 recipe stops: training loss against evaluations, and y's of each step against torch's 1e-10 threshold" />
+        <div class="caption"><strong>Fig 7 · torch.optim.LBFGS vs. SciPy L-BFGS-B,</strong> from the point where the float64 recipe stops (seed 0), 600 loss evaluations each. Left: training loss. Right: \(y^\top s\) of each accepted step against torch's threshold \(10^{-10}\); torch discards all 300 of its curvature pairs, L-BFGS-B keeps all 556.</div>
+      </div>
     </div>
   </div>
 </section>

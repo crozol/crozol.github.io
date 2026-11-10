@@ -387,7 +387,7 @@
     </div>
 
     <h3 class="reveal" style="margin-top: 40px;">Controlled ablation on unseen orbits</h3>
-    <p class="reveal" style="color: var(--fg-1); max-width: 820px;">Three models with the same width, depth and schedule — the MLP in \((x, z)\), <strong style="color:var(--fg-0)">the same MLP in \((\ln x, \ln z)\)</strong> as a coordinate control, and the HNN — trained on one trajectory or on three, with the initial state of each training trajectory fitted jointly with the network. Each is scored on five orbits it never saw, over \(t \in [0, 22]\). Five seeds per configuration, 30 runs; the \(H\) drift is normalised by the height of each orbit above the fixed point.</p>
+    <p class="reveal" style="color: var(--fg-1); max-width: 820px;">Three models with the same width, depth and schedule — the MLP in \((x, z)\), <strong style="color:var(--fg-0)">the same MLP in \((\ln x, \ln z)\)</strong> as a coordinate control, and the HNN — trained on one trajectory or on three, with the initial state of each training trajectory fitted jointly with the network. Each is scored on five orbits it never saw, over \(t \in [0, 22]\). Five seeds per configuration; the \(H\) drift is normalised by the height of each orbit above the fixed point. The loss is measured in \((x, z)\), where the noise is added, so that it is the exact likelihood of the observations for all three models; the first comparison measured it in log-coordinates, which weights the bottom of an orbit up to 7 500× more.</p>
 
     <table class="analysis-table reveal" style="margin-top: 16px;">
       <thead>
@@ -401,32 +401,54 @@
       </thead>
       <tbody>
         <tr><td>1 trajectory</td><td>MLP \((x, z)\)</td><td>16.6 % ± 1.9 %</td><td>82.7 % ± 15.7 %</td><td>6.45 % ± 1.51 %</td></tr>
-        <tr><td>1 trajectory</td><td>MLP \((\ln x, \ln z)\)</td><td>17.3 % ± 1.2 %</td><td>60.1 % ± 1.6 %</td><td class="highlight">2.14 % ± 0.30 %</td></tr>
-        <tr><td>1 trajectory</td><td>HNN</td><td>18.5 % ± 2.2 %</td><td>11.7 % ± 0.9 %</td><td>2.36 % ± 0.29 %</td></tr>
+        <tr><td>1 trajectory</td><td>MLP \((\ln x, \ln z)\)</td><td>14.5 % ± 0.7 %</td><td>65.9 % ± 3.5 %</td><td>5.12 % ± 0.54 %</td></tr>
+        <tr><td>1 trajectory</td><td>HNN</td><td>13.7 % ± 3.0 %</td><td>12.1 % ± 0.7 %</td><td class="highlight">4.72 % ± 0.84 %</td></tr>
         <tr><td>3 trajectories</td><td>MLP \((x, z)\)</td><td>5.35 % ± 0.37 %</td><td>32.5 % ± 1.3 %</td><td>12.8 % ± 1.4 %</td></tr>
-        <tr><td>3 trajectories</td><td>MLP \((\ln x, \ln z)\)</td><td>5.03 % ± 0.23 %</td><td>8.60 % ± 0.33 %</td><td>5.51 % ± 0.15 %</td></tr>
-        <tr><td>3 trajectories</td><td>HNN</td><td class="highlight">2.38 % ± 0.41 %</td><td class="highlight">2.18 % ± 0.32 %</td><td>1.52 % ± 0.18 %</td></tr>
+        <tr><td>3 trajectories</td><td>MLP \((\ln x, \ln z)\)</td><td>4.65 % ± 0.45 %</td><td>12.6 % ± 1.8 %</td><td>8.19 % ± 0.68 %</td></tr>
+        <tr><td>3 trajectories</td><td>HNN</td><td class="highlight">2.57 % ± 0.94 %</td><td class="highlight">6.03 % ± 1.01 %</td><td>3.31 % ± 0.41 %</td></tr>
       </tbody>
     </table>
 
     <div class="results-grid reveal" style="grid-template-columns: 1fr; margin-top: 24px;">
       <div class="result-figure">
         <img src="../assets/results/02-hnn-ablation-ic.png" alt="Relative error and H drift on unseen orbits for three models and two training regimes, and the predicted unseen orbits" />
-        <div class="caption"><strong>Fig 11 · Ablation on unseen orbits.</strong> (a) Relative error and (b) drift of the true \(H\), averaged over the five unseen orbits; bars are means, dots are seeds. (c) The unseen orbits predicted by the log-coordinate MLP (dashed) and the HNN (solid), both trained on three trajectories (thin grey), against the truth (cyan).</div>
+        <div class="caption"><strong>Fig 11 · Ablation on unseen orbits.</strong> (a) Relative error and (b) drift of the true \(H\), averaged over the five unseen orbits; bars are means, dots are seeds. (c) The unseen orbits predicted by the log-coordinate MLP (dashed) and the HNN (solid), both trained on three trajectories (thin grey), against the truth (cyan). Loss in \((x, z)\) for every model.</div>
       </div>
     </div>
 
+    <p class="reveal" style="color: var(--fg-1); max-width: 820px; margin-top: 24px;">The same models with the loss measured in either coordinate system:</p>
+    <table class="analysis-table reveal" style="margin-top: 16px;">
+      <thead>
+        <tr>
+          <th>Model</th>
+          <th>Loss in</th>
+          <th>3 trajectories · unseen: rel. error</th>
+          <th>3 trajectories · unseen: \(H\) drift</th>
+          <th>1 trajectory · training orbit: rel. error</th>
+          <th>1 trajectory · training orbit: \(H\) drift</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>MLP \((x, z)\)</td><td>\((x, z)\) = likelihood</td><td>5.35 % ± 0.37 %</td><td>32.5 % ± 1.3 %</td><td>1.73 % ± 0.39 %</td><td>6.45 % ± 1.51 %</td></tr>
+        <tr><td>MLP \((x, z)\)</td><td>\((\ln x, \ln z)\)</td><td>6.77 % ± 0.26 %</td><td>23.6 % ± 4.5 %</td><td>1.68 % ± 0.34 %</td><td>3.66 % ± 0.39 %</td></tr>
+        <tr><td>MLP \((\ln x, \ln z)\)</td><td>\((x, z)\) = likelihood</td><td>4.65 % ± 0.45 %</td><td>12.6 % ± 1.8 %</td><td>0.42 % ± 0.03 %</td><td>5.12 % ± 0.54 %</td></tr>
+        <tr><td>MLP \((\ln x, \ln z)\)</td><td>\((\ln x, \ln z)\)</td><td>5.03 % ± 0.23 %</td><td>8.60 % ± 0.33 %</td><td>0.43 % ± 0.14 %</td><td>2.14 % ± 0.30 %</td></tr>
+        <tr><td>HNN</td><td>\((x, z)\) = likelihood</td><td>2.57 % ± 0.94 %</td><td>6.03 % ± 1.01 %</td><td>0.71 % ± 0.33 %</td><td>4.72 % ± 0.84 %</td></tr>
+        <tr><td>HNN</td><td>\((\ln x, \ln z)\)</td><td>2.38 % ± 0.41 %</td><td>2.18 % ± 0.32 %</td><td>3.06 % ± 1.12 %</td><td>2.36 % ± 0.29 %</td></tr>
+      </tbody>
+    </table>
+
     <div class="analysis-callout reveal" style="margin-top: 24px;">
-      <h4>1 · On the training orbit, the coordinates do most of the work</h4>
-      <p>With one trajectory, the MLP in log-coordinates conserves \(H\) as well as the HNN (2.14 % vs 2.36 %) and tracks the orbit more closely (0.43 % vs 3.06 % relative error). The lower drift in the first comparison came mostly from the change to \((\ln x, \ln z)\), not from the Hamiltonian structure.</p>
+      <h4>1 · On the training orbit, the coordinates make the fit track the orbit; the loss does most of the conserving</h4>
+      <p>With one trajectory, moving the MLP to log-coordinates cuts its error on the training orbit from 1.7 % to 0.4 % with either loss. Its \(H\) drift falls mostly with the loss instead: measuring the residuals in log-coordinates lowers it from 6.5 % to 3.7 % for the MLP in \((x, z)\) and from 5.1 % to 2.1 % for the MLP in \((\ln x, \ln z)\), while the change of coordinates under the exact likelihood lowers it only from 6.5 % to 5.1 %. The reason is in \(H = d x - c \ln x + b z - a \ln z\): its logarithmic terms make it most sensitive where the populations are small, the region a loss in log-coordinates over-weights. The lower drift in the first comparison came mostly from the loss, not from the Hamiltonian structure.</p>
     </div>
     <div class="analysis-callout reveal">
       <h4>2 · One trajectory does not determine the vector field</h4>
-      <p>Trained on a single orbit, all three models miss unseen orbits by 17–18 %, the HNN included. The HNN's orbits still close (\(H\) drift 11.7 % against 60–83 %), but they are the wrong orbits: an \(H_\theta\) that is accurate along one curve need not be accurate anywhere else.</p>
+      <p>Trained on a single orbit, all three models miss unseen orbits by 14–17 %, the HNN included. The HNN's orbits still close (\(H\) drift 12.1 % against 66–83 %), but they are the wrong orbits: an \(H_\theta\) that is accurate along one curve need not be accurate anywhere else.</p>
     </div>
     <div class="analysis-callout reveal">
       <h4>3 · With three trajectories, the prior pays off</h4>
-      <p>On unseen orbits the HNN's error is less than half that of the log-coordinate MLP (2.38 % vs 5.03 %) and its \(H\) drift four times smaller (2.18 % vs 8.60 %), with every seed better than every MLP seed on both metrics (paired by seed, 5/5: sign test p = 1/32 ≈ 0.03). The MLP's orbits spiral slowly in or out; the HNN's stay closed near the true ones, including the two orbits above the training range. The HNN remains applicable only to systems known to be Hamiltonian, in known canonical coordinates; for the damped pendulum the natural extension is a dissipation-aware split flow (Sosanya &amp; Greydanus, 2022).</p>
+      <p>On unseen orbits the HNN's error is 1.8 times lower than that of the log-coordinate MLP (2.57 % vs 4.65 %) and its \(H\) drift 2.1 times lower (6.03 % vs 12.6 %), with every seed better than every MLP seed on both metrics (Mann-Whitney, two-sided p = 0.008, the smallest five seeds against five can give; paired by seed, 5/5, sign test p = 0.06). With the loss in log-coordinates the gap is wider (2.38 % and 2.18 % against 5.03 % and 8.60 %). The MLP's orbits spiral slowly in or out; the HNN's stay closed near the true ones, including the two orbits above the training range. The HNN remains applicable only to systems known to be Hamiltonian, in known canonical coordinates; for the damped pendulum the natural extension is a dissipation-aware split flow (Sosanya &amp; Greydanus, 2022).</p>
     </div>
 
     <noscript>

@@ -278,7 +278,7 @@
   <div class="container">
     <div class="section-eyebrow reveal">// Baselines &amp; ablation</div>
     <h2 class="reveal">What the autoencoder is measured against</h2>
-    <p class="section-intro reveal">The 3 913 test windows overlap 29/30 and come from only 20 engines, so the effective sample size is about 20. Intervals are 95% bootstrap intervals over test engines. Lead time is the RUL at which an engine's score crosses the q99 threshold and stays above it, one number per engine.</p>
+    <p class="section-intro reveal">The 3 913 test windows overlap 29/30 and come from only 20 engines, so the effective sample size is about 20. Intervals are 95% bootstrap intervals over test engines. Lead time is the RUL at an engine's first alarm, three consecutive windows above the q99 threshold, one number per engine; an alarm on a healthy window (RUL &gt; 100) counts as a false alarm instead.</p>
 
     <table class="analysis-table reveal">
       <thead>
@@ -291,15 +291,22 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td>Cycle index (trivial)</td><td>0.839 [0.803, 0.897]</td><td>0.484</td><td>88 [57, 144] · 26% false alarms on healthy windows</td><td>0 / 20</td></tr>
-        <tr><td>PCA reconstruction (16 comp.)</td><td>0.895 [0.841, 0.944]</td><td>0.743</td><td>16 [4, 24]</td><td>4 / 20</td></tr>
-        <tr><td>One-Class SVM</td><td>0.960 [0.936, 0.981]</td><td>0.859</td><td>52 [31, 79]</td><td>0 / 20</td></tr>
-        <tr><td>Isolation Forest</td><td>0.970 [0.955, 0.985]</td><td>0.885</td><td>34 [24, 54]</td><td>0 / 20</td></tr>
-        <tr><td>LSTM autoencoder</td><td class="highlight">0.969 [0.954, 0.985]</td><td class="highlight">0.882</td><td class="highlight">46 [28, 67]</td><td>0 / 20</td></tr>
+        <tr><td>Cycle index (trivial)</td><td>0.839 [0.803, 0.897]</td><td>0.484</td><td>85.5 [55, 100] · 25% false alarms on healthy windows</td><td>0 / 20</td></tr>
+        <tr><td>PCA reconstruction (16 comp.)</td><td>0.895 [0.841, 0.944]</td><td>0.743</td><td>18 [10, 29]</td><td>3 / 20</td></tr>
+        <tr><td>One-Class SVM</td><td>0.960 [0.936, 0.981]</td><td>0.859</td><td>50 [29, 77] · 0.26% false alarms on healthy windows</td><td>0 / 20</td></tr>
+        <tr><td>Isolation Forest</td><td>0.970 [0.955, 0.985]</td><td>0.885</td><td>32.5 [22, 52]</td><td>0 / 20</td></tr>
+        <tr><td>LSTM autoencoder</td><td class="highlight">0.969 [0.954, 0.985]</td><td class="highlight">0.882</td><td class="highlight">44 [25.5, 65]</td><td>0 / 20</td></tr>
       </tbody>
     </table>
 
-    <p class="reveal" style="margin-top: 22px;">The autoencoder has learned degradation rather than elapsed time — its interval does not overlap the cycle-count one — and the non-linear model matters: a linear reconstruction of the same latent size misses 4 engines. An Isolation Forest on the same windows, however, is statistically indistinguishable in ranking quality. So is its lead time: the medians (46 vs 34 cycles) suggest an earlier alarm, but engine by engine the autoencoder alarms a median of 1 cycle before the forest (95% bootstrap interval [−1, +5.5]; first on 11 engines, the forest on 7, 2 ties; sign test p = 0.48). The autoencoder is kept because it reconstructs each sensor, so an alarm can be traced to the sensors that drift — not because it ranks better.</p>
+    <p class="reveal" style="margin-top: 22px;">The autoencoder has learned degradation rather than elapsed time — its interval does not overlap the cycle-count one — and the non-linear model matters: a linear reconstruction of the same latent size misses 3 engines. An Isolation Forest on the same windows, however, ranks as well: paired over engines, the ROC-AUC difference is −0.002 (95% interval [−0.012, +0.009]), and at the q99 threshold the autoencoder alarms first on 11 engines, the forest on 7, with 2 ties (sign test p = 0.48). At its own q99 threshold the One-Class SVM alarms earlier than the autoencoder on 19 of 20 engines, but that threshold also lets it raise false alarms on healthy windows where the autoencoder raises none. Compared at equal false-alarm rates (Fig 5), the advantage disappears: with no healthy false alarm it alarms first on 14 engines against 5 (p = 0.064), at 0.5% and 1% on 12 against 8 and 11 against 7, and no score warns significantly earlier than the autoencoder. The autoencoder is kept because it reconstructs each sensor, so an alarm can be traced to the sensors that drift — not because it ranks better.</p>
+
+    <div class="results-grid reveal" style="grid-template-columns: 1fr; margin-top: 24px;">
+      <div class="result-figure">
+        <img src="../assets/results/03-lead-vs-false-alarms.png" alt="Median lead time against the false-alarm rate on healthy windows for the autoencoder, the Isolation Forest and the One-Class SVM" />
+        <div class="caption"><strong>Fig 5 · Lead time at equal false-alarm rates.</strong> Median lead time against the false-alarm rate on healthy windows (RUL &gt; 100), sweeping each score's threshold; dots mark each score's q99 validation threshold. The alarm is three consecutive windows above the threshold.</div>
+      </div>
+    </div>
 
     <table class="analysis-table reveal" style="margin-top: 28px;">
       <thead>

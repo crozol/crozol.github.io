@@ -331,7 +331,7 @@
         <div class="num">02</div>
         <div class="domain">Deep learning · Dynamical systems</div>
         <h3>Neural ODEs for dynamical systems</h3>
-        <p>Neural ODEs fit to short noisy trajectories of a damped pendulum and a Lotka-Volterra system, trained end-to-end through a differentiable Dormand-Prince solver. A controlled ablation of Hamiltonian structure: against an MLP given the same log-coordinates, the confounder of the naive comparison, a Hamiltonian Neural Network of the same size generalises to five unseen Lotka-Volterra orbits with 2.4% error and 2.2% drift in the conserved quantity, against 5.0% and 8.6%, better on 5/5 seeds (sign test p = 0.031), once trained on three trajectories; trained on one, no model generalises.</p>
+        <p>Neural ODEs fit to short noisy trajectories of a damped pendulum and a Lotka-Volterra system, trained end-to-end through a differentiable Dormand-Prince solver. A controlled ablation of Hamiltonian structure: against an MLP given the same log-coordinates, the confounder of the naive comparison, a Hamiltonian Neural Network of the same size, trained with the exact likelihood of the noise, generalises to five unseen Lotka-Volterra orbits with 2.6% error and 6.0% drift in the conserved quantity, against 4.7% and 12.6%, every seed better than every MLP seed (Mann-Whitney p = 0.008), once trained on three trajectories; trained on one, no model generalises.</p>
         <div class="project-tags">
           <span class="tag tag-live">● Live demo</span><span class="tag">PyTorch</span><span class="tag">torchdiffeq</span><span class="tag">ODEs</span><span class="tag">Autograd</span>
         </div>
@@ -343,7 +343,7 @@
         <div class="num">03</div>
         <div class="domain">Deep learning · MLOps</div>
         <h3>Anomaly Detection API · Autoencoder + FastAPI + Docker</h3>
-        <p>LSTM autoencoder trained on healthy CMAPSS turbofan windows; reconstruction error becomes the anomaly score, calibrated against a held-out healthy validation set. ROC-AUC 0.969 [0.954, 0.985] (bootstrap over 20 test engines), above a trivial cycle-count baseline (0.839) but not above an Isolation Forest on the same windows (0.970). Every test engine is flagged before failure (median 46 cycles of warning), and the warning times of the two methods are tied (paired median +1 cycle, p = 0.48). Served as a typed FastAPI service with a Streamlit demo, two-service Docker stack.</p>
+        <p>LSTM autoencoder trained on healthy CMAPSS turbofan windows; reconstruction error becomes the anomaly score, calibrated against a held-out healthy validation set. ROC-AUC 0.969 [0.954, 0.985] (bootstrap over 20 test engines), above a trivial cycle-count baseline (0.839) but not above an Isolation Forest on the same windows (0.970; paired difference −0.002 [−0.012, +0.009]). With a causal alarm every test engine is flagged before failure, a median of 44 cycles ahead, and at equal false-alarm rates on healthy windows no other score, the One-Class SVM included, warns significantly earlier. Served as a typed FastAPI service with a Streamlit demo, two-service Docker stack.</p>
         <div class="project-tags">
           <span class="tag tag-live">● Live demo</span><span class="tag">PyTorch</span><span class="tag">FastAPI</span><span class="tag">Docker</span><span class="tag">Streamlit</span><span class="tag">Pandas</span>
         </div>

@@ -344,7 +344,7 @@
 
     <div class="analysis-callout reveal" style="margin-top: 24px;">
       <h4>Burgers · sensitivity to the boundary weight</h4>
-      <p>The weight \(\lambda_B = 2\) was not tuned. It is chosen here without the exact solution: seed 0 is retrained for four values, and the unweighted validation loss \(V\) (PDE residual, boundary and initial terms, weight 1 each) on a fresh 201&nbsp;×&nbsp;101 grid not used in training selects \(\lambda_B = 0.5\). Its relative \(L^2\) error, reported once after the choice, is <strong style="color:var(--fg-0)">0.86%</strong>, about half that of the untuned value; \(V\) orders the four weights as the exact error does. This is a single seed, and some of the differences are of the order of the seed-to-seed spread. The frozen configuration stays at \(\lambda_B = 2\), so every other number on this page comes from the same setup.</p>
+      <p>The weight \(\lambda_B = 2\) was not tuned. It is chosen here without the exact solution: seed 0 is retrained for four values, and the unweighted validation loss \(V\) (PDE residual, boundary and initial terms, weight 1 each) on a fresh 201&nbsp;×&nbsp;101 grid not used in training selects \(\lambda_B = 0.5\). Its relative \(L^2\) error, reported once after the choice, is <strong style="color:var(--fg-0)">0.86%</strong>, about half that of the untuned value; \(V\) orders the four weights as the exact error does. On its own that is weak evidence: a random order of four matches 1 time in 24, this is a single seed, and some of the differences are of the order of the seed-to-seed spread. On the 40 runs of the paper's recipe below, \(V\) also ranks the errors. The frozen configuration stays at \(\lambda_B = 2\), so every other number on this page comes from the same setup.</p>
     </div>
 
     <table class="analysis-table reveal">
@@ -359,7 +359,7 @@
 
     <div class="analysis-callout reveal" style="margin-top: 24px;">
       <h4>Burgers · comparison with the original paper</h4>
-      <p>Raissi et al. (2019) report \(6.7 \times 10^{-4}\) on this benchmark. Their released code trains a tanh network with 8 hidden layers of 20 neurons in float32, on 100 initial/boundary points and 10&nbsp;000 Latin-hypercube collocation points, with SciPy's L-BFGS-B and their options (up to 50&nbsp;000 iterations, SciPy's default gradient tolerance) and no Adam phase. That recipe, rerun over 20 seeds in float32 and again in float64 and scored against the exact solution:</p>
+      <p>Raissi et al. (2019) report \(6.7 \times 10^{-4}\) on this benchmark. Their released code trains a tanh network with 8 hidden layers of 20 neurons in float32, on 100 initial/boundary points and 10&nbsp;000 Latin-hypercube collocation points over \(t \in [0, 0.99]\), the time range of their data, with SciPy's L-BFGS-B and their options (up to 50&nbsp;000 iterations, SciPy's default gradient tolerance) and no Adam phase. That recipe, rerun over 20 seeds in float32 and again in float64 and scored against the exact solution:</p>
     </div>
 
     <table class="analysis-table reveal">
@@ -367,21 +367,22 @@
         <tr><th></th><th>float32 (authors' precision)</th><th>float64</th></tr>
       </thead>
       <tbody>
-        <tr><td>Runs above \(10^{-3}\)</td><td>18 / 20</td><td>8 / 20</td></tr>
-        <tr><td>Runs at or below \(6.7 \times 10^{-4}\)</td><td>0 / 20</td><td class="highlight">8 / 20</td></tr>
-        <tr><td>Median rel. L² error [IQR]</td><td>\(2.9 \times 10^{-3}\) [\(1.3 \times 10^{-3}\), \(6.4 \times 10^{-3}\)]</td><td>\(9.7 \times 10^{-4}\) [\(5.4 \times 10^{-4}\), \(1.8 \times 10^{-3}\)]</td></tr>
-        <tr><td>Stopped by</td><td>loss decrease below float32 resolution (20 / 20)</td><td>gradient tolerance (20 / 20)</td></tr>
+        <tr><td>Runs above \(10^{-3}\) [95% CI]</td><td>20 / 20 [83, 100%]</td><td>10 / 20 [27, 73%]</td></tr>
+        <tr><td>Runs at or below \(6.7 \times 10^{-4}\) [95% CI]</td><td>0 / 20 [0, 17%]</td><td class="highlight">4 / 20 [6, 44%]</td></tr>
+        <tr><td>Median rel. L² error [IQR]</td><td>\(2.0 \times 10^{-3}\) [\(1.4 \times 10^{-3}\), \(5.7 \times 10^{-3}\)]</td><td>\(1.15 \times 10^{-3}\) [\(7.0 \times 10^{-4}\), \(2.1 \times 10^{-3}\)]</td></tr>
+        <tr><td>Stopped by</td><td>loss decrease below float32 resolution (19 / 20)</td><td>gradient tolerance (20 / 20)</td></tr>
+        <tr><td>Spearman ρ with the error: \(V\) / final training loss</td><td>0.58 / 0.04</td><td>0.54 / 0.11</td></tr>
       </tbody>
     </table>
 
     <div class="analysis-callout reveal" style="margin-top: 24px;">
-      <p style="margin-bottom:0;">In float32 every run stops when the decrease of the loss falls below what float32 can represent, long before it converges; in float64 the same recipe runs until the gradient test and reaches the published number on 8 of 20 seeds, although its final loss does not tell the good runs from the bad ones. An earlier version of this reproduction used <code>torch.optim.LBFGS</code>, whose absolute curvature test (\(y^\top s > 10^{-10}\)) silently freezes its memory near a loss of \(10^{-6}\): from the same point it lowers the loss about 400 times more slowly than L-BFGS-B (Fig 7). Details in <a href="https://github.com/crozol/04-pinns#9--comparison-with-the-original-paper" target="_blank" rel="noopener">Section 9 of the README</a>.</p>
+      <p style="margin-bottom:0;">In float32 nearly every run stops when the decrease of the loss falls below what float32 can represent, long before it converges; in float64 the same recipe runs until the gradient test and reaches the published number on 4 of 20 seeds. In neither precision does the final training loss tell the good runs from the bad ones; the validation loss \(V\) on a fresh grid does, without the exact solution: the run with the lowest \(V\) is the best of the 20 in float64, and keeping the lowest-\(V\) run of 5 seeds leaves 13% of float64 picks above \(10^{-3}\), against 50% of single runs. The authors' reference file agrees with the exact solution to \(3 \times 10^{-12}\), so the comparison is like for like. An earlier version of this reproduction used <code>torch.optim.LBFGS</code>, whose absolute curvature test (\(y^\top s > 10^{-10}\)) silently freezes its memory near a loss of \(10^{-6}\): from then on it lowers the loss about 70 times more slowly than L-BFGS-B (Fig 7). Details in <a href="https://github.com/crozol/04-pinns#9--comparison-with-the-original-paper" target="_blank" rel="noopener">Section 9 of the README</a>.</p>
     </div>
 
     <div class="results-grid reveal" style="grid-template-columns: 1fr; margin-top: 24px;">
       <div class="result-figure">
         <img src="../assets/results/04-lbfgs-memory-test.png" alt="torch.optim.LBFGS against SciPy L-BFGS-B from the point where the float64 recipe stops: training loss against evaluations, and y's of each step against torch's 1e-10 threshold" />
-        <div class="caption"><strong>Fig 7 · torch.optim.LBFGS vs. SciPy L-BFGS-B,</strong> from the point where the float64 recipe stops (seed 0), 600 loss evaluations each. Left: training loss. Right: \(y^\top s\) of each accepted step against torch's threshold \(10^{-10}\); torch discards all 300 of its curvature pairs, L-BFGS-B keeps all 556.</div>
+        <div class="caption"><strong>Fig 7 · torch.optim.LBFGS vs. SciPy L-BFGS-B,</strong> from the point where the float64 recipe stops (seed 0), 600 loss evaluations each. Left: training loss. Right: \(y^\top s\) of each accepted step against torch's threshold \(10^{-10}\); torch keeps no pair after step 264 (dotted line), while L-BFGS-B keeps all 554.</div>
       </div>
     </div>
   </div>

@@ -41,7 +41,7 @@
     <p class="tagline reveal">Use persistent homology over sliding windows of multi-asset returns to detect transitions between normal regime and market crises (2008, 2011, 2015, 2018, 2020, 2022), and test whether topological descriptors add anything beyond volatility and correlation on leakage-free folds.</p>
     <div class="cta-row reveal">
       <a href="https://github.com/crozol/05-tda-finance" class="btn btn-primary" target="_blank" rel="noopener">Code on GitHub →</a>
-      <a href="#" class="btn btn-ghost">Demo (pending)</a>
+      <a href="https://doi.org/10.5281/zenodo.24095680" class="btn btn-ghost" target="_blank" rel="noopener">Analysis plan (DOI) →</a>
     </div>
   </div>
 </header>
@@ -53,19 +53,23 @@
     <div class="two-col">
       <div class="reveal">
         <p>Classical methods for detecting regime changes in finance (rolling volatility, rolling correlations, HMMs) look at statistical moments. <strong style="color:var(--fg-0)">Topological Data Analysis</strong> proposes a complementary angle: look at the <strong style="color:var(--fg-0)">shape</strong> of the return cloud in \(\mathbb{R}^d\) through <strong style="color:var(--fg-0)">persistent homology</strong>, extracting invariants that are robust to reparameterization.</p>
-        <p>Idea: in a normal regime, returns form a "round" low-correlation cloud; during a crisis, the cloud collapses toward a single direction (systemic co-movement) and its topology changes. Gidea &amp; Katz (2018) found that the norms of persistence landscapes grow in the run-up to the 2000 and 2008 crashes.</p>
-        <p>The question here is narrower: do topological features detect crisis regimes <em>better than</em> realised volatility and the leading eigenvalue of the correlation matrix — the two things a crisis also changes — when all are scored on the same leakage-free folds?</p>
+        <p>Idea: in a normal regime, returns form a "round" low-correlation cloud; during a crisis, the cloud collapses toward a single direction (systemic co-movement) and its shape changes. Gidea &amp; Katz (2018) found that the norms of persistence landscapes grow in the run-up to the 2000 and 2008 crashes. Much of that change is measured without topology: for independent Gaussian days, the persistence of a standardised window depends on its correlation matrix only through the eigenvalues.</p>
+        <p>The question here is narrower: do topological features detect crisis regimes <em>better than</em> realised volatility and the eigenvalues of the correlation matrix together — the two things a crisis also changes — when all are scored on the same leakage-free folds? The analysis plan was fixed before any result and is archived on Zenodo (<a href="https://doi.org/10.5281/zenodo.24095680" target="_blank" rel="noopener">doi:10.5281/zenodo.24095680</a>).</p>
       </div>
       <div class="theory-card reveal">
         <h3>Mathematical pipeline</h3>
         <p>Log returns:</p>
         <div class="formula">\[ r_t = \log\!\left(p_t / p_{t-1}\right) \in \mathbb{R}^d \]</div>
-        <p>Sliding window:</p>
-        <div class="formula">\[ W_t = \{\, r_s : t - h \le s \le t \,\} \subset \mathbb{R}^d \]</div>
+        <p>Sliding window of \(h = 40\) days, each asset standardised inside it:</p>
+        <div class="formula">\[ W_t = \{\, z_s : t - h &lt; s \le t \,\} \subset \mathbb{R}^d, \qquad z_{s,i} = \frac{r_{s,i} - \bar r_{t,i}}{\hat\sigma_{t,i}} \]</div>
         <p>Vietoris-Rips persistent homology:</p>
         <div class="formula">\[ \mathrm{PD}_0(W_t),\quad \mathrm{PD}_1(W_t) \]</div>
-        <p>Topological features and baselines:</p>
-        <div class="formula">\[ \varphi(W_t) = \big[\, \|\lambda\|_1,\ \|\lambda\|_2,\ \text{entropy} \,\big], \qquad b(W_t) = \big[\, \sigma_t,\ \lambda_{\max}(C_t)/d \,\big] \]</div>
+        <p>Landscape norms summed over all layers (Gidea &amp; Katz, 2018), in dimensions 0 and 1:</p>
+        <div class="formula">\[ \|\lambda\|_p = \Big( \sum_k \|\lambda_k\|_p^p \Big)^{1/p}, \qquad \varphi(W_t) = \big[\, \|\lambda^{(q)}\|_p \,\big]_{q \in \{0,1\},\ p \in \{1,2\}} \]</div>
+        <p>Baselines: realised volatility and the eigenvalues of the correlation matrix \(C_t\):</p>
+        <div class="formula">\[ b(W_t) = \big[\, \sigma_t,\ \lambda_1(C_t)/d,\ \dots,\ \lambda_d(C_t)/d \,\big] \]</div>
+        <p>Primary comparison, for each held-out crisis:</p>
+        <div class="formula">\[ \Delta\mathrm{AUC} = \mathrm{AUC}(\varphi \oplus b) - \mathrm{AUC}(b) \]</div>
       </div>
     </div>
   </div>
@@ -80,17 +84,17 @@
       <div class="skill-name">Applied algebraic topology</div>
       <div class="skill-how">Vietoris-Rips persistent homology computation in dimensions 0 and 1 over point clouds.</div>
       <div class="skill-name">Topological feature engineering</div>
-      <div class="skill-how">Persistence landscapes, their \(L^p\) norms and entropy as input to classical ML, on per-window standardised returns so the topology does not just re-measure volatility.</div>
+      <div class="skill-how">Persistence landscapes and their \(L^p\) norms summed over all layers, as input to classical ML, on per-window standardised returns so the topology does not just re-measure volatility.</div>
       <div class="skill-name">Time series</div>
       <div class="skill-how">Sliding windows, temporal alignment, handling missing ticks and holidays.</div>
       <div class="skill-name">Quantitative finance</div>
-      <div class="skill-how">Log returns; realised volatility and the leading eigenvalue of the correlation matrix as baselines scored on the same folds.</div>
+      <div class="skill-how">Log returns; realised volatility and the eigenvalue spectrum of the correlation matrix as baselines scored on the same folds.</div>
       <div class="skill-name">Leakage-free validation</div>
       <div class="skill-how">Purged walk-forward and leave-one-crisis-out splits for overlapping windows, with a test showing that shuffled k-fold inflates ROC-AUC from ~0.5 to ~0.97 on a feature unrelated to the label.</div>
-      <div class="skill-name">Domain validation</div>
-      <div class="skill-how">Confirm score peaks coincide with real macro events (Lehman 2008, COVID 2020).</div>
-      <div class="skill-name">Visual storytelling</div>
-      <div class="skill-how">Before / during / after crisis plots with annotated persistence diagrams.</div>
+      <div class="skill-name">Pre-registration</div>
+      <div class="skill-how">Analysis plan and success criterion fixed before any result; every amendment listed with its date and reason, and each version archived with a DOI.</div>
+      <div class="skill-name">Calibration on synthetic data</div>
+      <div class="skill-how">How often the success criterion passes when topology has nothing to add (a null) and when it has (a positive control), on synthetic crises before any market data; the primary comparison was changed by what it showed.</div>
     </div>
 
     <div class="skill-chip-row reveal">
@@ -111,15 +115,21 @@
     <div class="section-eyebrow reveal">// Structure</div>
     <h2 class="reveal">Project organization</h2>
     <pre class="code-tree reveal"><span class="folder">05-tda-finance/</span>
-├── <span class="file">README.md</span>
-├── <span class="file">requirements.txt</span>
+├── <span class="file">README.md</span>             <span class="comment"># motivation, evaluation design, analysis plan</span>
+├── <span class="file">LICENSE</span>
+├── <span class="file">CITATION.cff</span>
+├── <span class="file">requirements.txt</span>      <span class="comment"># the pinned environment of the plan</span>
 ├── <span class="folder">src/</span>
 │   ├── <span class="file">data.py</span>          <span class="comment"># prices, log returns, crisis periods and labels</span>
 │   ├── <span class="file">persistence.py</span>   <span class="comment"># sliding windows, standardisation, Vietoris-Rips</span>
 │   ├── <span class="file">features.py</span>      <span class="comment"># landscapes, landscape norms, baselines</span>
 │   ├── <span class="file">validation.py</span>    <span class="comment"># purged walk-forward, leave-one-crisis-out</span>
 │   └── <span class="file">classify.py</span>      <span class="comment"># feature-set comparison on shared folds</span>
-└── <span class="folder">tests/</span>            <span class="comment"># splits, labels, baselines, leakage demonstration</span></pre>
+├── <span class="folder">scripts/</span>
+│   ├── <span class="file">run_plan.py</span>      <span class="comment"># the analysis plan end to end</span>
+│   └── <span class="file">calibrate_plan.py</span> <span class="comment"># how often the criterion passes on synthetic data</span>
+├── <span class="folder">results/</span>          <span class="comment"># calibration.json and one file per synthetic dataset</span>
+└── <span class="folder">tests/</span>            <span class="comment"># splits, labels, features, plan, leakage demonstration</span></pre>
   </div>
 </section>
 
@@ -130,10 +140,12 @@
     <ul class="roadmap reveal">
       <li class="done">Crisis labels fixed in advance; each window labelled by its last day</li>
       <li class="done">Leakage-free validation (purged walk-forward, leave-one-crisis-out) with tests</li>
-      <li class="done">Baselines: realised volatility and leading eigenvalue of the correlation matrix</li>
-      <li>Download daily prices (sector ETFs, indices) via yfinance; log returns</li>
+      <li class="done">Baselines: realised volatility and the eigenvalue spectrum of the correlation matrix</li>
+      <li class="done">Daily prices of sector ETFs and indices (yfinance), frozen with their SHA-256; log returns</li>
+      <li class="done">Analysis plan fixed before any result, archived with a DOI</li>
+      <li class="done">Success criterion run on synthetic data before any market data</li>
       <li>Persistent homology (dimensions 0 and 1) on standardised windows with giotto-tda</li>
-      <li>Landscape norms, landscapes and entropy as features</li>
+      <li>Landscape norms and landscapes as features</li>
       <li>Compare feature sets on both split schemes</li>
       <li>Time series of the features annotated with the crisis periods</li>
     </ul>
@@ -146,14 +158,14 @@
     <h2 class="reveal">Success criteria</h2>
     <div class="two-col">
       <div class="info-card reveal">
-        <h3>Classification</h3>
-        <p>Topology plus baselines must beat the baselines alone, in ROC-AUC and average precision, under both purged walk-forward and leave-one-crisis-out.</p>
-        <p style="margin-bottom:0;">A gain over a model without baselines would not count: a crisis raises volatility and co-movement, and both also change a persistence diagram.</p>
+        <h3>Primary comparison</h3>
+        <p>Topology plus volatility and the correlation spectrum, against those baselines alone. For each held-out crisis, ΔAUC is averaged over 10 random-forest seeds and counts as a win only if it exceeds its spread across seeds.</p>
+        <p style="margin-bottom:0;">Success: at least 4 of the 5 counted crises under leave-one-crisis-out and 3 of the 4 the walk-forward can score. Reported, not counted: average precision, three other controls for the topology, and the settings of Gidea &amp; Katz (H1, windows of 50 and 100 days).</p>
       </div>
       <div class="info-card reveal">
-        <h3>Interpretability</h3>
-        <p>Whether the topological features move with the labelled crisis periods, which are fixed in advance and not tuned:</p>
-        <p style="margin-bottom:0;">2008–09 · 2011 · 2015 · Q4 2018 · 2020 · 2022.</p>
+        <h3>Calibrated before any market data</h3>
+        <p>On synthetic crises that change only volatility and correlation, the criterion passed in 3 of 20 datasets (the first version's comparison: 8 of 20). In a positive control, with crises only in the tails, it passed in 7 of 20.</p>
+        <p style="margin-bottom:0;">Crisis periods fixed in advance: 2008–09 · 2011 · 2015 · Q4 2018 · 2020 · 2022.</p>
       </div>
     </div>
   </div>
@@ -168,7 +180,7 @@
     <div class="result-empty reveal">
       <div class="big">Pending</div>
       <p>No results published yet.</p>
-      <p class="hint">What goes here: "topological anomaly score" time series with annotated crises, persistence diagrams across regimes, confusion matrix, and classifier AUC.</p>
+      <p class="hint">What goes here: ΔAUC per held-out crisis under both schemes, the alarm lead times, and the time series of the features annotated with the crisis periods.</p>
     </div>
   </div>
 </section>

@@ -35,7 +35,7 @@
     <div class="badges reveal" style="margin-top: 28px;">
       <span class="badge">05 / 05</span>
       <span class="badge domain">Applied topology · Finance</span>
-      <span class="badge status-planned">Planned</span>
+      <span class="badge status-in-progress">In progress</span>
     </div>
     <h1 class="reveal"><span class="grad">TDA on financial time series</span><br /><span class="grad">Regime change detection</span></h1>
     <p class="tagline reveal">Use persistent homology over sliding windows of multi-asset returns to detect transitions between normal regime and market crises (2008, 2011, 2015, 2018, 2020, 2022), and test whether topological descriptors add anything beyond volatility and correlation on leakage-free folds.</p>
@@ -127,8 +127,11 @@
 │   └── <span class="file">classify.py</span>      <span class="comment"># feature-set comparison on shared folds</span>
 ├── <span class="folder">scripts/</span>
 │   ├── <span class="file">run_plan.py</span>      <span class="comment"># the analysis plan end to end</span>
-│   └── <span class="file">calibrate_plan.py</span> <span class="comment"># how often the criterion passes on synthetic data</span>
-├── <span class="folder">results/</span>          <span class="comment"># calibration.json and one file per synthetic dataset</span>
+│   ├── <span class="file">calibrate_plan.py</span> <span class="comment"># how often the criterion passes on synthetic data</span>
+│   ├── <span class="file">post_result.py</span>   <span class="comment"># analyses added after the first run on market data</span>
+│   └── <span class="file">plot_features.py</span> <span class="comment"># the window features over time</span>
+├── <span class="folder">figures/</span>          <span class="comment"># the features over time, crisis periods shaded</span>
+├── <span class="folder">results/</span>          <span class="comment"># the run on market data, calibration summaries, one file per synthetic dataset</span>
 └── <span class="folder">tests/</span>            <span class="comment"># splits, labels, features, plan, leakage demonstration</span></pre>
   </div>
 </section>
@@ -144,10 +147,10 @@
       <li class="done">Daily prices of sector ETFs and indices (yfinance), frozen with their SHA-256; log returns</li>
       <li class="done">Analysis plan fixed before any result, archived with a DOI</li>
       <li class="done">Success criterion run on synthetic data before any market data</li>
-      <li>Persistent homology (dimensions 0 and 1) on standardised windows with giotto-tda</li>
-      <li>Landscape norms and landscapes as features</li>
-      <li>Compare feature sets on both split schemes</li>
-      <li>Time series of the features annotated with the crisis periods</li>
+      <li class="done">Persistent homology (dimensions 0 and 1) on standardised windows with giotto-tda</li>
+      <li class="done">Landscape norms as features</li>
+      <li class="done">Compare feature sets on both split schemes</li>
+      <li class="done">Time series of the features annotated with the crisis periods</li>
     </ul>
   </div>
 </section>
@@ -177,10 +180,17 @@
     <h2 class="reveal">Outputs and final metrics</h2>
     <p class="section-intro reveal">Temporal score with macro events, persistence diagrams, and classifier metrics.</p>
 
+    <div class="results-grid reveal" style="grid-template-columns: 1fr; margin-bottom: 28px;">
+      <div class="result-figure">
+        <img src="../assets/results/05-features.png" alt="Realised volatility, leading eigenvalue share and landscape L1 norms in dimensions 0 and 1 of every window, 2005 to 2026, with the crisis periods shaded" />
+        <div class="caption"><strong>Fig 1 · Window features on market data.</strong> Realised volatility, the leading eigenvalue share and the landscape \(L^1\) norms in dimensions 0 and 1 of every window, 2005–2026, crisis periods shaded (<code>scripts/plot_features.py</code>). Descriptive: it tests nothing.</div>
+      </div>
+    </div>
+
     <div class="result-empty reveal">
       <div class="big">Pending</div>
-      <p>No results published yet.</p>
-      <p class="hint">What goes here: ΔAUC per held-out crisis under both schemes, the alarm lead times, and the time series of the features annotated with the crisis periods.</p>
+      <p>Results being written up.</p>
+      <p class="hint">What goes here: ΔAUC per held-out crisis under both schemes and the alarm lead times.</p>
     </div>
   </div>
 </section>

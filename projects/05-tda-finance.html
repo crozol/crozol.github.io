@@ -41,7 +41,7 @@
     <p class="tagline reveal">Use persistent homology over sliding windows of multi-asset returns to detect transitions between normal regime and market crises (2008, 2011, 2015, 2018, 2020, 2022), and test whether topological descriptors add anything beyond volatility and correlation on leakage-free folds.</p>
     <div class="cta-row reveal">
       <a href="https://github.com/crozol/05-tda-finance" class="btn btn-primary" target="_blank" rel="noopener">Code on GitHub →</a>
-      <a href="https://doi.org/10.5281/zenodo.24095680" class="btn btn-ghost" target="_blank" rel="noopener">Analysis plan (DOI) →</a>
+      <a href="https://doi.org/10.5281/zenodo.24095680" class="btn btn-ghost" target="_blank" rel="noopener">Archived release (DOI) →</a>
     </div>
   </div>
 </header>
@@ -54,7 +54,7 @@
       <div class="reveal">
         <p>Classical methods for detecting regime changes in finance (rolling volatility, rolling correlations, HMMs) look at statistical moments. <strong style="color:var(--fg-0)">Topological Data Analysis</strong> proposes a complementary angle: look at the <strong style="color:var(--fg-0)">shape</strong> of the return cloud in \(\mathbb{R}^d\) through <strong style="color:var(--fg-0)">persistent homology</strong>, extracting invariants that are robust to reparameterization.</p>
         <p>Idea: in a normal regime, returns form a "round" low-correlation cloud; during a crisis, the cloud collapses toward a single direction (systemic co-movement) and its shape changes. Gidea &amp; Katz (2018) found that the norms of persistence landscapes grow in the run-up to the 2000 and 2008 crashes. Much of that change is measured without topology: for independent Gaussian days, the persistence of a standardised window depends on its correlation matrix only through the eigenvalues.</p>
-        <p>The question here is narrower: do topological features detect crisis regimes <em>better than</em> realised volatility and the eigenvalues of the correlation matrix together — the two things a crisis also changes — when all are scored on the same leakage-free folds? The analysis plan was fixed before any result and is archived on Zenodo (<a href="https://doi.org/10.5281/zenodo.24095680" target="_blank" rel="noopener">doi:10.5281/zenodo.24095680</a>).</p>
+        <p>The question here is narrower: do topological features detect crisis regimes <em>better than</em> realised volatility and the eigenvalues of the correlation matrix together — the two things a crisis also changes — when all are scored on the same leakage-free folds? The analysis plan was fixed before any result and is archived on Zenodo (version 0.1.2, <a href="https://doi.org/10.5281/zenodo.24356109" target="_blank" rel="noopener">doi:10.5281/zenodo.24356109</a>).</p>
       </div>
       <div class="theory-card reveal">
         <h3>Mathematical pipeline</h3>
@@ -115,7 +115,7 @@
     <div class="section-eyebrow reveal">// Structure</div>
     <h2 class="reveal">Project organization</h2>
     <pre class="code-tree reveal"><span class="folder">05-tda-finance/</span>
-├── <span class="file">README.md</span>             <span class="comment"># motivation, evaluation design, analysis plan</span>
+├── <span class="file">README.md</span>             <span class="comment"># motivation, evaluation design, analysis plan, results</span>
 ├── <span class="file">LICENSE</span>
 ├── <span class="file">CITATION.cff</span>
 ├── <span class="file">requirements.txt</span>      <span class="comment"># the pinned environment of the plan</span>

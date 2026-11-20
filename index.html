@@ -363,11 +363,11 @@
       </a>
 
       <a class="project reveal" href="projects/05-tda-finance.html" style="grid-column: 1 / -1;">
-        <span class="status in-progress">In progress</span>
+        <span class="status done">Completed</span>
         <div class="num">05</div>
         <div class="domain">Applied topology · Finance</div>
         <h3>TDA on financial time series — regime change detection</h3>
-        <p>Persistent homology over sliding windows of multi-asset returns to detect market crises, tested against volatility and correlation baselines on leakage-free folds (purged walk-forward, leave-one-crisis-out). Evaluation pre-registered before any result; a negative control shows that shuffled K-fold gives ROC-AUC ≈ 0.97 to an unrelated feature, against ≈ 0.5 with purged folds. Results pending.</p>
+        <p>Persistent homology over sliding windows of multi-asset returns to detect market crises, tested against volatility and correlation baselines on leakage-free folds (purged walk-forward, leave-one-crisis-out). The pre-registered success criterion is not met on market data: the combined model won in 2 of 5 held-out crises (4 needed) and in 3 of 4 under the walk-forward. Monte Carlo tests against 99 synthetic nulls, added after the result and declared before they were computed, find no evidence either, with power of 20–35% on realistic synthetic crises. A negative control shows that shuffled K-fold gives ROC-AUC ≈ 0.97 to an unrelated feature, against ≈ 0.5 with purged folds.</p>
         <div class="project-tags">
           <span class="tag">Giotto-TDA</span><span class="tag">Persistence Homology</span><span class="tag">scikit-learn</span><span class="tag">Pandas</span><span class="tag">yfinance</span>
         </div>

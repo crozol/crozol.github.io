@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Key results · Camilo Rozo</title>
-<meta name="description" content="Headline results from Camilo Rozo's portfolio projects — Bayesian inference on the 2D Ising model, Neural ODEs with a Hamiltonian prior, reconstruction-based anomaly detection on NASA CMAPSS, and physics-informed neural networks for the heat and Burgers equations." />
+<meta name="description" content="Headline results from Camilo Rozo's portfolio projects — Bayesian inference on the 2D Ising model, Neural ODEs with a Hamiltonian prior, reconstruction-based anomaly detection on NASA CMAPSS, physics-informed neural networks for the heat and Burgers equations, and topological data analysis of financial time series." />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,7 +44,7 @@
     <a href="index.html#projects" class="back-link reveal">← Back to home</a>
     <div class="badges reveal" style="margin-top: 28px;">
       <span class="badge">Portfolio</span>
-      <span class="badge domain">Headline numbers · 4 completed projects</span>
+      <span class="badge domain">Headline numbers · 5 completed projects</span>
     </div>
     <h1 class="reveal"><span class="grad">Key results</span></h1>
     <p class="tagline reveal">The headline numbers from each completed project, side by side with the exact benchmark it was validated against. Every figure here matches the project's repository; click through for the full method, interactive figures and the live demo.</p>
@@ -168,7 +168,29 @@
 
 <section class="content-section">
   <div class="container">
-    <p class="section-intro reveal" style="opacity: 0.8;">One more project is in preparation — topological data analysis of financial time series. It will appear here once its results are final. See the <a href="index.html#projects">projects overview</a> for the full roadmap.</p>
+    <div class="section-eyebrow reveal">05 · Applied topology · Finance</div>
+    <h2 class="reveal">TDA on financial time series</h2>
+    <p class="section-intro reveal">Persistent homology over sliding windows of daily returns, tested against realised volatility and the eigenvalues of the correlation matrix on leakage-free folds; the analysis plan, with its success criterion, was fixed before any result and run once on market data.</p>
+
+    <div class="results-grid reveal" style="margin-bottom: 22px;">
+      <div class="result-metric">
+        <div class="value">Not met</div>
+        <div class="label">pre-registered criterion · the combined model wins in 2 of 5 held-out crises under leave-one-crisis-out (4 needed) and in 3 of 4 under the walk-forward (3 needed)</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">p ≥ 0.96</div>
+        <div class="label">tests added after the result · Holm-adjusted p on market data of the four statistics with power: no evidence that topology adds to the baselines</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">4–7 of 20</div>
+        <div class="label">their power on realistic (heavy-tailed) synthetic crises; the reading as a whole, 7 of 20 · the absence of evidence says little</div>
+      </div>
+    </div>
+
+    <div class="cta-row reveal">
+      <a href="projects/05-tda-finance.html" class="btn btn-primary">View details →</a>
+      <a href="https://github.com/crozol/05-tda-finance" class="btn btn-ghost" target="_blank" rel="noopener">Code on GitHub →</a>
+    </div>
   </div>
 </section>
 

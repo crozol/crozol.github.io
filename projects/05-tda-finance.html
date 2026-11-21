@@ -129,9 +129,10 @@
 │   ├── <span class="file">run_plan.py</span>      <span class="comment"># the analysis plan end to end</span>
 │   ├── <span class="file">calibrate_plan.py</span> <span class="comment"># how often the criterion passes on synthetic data</span>
 │   ├── <span class="file">post_result.py</span>   <span class="comment"># analyses added after the first run on market data</span>
+│   ├── <span class="file">direction_diagnostic.py</span> <span class="comment"># why the market test says little</span>
 │   └── <span class="file">plot_features.py</span> <span class="comment"># the window features over time</span>
 ├── <span class="folder">figures/</span>          <span class="comment"># the features over time, crisis periods shaded</span>
-├── <span class="folder">results/</span>          <span class="comment"># the run on market data, the analyses added after it, calibration summaries, one file per synthetic dataset</span>
+├── <span class="folder">results/</span>          <span class="comment"># the run on market data, the analyses added after it, the diagnostic, calibration summaries, one file per synthetic dataset</span>
 └── <span class="folder">tests/</span>            <span class="comment"># splits, labels, features, plan, leakage demonstration</span></pre>
   </div>
 </section>
@@ -152,6 +153,8 @@
       <li class="done">Compare feature sets on both split schemes</li>
       <li class="done">Time series of the features annotated with the crisis periods</li>
       <li class="done">Plan run once on market data; tests added after the result, declared before they were computed</li>
+      <li class="done">Diagnostic of the market test, declared with the reviewer's prediction before it was computed</li>
+      <li>A new question, pre-registered as this one: early warning, before the peak of a drawdown</li>
     </ul>
   </div>
 </section>
@@ -179,7 +182,7 @@
   <div class="container">
     <div class="section-eyebrow reveal">// Results</div>
     <h2 class="reveal">Outputs and final metrics</h2>
-    <p class="section-intro reveal">The analysis plan, version 0.1.2, run once on the frozen market data on 2026-11-19; the tests added after the result, declared in the code before they were computed; and the features over time.</p>
+    <p class="section-intro reveal">The analysis plan, version 0.1.2, run once on the frozen market data on 2026-11-19; the tests added after the result, declared in the code before they were computed; a diagnostic of why the market test says little; and the features over time.</p>
 
     <div class="results-grid reveal" style="margin-bottom: 28px;">
       <div class="result-metric">
@@ -187,12 +190,12 @@
         <div class="label">pre-registered criterion · the combined model wins in 2 of 5 held-out crises under leave-one-crisis-out (4 needed) and in 3 of 4 under the walk-forward (3 needed)</div>
       </div>
       <div class="result-metric">
-        <div class="value">p ≥ 0.96</div>
-        <div class="label">tests added after the result · Holm-adjusted p on market data of the four statistics with power: no evidence that topology adds to the baselines</div>
+        <div class="value">0.45–0.58</div>
+        <div class="label">ROC-AUC of the baselines inside four of the five held-out crises · every feature compared ignores the sign of the returns, the drawdown label does not: the result is inconclusive</div>
       </div>
       <div class="result-metric">
-        <div class="value">4–7 of 20</div>
-        <div class="label">their power on realistic (heavy-tailed) synthetic crises; the reading as a whole, 7 of 20 · the absence of evidence says little</div>
+        <div class="value">p ≥ 0.96</div>
+        <div class="label">tests added after the result · Holm-adjusted p on market data of the four statistics with power: no evidence, with power of 4–7 in 20 on synthetic crises far easier to see</div>
       </div>
     </div>
 
@@ -215,7 +218,7 @@
       </tbody>
     </table>
 
-    <p class="reveal" style="margin-top: 22px;">ΔAUC is the ROC-AUC of topology plus volatility and the correlation spectrum minus that of the two baselines alone, mean ± standard deviation over 10 random-forest seeds; highlighted, a win (mean above the spread). Inside the held-out blocks the classes barely separate: under leave-one-crisis-out the combined model reaches a ROC-AUC of 0.49–0.61 in every counted crisis but 2011 (0.99), below volatility alone (0.55–0.71) in those four. Reported, not counted: three other controls for the topology, logistic regression in place of the forest and the settings of Gidea &amp; Katz; none meets the criterion. Under leave-one-crisis-out the alarm rule of the plan warns before the drawdown minimum in one counted crisis with the combined model (2022, 80 trading days ahead), as with the baselines alone, and in three with volatility alone.</p>
+    <p class="reveal" style="margin-top: 22px;">ΔAUC is the ROC-AUC of topology plus volatility and the correlation spectrum minus that of the two baselines alone, mean ± standard deviation over 10 random-forest seeds; highlighted, a win (mean above the spread). Inside the held-out blocks the classes barely separate: under leave-one-crisis-out the combined model reaches a ROC-AUC of 0.49–0.61 in every counted crisis but 2011 (0.99), below volatility alone (0.55–0.71) in those four. Reported, not counted: three other controls for the topology, logistic regression in place of the forest and the settings of Gidea &amp; Katz; none meets the criterion. With logistic regression, the plan's check, ΔAUC is negative in all five counted crises under leave-one-crisis-out. Under leave-one-crisis-out the alarm rule of the plan warns before the drawdown minimum in one counted crisis with the combined model (2022, 80 trading days ahead), as with the baselines alone, and in three with volatility alone.</p>
 
     <div class="results-grid reveal" style="grid-template-columns: 1fr; margin-top: 24px;">
       <div class="result-figure">
@@ -249,7 +252,36 @@
       </tbody>
     </table>
 
-    <p class="reveal" style="margin-top: 22px;">Each statistic is tested against 99 synthetic null datasets (Monte Carlo test, Barnard 1963), and its power is the share of synthetic crisis datasets it detects at the 5% level. The reading, fixed before any statistic was computed on market data, counts the primary comparison and the statistics whose power on heavy-tailed crises exceeds the nominal size of 0.05 by an exact binomial test, with Holm's correction: the four above. They give no evidence that topology adds to the baselines, and with power of 4 to 7 in 20 (the reading as a whole: 7 of 20 heavy-tailed datasets, computed after the market data) the absence of evidence says little. Every p-value at or below 0.05 belongs to a statistic or comparison outside that family and counts for nothing: ΔAUC itself (0.02 and 0.01, with power 3 and 1 in 20), the comparison with Mardia's kurtosis on both sides (0.01–0.04) and four statistics in the settings of Gidea &amp; Katz (0.048, the smallest p-value 20 null datasets allow). The null is synthetic and separates its crises far more easily than the market does (ROC-AUC 0.96–0.99 for the fraction of crisis days in a window, against 0.49–0.61 for the combined model on market data), so a small p-value says that the market is unusual for those datasets, not why. Every table is in the <a href="https://github.com/crozol/05-tda-finance#analyses-added-after-the-result" target="_blank" rel="noopener">README</a>.</p>
+    <p class="reveal" style="margin-top: 22px;">Each statistic is tested against 99 synthetic null datasets (Monte Carlo test, Barnard 1963), and its power is the share of synthetic crisis datasets it detects at the 5% level. The reading, fixed before any statistic was computed on market data, counts the primary comparison and the statistics whose power on heavy-tailed crises exceeds the nominal size of 0.05 by an exact binomial test, with Holm's correction: the four above. They give no evidence that topology adds to the baselines, and with power of 4 to 7 in 20 (the reading as a whole: 7 of 20 heavy-tailed datasets, computed after the market data) the absence of evidence says little, and less on market data (next section). Every p-value at or below 0.05 belongs to a statistic or comparison outside that family and counts for nothing: ΔAUC itself (0.02 and 0.01, with power 3 and 1 in 20), the comparison with Mardia's kurtosis on both sides (0.01–0.04) and four statistics in the settings of Gidea &amp; Katz (0.048, the smallest p-value 20 null datasets allow). The null is synthetic and separates its crises far more easily than the market does (ROC-AUC 0.96–0.99 for the fraction of crisis days in a window, against 0.49–0.61 for the combined model on market data), so a small p-value says that the market is unusual for those datasets, not why. Every table is in the <a href="https://github.com/crozol/05-tda-finance#analyses-added-after-the-result" target="_blank" rel="noopener">README</a>.</p>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">// Diagnostic</div>
+    <h2 class="reveal">Why the market test says little</h2>
+    <p class="section-intro reveal">Every feature compared, the baselines included, is unchanged when every return changes sign or the days of a window are reordered; the label, a window whose last day falls inside a peak-to-trough drawdown, is not. An external review of the result proposed a diagnostic and predicted its outcome; it was declared in the code (<code>scripts/direction_diagnostic.py</code>) with that prediction before it was computed, and it does not change the verdict.</p>
+
+    <table class="analysis-table reveal">
+      <thead>
+        <tr>
+          <th>Held-out crisis</th>
+          <th>Volatility vs. windows before</th>
+          <th>Volatility vs. windows after</th>
+          <th>Baselines</th>
+          <th>Baselines + mean return</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>2008–09</td><td>1.00</td><td>0.75</td><td>0.45</td><td>0.61</td></tr>
+        <tr><td>2011</td><td>1.00</td><td>0.89</td><td>0.91</td><td>0.96</td></tr>
+        <tr><td>Q4 2018</td><td>0.78</td><td class="highlight">0.29</td><td>0.58</td><td>0.65</td></tr>
+        <tr><td>2020</td><td>1.00</td><td class="highlight">0.25</td><td>0.58</td><td>0.69</td></tr>
+        <tr><td>2022</td><td>1.00</td><td class="highlight">0.42</td><td>0.49</td><td>0.62</td></tr>
+      </tbody>
+    </table>
+
+    <p class="reveal" style="margin-top: 22px;">ROC-AUC of the crisis windows under leave-one-crisis-out: realised volatility against the normal windows before and after each crisis, and the random forest on the baselines without and with the mean return of the window, the one feature here that changes sign with the returns (mean over 10 seeds). Volatility separates every crisis from the windows before it; in Q4 2018, 2020 and 2022 the windows after the trough are as volatile as the crisis or more (highlighted). In 2008–09 volatility separates the crisis on both sides, yet the forest on the baselines ranks it below chance: there the weakness lies in what the forest learned from the other crises. The review predicted at least 0.8 before and at most 0.5 after in 2008–09, Q4 2018 and 2020; that does not hold, and the mechanism it proposed accounts for three of the five crises. The mean return raises every baseline AUC, to 0.61–0.69 outside 2011, and with it on both sides the primary comparison wins in 3 of 5 crises; none of this counts. On market data ΔAUC is measured around baselines near chance, so the data could say little about whether topology adds. Details in the <a href="https://github.com/crozol/05-tda-finance#why-the-market-test-says-little" target="_blank" rel="noopener">README</a>.</p>
   </div>
 </section>
 

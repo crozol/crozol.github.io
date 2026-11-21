@@ -130,9 +130,10 @@
 │   ├── <span class="file">calibrate_plan.py</span> <span class="comment"># how often the criterion passes on synthetic data</span>
 │   ├── <span class="file">post_result.py</span>   <span class="comment"># analyses added after the first run on market data</span>
 │   ├── <span class="file">direction_diagnostic.py</span> <span class="comment"># why the market test says little</span>
+│   ├── <span class="file">rebound_hypothesis.py</span> <span class="comment"># 2008–09: the forest without the 2020 rebound</span>
 │   └── <span class="file">plot_features.py</span> <span class="comment"># the window features over time</span>
 ├── <span class="folder">figures/</span>          <span class="comment"># the features over time, crisis periods shaded</span>
-├── <span class="folder">results/</span>          <span class="comment"># the run on market data, the analyses added after it, the diagnostic, calibration summaries, one file per synthetic dataset</span>
+├── <span class="folder">results/</span>          <span class="comment"># the run on market data, the analyses added after it, the diagnostic and the 2008–09 test, calibration summaries, one file per synthetic dataset</span>
 └── <span class="folder">tests/</span>            <span class="comment"># splits, labels, features, plan, leakage demonstration</span></pre>
   </div>
 </section>
@@ -154,7 +155,8 @@
       <li class="done">Time series of the features annotated with the crisis periods</li>
       <li class="done">Plan run once on market data; tests added after the result, declared before they were computed</li>
       <li class="done">Diagnostic of the market test, declared with the reviewer's prediction before it was computed</li>
-      <li>A new question, pre-registered as this one: early warning, before the peak of a drawdown</li>
+      <li class="done">Hypothesis for 2008–09 from a second review, declared with its predictions before it was computed; both hold</li>
+      <li>A new question, pre-registered as this one: early warning, before the peak of a drawdown, leaving out of the evaluation the windows near a peak or a trough</li>
     </ul>
   </div>
 </section>
@@ -260,7 +262,7 @@
   <div class="container">
     <div class="section-eyebrow reveal">// Diagnostic</div>
     <h2 class="reveal">Why the market test says little</h2>
-    <p class="section-intro reveal">Every feature compared, the baselines included, is unchanged when every return changes sign or the days of a window are reordered; the label, a window whose last day falls inside a peak-to-trough drawdown, is not. An external review of the result proposed a diagnostic and predicted its outcome; it was declared in the code (<code>scripts/direction_diagnostic.py</code>) with that prediction before it was computed, and it does not change the verdict.</p>
+    <p class="section-intro reveal">Every feature compared, the baselines included, is unchanged when every return changes sign or the days of a window are reordered; the label, a window whose last day falls inside a peak-to-trough drawdown, is not. Two external reviews of the result proposed tests and predicted their outcome; each was declared in the code (<code>scripts/direction_diagnostic.py</code>, <code>scripts/rebound_hypothesis.py</code>) with its predictions before it was computed, and neither changes the verdict.</p>
 
     <table class="analysis-table reveal">
       <thead>
@@ -281,7 +283,7 @@
       </tbody>
     </table>
 
-    <p class="reveal" style="margin-top: 22px;">ROC-AUC of the crisis windows under leave-one-crisis-out: realised volatility against the normal windows before and after each crisis, and the random forest on the baselines without and with the mean return of the window, the one feature here that changes sign with the returns (mean over 10 seeds). Volatility separates every crisis from the windows before it; in Q4 2018, 2020 and 2022 the windows after the trough are as volatile as the crisis or more (highlighted). In 2008–09 volatility separates the crisis on both sides, yet the forest on the baselines ranks it below chance: there the weakness lies in what the forest learned from the other crises. The review predicted at least 0.8 before and at most 0.5 after in 2008–09, Q4 2018 and 2020; that does not hold, and the mechanism it proposed accounts for three of the five crises. The mean return raises every baseline AUC, to 0.61–0.69 outside 2011, and with it on both sides the primary comparison wins in 3 of 5 crises; none of this counts. On market data ΔAUC is measured around baselines near chance, so the data could say little about whether topology adds. Details in the <a href="https://github.com/crozol/05-tda-finance#why-the-market-test-says-little" target="_blank" rel="noopener">README</a>.</p>
+    <p class="reveal" style="margin-top: 22px;">ROC-AUC of the crisis windows under leave-one-crisis-out: realised volatility against the normal windows before and after each crisis, and the random forest on the baselines without and with the mean return of the window, the one feature here that changes sign with the returns (mean over 10 seeds). Volatility separates every crisis from the windows before it; in Q4 2018, 2020 and 2022 the windows after the trough are as volatile as the crisis or more (highlighted). In 2008–09 volatility separates the crisis on both sides, yet the forest on the baselines ranks it below chance: there the weakness lies in what the forest learned from the other crises. A second review traced it to the rebound after the 2020 trough, the most volatile windows of the training set (4.8–5.2% daily), labelled normal; as it predicted, the forest on volatility alone gives less crisis probability at 4% or more than at 2–3% (0.61 against 0.84), and without those 12 windows its AUC against the windows before the 2008–09 crisis rises from 0.71 to 1.00. The first review predicted at least 0.8 before and at most 0.5 after in 2008–09, Q4 2018 and 2020; that does not hold, and the mechanism it proposed accounts for three of the five crises. The mean return raises every baseline AUC, to 0.61–0.69 outside 2011, and with it on both sides the primary comparison wins in 3 of 5 crises; none of this counts. Near the ends of a crisis no feature can do much: a window that ends k days before the trough shares 40 − 2k of its 40 days with the normal window that ends k days after it. On market data ΔAUC is measured around baselines near chance, so the data could say little about whether topology adds. Details in the <a href="https://github.com/crozol/05-tda-finance#why-the-market-test-says-little" target="_blank" rel="noopener">README</a>.</p>
   </div>
 </section>
 

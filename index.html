@@ -319,7 +319,8 @@
         <div class="num">01</div>
         <div class="domain">Statistical mechanics · Bayesian</div>
         <h3>Bayesian Inference on the 2D Ising Model</h3>
-        <p>Metropolis and Wolff simulators (Numba) plus Bayesian inference of the critical point. Finite-size scaling of the Binder cumulant on Wolff data for L = 32–128 gives Tc = 2.2691(1)(1), ν = 0.981(10)(20) and β = 0.1220(15)(24), within 1.1 combined standard deviations of Onsager's exact values, with the fit range set by a χ² test. A single-lattice power-law fit misses Tc by 0.1 and its β near 1/8 comes from two compensating errors; with the first correction of Onsager's expansion, the same data give β = 0.124.</p>
+        <p>Metropolis and Wolff simulations of the 2D Ising model, and Bayesian inference of its critical point. Finite-size scaling recovers Onsager's exact values; a single-lattice fit shows why it is needed.</p>
+        <div class="project-figures"><span><b>2.2691(1)(1)</b>Tc</span><span><b>0.981(10)(20)</b>ν</span><span><b>0.1220(15)(24)</b>β</span></div>
         <div class="project-tags">
           <span class="tag tag-live">● Live demo</span><span class="tag">Python</span><span class="tag">PyMC</span><span class="tag">NumPy</span><span class="tag">ArviZ</span><span class="tag">Monte Carlo</span>
         </div>
@@ -331,7 +332,8 @@
         <div class="num">02</div>
         <div class="domain">Deep learning · Dynamical systems</div>
         <h3>Neural ODEs for dynamical systems</h3>
-        <p>Neural ODEs fit to short noisy trajectories of a damped pendulum and a Lotka-Volterra system, trained end-to-end through a differentiable Dormand-Prince solver. A controlled ablation of Hamiltonian structure: against an MLP given the same log-coordinates, the confounder of the naive comparison, a Hamiltonian Neural Network of the same size, trained with the exact likelihood of the noise, generalises to five unseen Lotka-Volterra orbits with 2.6% error and 6.0% drift in the conserved quantity, against 4.7% and 12.6%, every seed better than every MLP seed (Mann-Whitney p = 0.008), once trained on three trajectories; trained on one, no model generalises.</p>
+        <p>Neural ODEs learn the vector field of a pendulum and a Lotka–Volterra system from short noisy trajectories. A controlled ablation shows when a Hamiltonian prior helps them generalise to unseen orbits.</p>
+        <div class="project-figures"><span><b>4.7 → 2.6 %</b>error</span><span><b>12.6 → 6.0 %</b>drift of H</span><span><b>p = 0.008</b>5 seeds</span></div>
         <div class="project-tags">
           <span class="tag tag-live">● Live demo</span><span class="tag">PyTorch</span><span class="tag">torchdiffeq</span><span class="tag">ODEs</span><span class="tag">Autograd</span>
         </div>
@@ -343,7 +345,8 @@
         <div class="num">03</div>
         <div class="domain">Deep learning · MLOps</div>
         <h3>Anomaly Detection API · Autoencoder + FastAPI + Docker</h3>
-        <p>LSTM autoencoder trained on healthy CMAPSS turbofan windows; reconstruction error becomes the anomaly score, calibrated against a held-out healthy validation set. ROC-AUC 0.969 [0.954, 0.985] (bootstrap over 20 test engines), above a trivial cycle-count baseline (0.839) but not above an Isolation Forest on the same windows (0.970; paired difference −0.002 [−0.012, +0.009]). With a causal alarm every test engine is flagged before failure, a median of 44 cycles ahead; at equal false-alarm rates no score dominates: a One-Class SVM ranks slightly worse but, with no healthy false alarm, warns a median 2.5 cycles earlier per engine. Served as a typed FastAPI service with a Streamlit demo, two-service Docker stack.</p>
+        <p>An LSTM autoencoder flags turbofan degradation by its reconstruction error, measured against simpler detectors over 20 test engines. Served as a FastAPI service, a Streamlit demo and a Docker stack.</p>
+        <div class="project-figures"><span><b>0.969</b>ROC-AUC</span><span><b>44 cycles</b>median warning</span><span><b>20 / 20</b>engines flagged</span></div>
         <div class="project-tags">
           <span class="tag tag-live">● Live demo</span><span class="tag">PyTorch</span><span class="tag">FastAPI</span><span class="tag">Docker</span><span class="tag">Streamlit</span><span class="tag">Pandas</span>
         </div>
@@ -355,7 +358,8 @@
         <div class="num">04</div>
         <div class="domain">ML for science · PDEs</div>
         <h3>Physics-Informed Neural Networks (PINNs)</h3>
-        <p>PINNs (Raissi et al. 2019) in PyTorch. Heat equation: 0.14 ± 0.05% relative L2 error vs. the closed-form solution, a global figure: per time slice it exceeds 10% from t ≈ 0.6, as the solution decays; Burgers: 1.66 ± 0.49% vs. the exact solution (Adam + L-BFGS, 5 seeds). Rerunning the paper's recipe over 20 seeds with the authors' optimizer: its 0.067% is reached on 0 of 20 in float32, the precision of their code (95% CI 0–17%), and on 4 of 20 in float64; a residual on a fresh grid, computed without the exact solution, ranks the runs where the training loss cannot.</p>
+        <p>Physics-informed neural networks for the heat and Burgers equations, checked against exact solutions. A 40-run reproduction of the original benchmark shows its headline number depends on numerical precision.</p>
+        <div class="project-figures"><span><b>0.14 %</b>heat</span><span><b>1.66 %</b>Burgers</span><span><b>0 / 20</b>float32 runs at the paper's value</span></div>
         <div class="project-tags">
           <span class="tag">PyTorch</span><span class="tag">PDEs</span><span class="tag">Autograd</span><span class="tag">L-BFGS</span>
         </div>
@@ -367,7 +371,8 @@
         <div class="num">05</div>
         <div class="domain">Applied topology · Finance</div>
         <h3>TDA on financial time series — regime change detection</h3>
-        <p>Persistent homology over sliding windows of multi-asset returns to detect market crises, tested against volatility and correlation baselines on leakage-free folds (purged walk-forward, leave-one-crisis-out). The pre-registered success criterion is not met on market data: the combined model won in 2 of 5 held-out crises (4 needed) and in 3 of 4 under the walk-forward. The result is inconclusive rather than negative: every feature compared ignores the sign of the returns while the drawdown label does not, and inside the held-out crises the baselines are near chance (ROC-AUC 0.45–0.58 in four of five). Monte Carlo tests against 99 synthetic nulls, added after the result and declared before they were computed, find no evidence either. A negative control shows that shuffled K-fold gives ROC-AUC ≈ 0.97 to an unrelated feature, against ≈ 0.5 with purged folds.</p>
+        <p>Persistent homology of market returns, tested against volatility and correlation with pre-registered, leakage-free designs. An exact result on what topology can see, and a replication of Gidea &amp; Katz (2018).</p>
+        <div class="project-figures"><span><b>2 of 5</b>crises where topology helps</span><span><b>τ 0.89 · 0.99</b>pre-Lehman rise: norms · volatility</span><span><b>Study 2</b>early warning, running</span></div>
         <div class="project-tags">
           <span class="tag">Giotto-TDA</span><span class="tag">Persistence Homology</span><span class="tag">scikit-learn</span><span class="tag">Pandas</span><span class="tag">yfinance</span>
         </div>

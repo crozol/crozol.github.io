@@ -13,7 +13,7 @@
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false})"></script>
 </head>
-<body class="text-balanced">
+<body class="text-balanced concise">
 
 <div class="bg-stage"></div>
 <div class="bg-grid"></div>
@@ -35,10 +35,10 @@
     <div class="badges reveal" style="margin-top: 28px;">
       <span class="badge">05 / 05</span>
       <span class="badge domain">Applied topology · Finance</span>
-      <span class="badge status-done">Completed</span>
+      <span class="badge status-in-progress">Study 2 running</span>
     </div>
     <h1 class="reveal"><span class="grad">TDA on financial time series</span><br /><span class="grad">Regime change detection</span></h1>
-    <p class="tagline reveal">Use persistent homology over sliding windows of multi-asset returns to detect transitions between normal regime and market crises (2008, 2011, 2015, 2018, 2020, 2022), and test whether topological descriptors add anything beyond volatility and correlation on leakage-free folds.</p>
+    <p class="tagline reveal">Does the shape of a window of daily returns, measured with persistent homology, tell market crises apart better than volatility and correlation do? An exact result on what topology can see, a replication of Gidea &amp; Katz (2018) and two pre-registered tests.</p>
     <div class="cta-row reveal">
       <a href="https://github.com/crozol/05-tda-finance" class="btn btn-primary" target="_blank" rel="noopener">Code on GitHub →</a>
       <a href="https://doi.org/10.5281/zenodo.24095680" class="btn btn-ghost" target="_blank" rel="noopener">Archived release (DOI) →</a>
@@ -48,184 +48,48 @@
 
 <section class="content-section">
   <div class="container">
-    <div class="section-eyebrow reveal">// Overview</div>
-    <h2 class="reveal">About this project</h2>
-    <div class="two-col">
-      <div class="reveal">
-        <p>Classical methods for detecting regime changes in finance (rolling volatility, rolling correlations, HMMs) look at statistical moments. <strong style="color:var(--fg-0)">Topological Data Analysis</strong> proposes a complementary angle: look at the <strong style="color:var(--fg-0)">shape</strong> of the return cloud in \(\mathbb{R}^d\) through <strong style="color:var(--fg-0)">persistent homology</strong>, extracting invariants that are robust to reparameterization.</p>
-        <p>Idea: in a normal regime, returns form a "round" low-correlation cloud; during a crisis, the cloud collapses toward a single direction (systemic co-movement) and its shape changes. Gidea &amp; Katz (2018) found that the norms of persistence landscapes grow in the run-up to the 2000 and 2008 crashes. Much of that change is measured without topology: for independent Gaussian days, the persistence of a standardised window depends on its correlation matrix only through the eigenvalues.</p>
-        <p>The question here is narrower: do topological features detect crisis regimes <em>better than</em> realised volatility and the eigenvalues of the correlation matrix together — the two things a crisis also changes — when all are scored on the same leakage-free folds? The analysis plan was fixed before any result and is archived on Zenodo (version 0.1.2, <a href="https://doi.org/10.5281/zenodo.24356109" target="_blank" rel="noopener">doi:10.5281/zenodo.24356109</a>).</p>
-      </div>
-      <div class="theory-card reveal">
-        <h3>Mathematical pipeline</h3>
-        <p>Log returns:</p>
-        <div class="formula">\[ r_t = \log\!\left(p_t / p_{t-1}\right) \in \mathbb{R}^d \]</div>
-        <p>Sliding window of \(h = 40\) days, each asset standardised inside it:</p>
-        <div class="formula">\[ W_t = \{\, z_s : t - h &lt; s \le t \,\} \subset \mathbb{R}^d, \qquad z_{s,i} = \frac{r_{s,i} - \bar r_{t,i}}{\hat\sigma_{t,i}} \]</div>
-        <p>Vietoris-Rips persistent homology:</p>
-        <div class="formula">\[ \mathrm{PD}_0(W_t),\quad \mathrm{PD}_1(W_t) \]</div>
-        <p>Landscape norms summed over all layers (Gidea &amp; Katz, 2018), in dimensions 0 and 1:</p>
-        <div class="formula">\[ \|\lambda\|_p = \Big( \sum_k \|\lambda_k\|_p^p \Big)^{1/p}, \qquad \varphi(W_t) = \big[\, \|\lambda^{(q)}\|_p \,\big]_{q \in \{0,1\},\ p \in \{1,2\}} \]</div>
-        <p>Baselines: realised volatility and the eigenvalues of the correlation matrix \(C_t\):</p>
-        <div class="formula">\[ b(W_t) = \big[\, \sigma_t,\ \lambda_1(C_t)/d,\ \dots,\ \lambda_d(C_t)/d \,\big] \]</div>
-        <p>Primary comparison, for each held-out crisis:</p>
-        <div class="formula">\[ \Delta\mathrm{AUC} = \mathrm{AUC}(\varphi \oplus b) - \mathrm{AUC}(b) \]</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="content-section">
-  <div class="container">
-    <div class="section-eyebrow reveal">// Skills demonstrated</div>
-    <h2 class="reveal">What skills it certifies</h2>
-
-    <div class="skill-matrix reveal" style="margin-bottom: 32px;">
-      <div class="skill-name">Applied algebraic topology</div>
-      <div class="skill-how">Vietoris-Rips persistent homology computation in dimensions 0 and 1 over point clouds.</div>
-      <div class="skill-name">Topological feature engineering</div>
-      <div class="skill-how">Persistence landscapes and their \(L^p\) norms summed over all layers, as input to classical ML, on per-window standardised returns so the topology does not just re-measure volatility.</div>
-      <div class="skill-name">Time series</div>
-      <div class="skill-how">Sliding windows, temporal alignment, handling missing ticks and holidays.</div>
-      <div class="skill-name">Quantitative finance</div>
-      <div class="skill-how">Log returns; realised volatility and the eigenvalue spectrum of the correlation matrix as baselines scored on the same folds.</div>
-      <div class="skill-name">Leakage-free validation</div>
-      <div class="skill-how">Purged walk-forward and leave-one-crisis-out splits for overlapping windows, with a test showing that shuffled k-fold inflates ROC-AUC from ~0.5 to ~0.97 on a feature unrelated to the label.</div>
-      <div class="skill-name">Pre-registration</div>
-      <div class="skill-how">Analysis plan and success criterion fixed before any result; every amendment listed with its date and reason, and each version archived with a DOI.</div>
-      <div class="skill-name">Calibration on synthetic data</div>
-      <div class="skill-how">How often the success criterion passes when topology has nothing to add (a null) and when it has (a positive control), on synthetic crises before any market data; the primary comparison was changed by what it showed.</div>
-    </div>
-
-    <div class="skill-chip-row reveal">
-      <span class="skill-chip">Python</span>
-      <span class="skill-chip">Giotto-TDA</span>
-      <span class="skill-chip">NumPy</span>
-      <span class="skill-chip">Pandas</span>
-      <span class="skill-chip">scikit-learn</span>
-      <span class="skill-chip">yfinance</span>
-      <span class="skill-chip">Matplotlib</span>
-      <span class="skill-chip">Persistence Homology</span>
-    </div>
-  </div>
-</section>
-
-<section class="content-section">
-  <div class="container">
-    <div class="section-eyebrow reveal">// Structure</div>
-    <h2 class="reveal">Project organization</h2>
-    <pre class="code-tree reveal"><span class="folder">05-tda-finance/</span>
-├── <span class="file">README.md</span>             <span class="comment"># motivation, evaluation design, analysis plan, results</span>
-├── <span class="file">LICENSE</span>
-├── <span class="file">CITATION.cff</span>
-├── <span class="file">requirements.txt</span>      <span class="comment"># the pinned environment of the plan</span>
-├── <span class="folder">src/</span>
-│   ├── <span class="file">data.py</span>          <span class="comment"># prices, log returns, crisis periods and labels</span>
-│   ├── <span class="file">persistence.py</span>   <span class="comment"># sliding windows, standardisation, Vietoris-Rips</span>
-│   ├── <span class="file">features.py</span>      <span class="comment"># landscapes, landscape norms, baselines</span>
-│   ├── <span class="file">validation.py</span>    <span class="comment"># purged walk-forward, leave-one-crisis-out</span>
-│   └── <span class="file">classify.py</span>      <span class="comment"># feature-set comparison on shared folds</span>
-├── <span class="folder">scripts/</span>
-│   ├── <span class="file">run_plan.py</span>      <span class="comment"># the analysis plan end to end</span>
-│   ├── <span class="file">calibrate_plan.py</span> <span class="comment"># how often the criterion passes on synthetic data</span>
-│   ├── <span class="file">post_result.py</span>   <span class="comment"># analyses added after the first run on market data</span>
-│   ├── <span class="file">direction_diagnostic.py</span> <span class="comment"># why the market test says little</span>
-│   ├── <span class="file">rebound_hypothesis.py</span> <span class="comment"># 2008–09: the forest without the 2020 rebound</span>
-│   └── <span class="file">plot_features.py</span> <span class="comment"># the window features over time</span>
-├── <span class="folder">figures/</span>          <span class="comment"># the features over time, crisis periods shaded</span>
-├── <span class="folder">results/</span>          <span class="comment"># the run on market data, the analyses added after it, the diagnostic and the 2008–09 test, calibration summaries, one file per synthetic dataset</span>
-└── <span class="folder">tests/</span>            <span class="comment"># splits, labels, features, plan, leakage demonstration</span></pre>
-  </div>
-</section>
-
-<section class="content-section">
-  <div class="container">
-    <div class="section-eyebrow reveal">// Roadmap</div>
-    <h2 class="reveal">Project status</h2>
-    <ul class="roadmap reveal">
-      <li class="done">Crisis labels fixed in advance; each window labelled by its last day</li>
-      <li class="done">Leakage-free validation (purged walk-forward, leave-one-crisis-out) with tests</li>
-      <li class="done">Baselines: realised volatility and the eigenvalue spectrum of the correlation matrix</li>
-      <li class="done">Daily prices of sector ETFs and indices (yfinance), frozen with their SHA-256; log returns</li>
-      <li class="done">Analysis plan fixed before any result, archived with a DOI</li>
-      <li class="done">Success criterion run on synthetic data before any market data</li>
-      <li class="done">Persistent homology (dimensions 0 and 1) on standardised windows with giotto-tda</li>
-      <li class="done">Landscape norms as features</li>
-      <li class="done">Compare feature sets on both split schemes</li>
-      <li class="done">Time series of the features annotated with the crisis periods</li>
-      <li class="done">Plan run once on market data; tests added after the result, declared before they were computed</li>
-      <li class="done">Diagnostic of the market test, declared with the reviewer's prediction before it was computed</li>
-      <li class="done">Hypothesis for 2008–09 from a second review, declared with its predictions before it was computed; both hold</li>
-      <li>A new question, pre-registered as this one: early warning, before the peak of a drawdown, leaving out of the evaluation the windows near a peak or a trough</li>
+    <div class="section-eyebrow reveal">Background</div>
+    <h2 class="reveal">The shape of a market</h2>
+    <ul class="key-points reveal">
+      <li>A window of daily returns of \(d\) assets is a cloud of points in \(\mathbb{R}^d\), one per day. <strong>Persistent homology</strong> records its components and loops across scales, stably under small perturbations (Cohen-Steiner, Edelsbrunner &amp; Harer, 2007); landscapes turn the result into vectors (Bubenik, 2015).</li>
+      <li><strong>Gidea &amp; Katz (2018)</strong> found that landscape norms of four US indices rise in the months before the 2000 and 2008 crashes.</li>
+      <li>But a crisis also raises volatility and correlation (Longin &amp; Solnik, 2001; Kritzman et al., 2011), and variance itself rises before crashes (Guttal et al., 2016). <strong>Open question:</strong> does topology add anything to them?</li>
     </ul>
   </div>
 </section>
 
 <section class="content-section">
   <div class="container">
-    <div class="section-eyebrow reveal">// Metrics</div>
-    <h2 class="reveal">Success criteria</h2>
-    <div class="two-col">
-      <div class="info-card reveal">
-        <h3>Primary comparison</h3>
-        <p>Topology plus volatility and the correlation spectrum, against those baselines alone. For each held-out crisis, ΔAUC is averaged over 10 random-forest seeds and counts as a win only if it exceeds its spread across seeds.</p>
-        <p style="margin-bottom:0;">Success: at least 4 of the 5 counted crises under leave-one-crisis-out and 3 of the 4 the walk-forward can score. Reported, not counted: average precision, three other controls for the topology, and the settings of Gidea &amp; Katz (H1, windows of 50 and 100 days).</p>
-      </div>
-      <div class="info-card reveal">
-        <h3>Calibrated before any market data</h3>
-        <p>On synthetic crises that change only volatility and correlation, the criterion passed in 3 of 20 datasets (the first version's comparison: 8 of 20). In a positive control, with crises only in the tails, it passed in 7 of 20.</p>
-        <p style="margin-bottom:0;">Crisis periods fixed in advance: 2008–09 · 2011 · 2015 · Q4 2018 · 2020 · 2022.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="content-section">
-  <div class="container">
-    <div class="section-eyebrow reveal">// Results</div>
-    <h2 class="reveal">Outputs and final metrics</h2>
-    <p class="section-intro reveal">The analysis plan, version 0.1.2, run once on the frozen market data on 2026-11-19; the tests added after the result, declared in the code before they were computed; a diagnostic of why the market test says little; and the features over time.</p>
-
-    <div class="results-grid reveal" style="margin-bottom: 28px;">
-      <div class="result-metric">
-        <div class="value">Not met</div>
-        <div class="label">pre-registered criterion · the combined model wins in 2 of 5 held-out crises under leave-one-crisis-out (4 needed) and in 3 of 4 under the walk-forward (3 needed)</div>
-      </div>
-      <div class="result-metric">
-        <div class="value">0.45–0.58</div>
-        <div class="label">ROC-AUC of the baselines inside four of the five held-out crises · every feature compared ignores the sign of the returns, the drawdown label does not: the result is inconclusive</div>
-      </div>
-      <div class="result-metric">
-        <div class="value">p ≥ 0.96</div>
-        <div class="label">tests added after the result · Holm-adjusted p on market data of the four statistics with power: no evidence, with power of 4–7 in 20 on synthetic crises far easier to see</div>
-      </div>
-    </div>
-
-    <table class="analysis-table reveal">
-      <thead>
-        <tr>
-          <th>Held-out crisis (positive windows)</th>
-          <th>ΔAUC, leave one crisis out</th>
-          <th>ΔAUC, walk-forward</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>2008–09 (24)</td><td>+0.041 ± 0.055</td><td>not scorable</td></tr>
-        <tr><td>2011 (9)</td><td class="highlight">+0.078 ± 0.009</td><td>+0.012 ± 0.013</td></tr>
-        <tr><td>2015 (2, not counted)</td><td>+0.017 ± 0.047</td><td>−0.002 ± 0.090</td></tr>
-        <tr><td>Q4 2018 (13)</td><td>−0.045 ± 0.022</td><td class="highlight">+0.058 ± 0.042</td></tr>
-        <tr><td>2020 (5)</td><td>+0.029 ± 0.035</td><td class="highlight">+0.042 ± 0.025</td></tr>
-        <tr><td>2022 (39)</td><td class="highlight">+0.043 ± 0.017</td><td class="highlight">+0.042 ± 0.021</td></tr>
-        <tr><td>Wins</td><td>2 of 5 (4 needed)</td><td>3 of 4 (3 needed)</td></tr>
-      </tbody>
-    </table>
-
-    <p class="reveal" style="margin-top: 22px;">ΔAUC is the ROC-AUC of topology plus volatility and the correlation spectrum minus that of the two baselines alone, mean ± standard deviation over 10 random-forest seeds; highlighted, a win (mean above the spread). Inside the held-out blocks the classes barely separate: under leave-one-crisis-out the combined model reaches a ROC-AUC of 0.49–0.61 in every counted crisis but 2011 (0.99), below volatility alone (0.55–0.71) in those four. Reported, not counted: three other controls for the topology, logistic regression in place of the forest and the settings of Gidea &amp; Katz; none meets the criterion. With logistic regression, the plan's check, ΔAUC is negative in all five counted crises under leave-one-crisis-out. Under leave-one-crisis-out the alarm rule of the plan warns before the drawdown minimum in one counted crisis with the combined model (2022, 80 trading days ahead), as with the baselines alone, and in three with volatility alone.</p>
-
-    <div class="results-grid reveal" style="grid-template-columns: 1fr; margin-top: 24px;">
+    <div class="section-eyebrow reveal">Approach</div>
+    <h2 class="reveal">From a window to a number</h2>
+    <div class="results-grid reveal" style="grid-template-columns: 1fr;">
       <div class="result-figure">
-        <img src="../assets/results/05-features.png" alt="Realised volatility, leading eigenvalue share and landscape L1 norms in dimensions 0 and 1 of every window, 2005 to 2026, with the crisis periods shaded" />
-        <div class="caption"><strong>Fig 1 · Window features on market data.</strong> Realised volatility, the leading eigenvalue share and the landscape \(L^1\) norms in dimensions 0 and 1 of every window, 2005–2026, crisis periods shaded (<code>scripts/plot_features.py</code>; drawn after the result, descriptive). The dimension-0 norm falls in most crises, mirroring the rise of the leading eigenvalue share, as the dependence of persistence on the correlation spectrum predicts.</div>
+        <img src="../assets/results/05-pipeline.png" alt="A calm window and a crisis window: the days on their first two principal axes, the persistence diagram and the landscape of the loops" />
+        <div class="caption"><strong>Fig 1 · The pipeline on two windows of market data.</strong> A calm window (2017) and a crisis window (Oct–Dec 2008): the cloud of days, its persistence diagram and the landscape of its loops.</div>
+      </div>
+    </div>
+    <ul class="key-points reveal" style="margin-top: 28px;">
+      <li><strong>Features:</strong> Vietoris–Rips persistence (H₀, H₁) → persistence landscape → its \(L^1\) and \(L^2\) norms.</li>
+      <li><strong>Baselines on the same folds:</strong> realised volatility and the eigenvalues of the correlation (and covariance) matrix.</li>
+      <li><strong>No leakage:</strong> purged walk-forward and leave-one-crisis-out. Shuffled k-fold gives an unrelated feature a ROC-AUC of 0.98.</li>
+      <li><strong>Fixed in advance:</strong> every test archived before the market data, and calibrated on synthetic markets.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">Theory</div>
+    <h2 class="reveal">What topology can see</h2>
+    <div class="two-col">
+      <div class="analysis-callout reveal" style="margin-top: 0;">
+        <h4>Proposition</h4>
+        <p>For Gaussian days, a window standardised per asset satisfies \(ZZ^\top = n\,V\,\mathrm{diag}(\hat\lambda)\,V^\top\), with \(\hat\lambda\) its sample correlation spectrum and \(V\) a uniformly random frame independent of it.</p>
+        <p><strong>So:</strong> given the spectrum, the topology is noise. It can add to volatility and correlation only through heavy tails or a regime change inside the window.</p>
+      </div>
+      <div class="result-figure reveal">
+        <img src="../assets/results/05-spectrum-check.png" alt="Paired differences between windows and their spectral surrogates: centred at zero for Gaussian windows, shifted for heavy tails and regime changes" />
+        <div class="caption"><strong>Fig 2 · Spectral surrogates.</strong> Gaussian windows: no difference (p = 0.10–0.99). Heavy tails, regime change inside the window: p &lt; 10⁻²⁷.</div>
       </div>
     </div>
   </div>
@@ -233,57 +97,83 @@
 
 <section class="content-section">
   <div class="container">
-    <div class="section-eyebrow reveal">// After the result</div>
-    <h2 class="reveal">What the market data can say</h2>
-    <p class="section-intro reveal">The criterion had almost no power where it matters: on heavy-tailed synthetic crises, which change volatility, correlation and the tails at once, it passed in 0 of 20 datasets. An external review of the plan, written before it saw the result, proposed tests that measure what the market data can and cannot say. They were declared in the code (<code>scripts/post_result.py</code>) and pushed before any of them was computed, and they do not change the verdict.</p>
+    <div class="section-eyebrow reveal">Results</div>
+    <h2 class="reveal">Key results</h2>
 
-    <table class="analysis-table reveal">
-      <thead>
-        <tr>
-          <th>Statistic (scheme)</th>
-          <th>Power, heavy-tailed crises</th>
-          <th>Market p</th>
-          <th>Holm-adjusted</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Decrease in log-loss (leave one crisis out)</td><td>5 / 20</td><td>0.35</td><td>1.00</td></tr>
-        <tr><td>Decrease in Brier score (leave one crisis out)</td><td>5 / 20</td><td>0.96</td><td>1.00</td></tr>
-        <tr><td>Decrease in log-loss (walk-forward)</td><td>7 / 20</td><td>0.24</td><td>0.96</td></tr>
-        <tr><td>ΔAUC on volatility-matched pairs (walk-forward)</td><td>4 / 20</td><td>0.48</td><td>1.00</td></tr>
-      </tbody>
-    </table>
+    <div class="results-grid tiles-3 reveal" style="margin-bottom: 36px;">
+      <div class="result-metric">
+        <div class="value">2 of 5</div>
+        <div class="label">Study 1 · held-out crises where topology helps (4 needed): pre-registered criterion not met</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">τ 0.89 · 0.99</div>
+        <div class="label">replication · rise before Lehman of the landscape norms (theirs 1.00) and of volatility alone</div>
+      </div>
+      <div class="result-metric">
+        <div class="value">Running</div>
+        <div class="label">Study 2 · early warning, pre-registered on 2026-11-24</div>
+      </div>
+    </div>
 
-    <p class="reveal" style="margin-top: 22px;">Each statistic is tested against 99 synthetic null datasets (Monte Carlo test, Barnard 1963), and its power is the share of synthetic crisis datasets it detects at the 5% level. The reading, fixed before any statistic was computed on market data, counts the primary comparison and the statistics whose power on heavy-tailed crises exceeds the nominal size of 0.05 by an exact binomial test, with Holm's correction: the four above. They give no evidence that topology adds to the baselines, and with power of 4 to 7 in 20 (the reading as a whole: 7 of 20 heavy-tailed datasets, computed after the market data) the absence of evidence says little, and less on market data (next section). Every p-value at or below 0.05 belongs to a statistic or comparison outside that family and counts for nothing: ΔAUC itself (0.02 and 0.01, with power 3 and 1 in 20), the comparison with Mardia's kurtosis on both sides (0.01–0.04) and four statistics in the settings of Gidea &amp; Katz (0.048, the smallest p-value 20 null datasets allow). The null is synthetic and separates its crises far more easily than the market does (ROC-AUC 0.96–0.99 for the fraction of crisis days in a window, against 0.49–0.61 for the combined model on market data), so a small p-value says that the market is unusual for those datasets, not why. Every table is in the <a href="https://github.com/crozol/05-tda-finance#analyses-added-after-the-result" target="_blank" rel="noopener">README</a>.</p>
+    <h3 class="reveal results-subhead">Study 1 · crisis detection</h3>
+    <div class="results-grid reveal" style="grid-template-columns: 1fr;">
+      <div class="result-figure">
+        <img src="../assets/results/05-market-delta-auc.png" alt="Gain in ROC-AUC from adding topology, per held-out crisis, under both validation schemes" />
+        <div class="caption"><strong>Fig 3 · ΔAUC per held-out crisis</strong>, random forest over 10 seeds (filled: a win) and logistic regression (diamonds).</div>
+      </div>
+    </div>
+    <ul class="key-points reveal" style="margin-top: 22px;">
+      <li><strong>Not met:</strong> 2 of 5 crises under leave-one-crisis-out, 3 of 4 under walk-forward; with logistic regression, ΔAUC &lt; 0 in all five.</li>
+      <li><strong>Inconclusive, not negative:</strong> every feature ignores the sign of the returns, the drawdown label does not. Inside the held-out crises even the baselines reach only ROC-AUC 0.45–0.58.</li>
+      <li><strong>2008–09:</strong> the forest learned from the 2020 rebound that extreme volatility is normal. Predicted before the test; both predictions hold.</li>
+    </ul>
+    <div class="chart-container reveal" style="margin-top: 28px;">
+      <div id="chart-features" style="width:100%; height:620px;"><div class="chart-loading">Loading chart…</div></div>
+      <div class="chart-caption"><strong>Window features, 2005–2026</strong> · 40-day windows of seven ETFs, crisis periods shaded. Hover to compare; drag to zoom.</div>
+    </div>
+
+    <h3 class="reveal results-subhead">Replication of Gidea &amp; Katz (2018)</h3>
+    <div class="chart-container reveal">
+      <div id="chart-replication" style="width:100%; height:420px;"><div class="chart-loading">Loading chart…</div></div>
+      <div class="chart-caption"><strong>Their setting, 1992–2016</strong> · 50-day windows of the S&amp;P 500, Dow Jones, Nasdaq and Russell 2000; the 250 trading days before each crash shaded.</div>
+    </div>
+    <ul class="key-points reveal" style="margin-top: 22px;">
+      <li><strong>Before Lehman:</strong> the low-frequency power of the norms rises (Kendall τ = 0.89; theirs 1.00), and volatility rises as much (τ = 0.99).</li>
+      <li><strong>Before the dot-com peak:</strong> no rise, for any frequency band tried.</li>
+    </ul>
+
+    <h3 class="reveal results-subhead">Study 2 · early warning</h3>
+    <ul class="key-points reveal">
+      <li>Windows ending 1–60 trading days before the peak of nine S&amp;P 500 drawdowns (1998–2025), against calm windows.</li>
+      <li>Gidea &amp; Katz's topology against volatility and the correlation and covariance spectra; Monte Carlo test against 99 synthetic markets, with power measured first.</li>
+      <li><em>Calibration running; one run on market data follows.</em></li>
+    </ul>
   </div>
 </section>
 
 <section class="content-section">
   <div class="container">
-    <div class="section-eyebrow reveal">// Diagnostic</div>
-    <h2 class="reveal">Why the market test says little</h2>
-    <p class="section-intro reveal">Every feature compared, the baselines included, is unchanged when every return changes sign or the days of a window are reordered; the label, a window whose last day falls inside a peak-to-trough drawdown, is not. Two external reviews of the result proposed tests and predicted their outcome; each was declared in the code (<code>scripts/direction_diagnostic.py</code>, <code>scripts/rebound_hypothesis.py</code>) with its predictions before it was computed, and neither changes the verdict.</p>
+    <div class="section-eyebrow reveal">Limits</div>
+    <h2 class="reveal">What the results do not show</h2>
+    <ul class="key-points reveal">
+      <li>Few episodes (5 counted crises, 9 drawdowns): the conclusions are qualitative.</li>
+      <li>Synthetic markets separate their regimes more easily than the real one; power measured on them is optimistic.</li>
+      <li>Only a prospective test, on drawdowns after November 2026, is fully clean.</li>
+    </ul>
+  </div>
+</section>
 
-    <table class="analysis-table reveal">
-      <thead>
-        <tr>
-          <th>Held-out crisis</th>
-          <th>Volatility vs. windows before</th>
-          <th>Volatility vs. windows after</th>
-          <th>Baselines</th>
-          <th>Baselines + mean return</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>2008–09</td><td>1.00</td><td>0.75</td><td>0.45</td><td>0.61</td></tr>
-        <tr><td>2011</td><td>1.00</td><td>0.89</td><td>0.91</td><td>0.96</td></tr>
-        <tr><td>Q4 2018</td><td>0.78</td><td class="highlight">0.29</td><td>0.58</td><td>0.65</td></tr>
-        <tr><td>2020</td><td>1.00</td><td class="highlight">0.25</td><td>0.58</td><td>0.69</td></tr>
-        <tr><td>2022</td><td>1.00</td><td class="highlight">0.42</td><td>0.49</td><td>0.62</td></tr>
-      </tbody>
-    </table>
-
-    <p class="reveal" style="margin-top: 22px;">ROC-AUC of the crisis windows under leave-one-crisis-out: realised volatility against the normal windows before and after each crisis, and the random forest on the baselines without and with the mean return of the window, the one feature here that changes sign with the returns (mean over 10 seeds). Volatility separates every crisis from the windows before it; in Q4 2018, 2020 and 2022 the windows after the trough are as volatile as the crisis or more (highlighted). In 2008–09 volatility separates the crisis on both sides, yet the forest on the baselines ranks it below chance: there the weakness lies in what the forest learned from the other crises. A second review traced it to the rebound after the 2020 trough, the most volatile windows of the training set (4.8–5.2% daily), labelled normal; as it predicted, the forest on volatility alone gives less crisis probability at 4% or more than at 2–3% (0.61 against 0.84), and without those 12 windows its AUC against the windows before the 2008–09 crisis rises from 0.71 to 1.00. The first review predicted at least 0.8 before and at most 0.5 after in 2008–09, Q4 2018 and 2020; that does not hold, and the mechanism it proposed accounts for three of the five crises. The mean return raises every baseline AUC, to 0.61–0.69 outside 2011, and with it on both sides the primary comparison wins in 3 of 5 crises; none of this counts. Near the ends of a crisis no feature can do much: a window that ends k days before the trough shares 40 − 2k of its 40 days with the normal window that ends k days after it. On market data ΔAUC is measured around baselines near chance, so the data could say little about whether topology adds. Details in the <a href="https://github.com/crozol/05-tda-finance#why-the-market-test-says-little" target="_blank" rel="noopener">README</a>.</p>
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">Full analysis</div>
+    <h2 class="reveal">On GitHub</h2>
+    <div class="readme-links reveal">
+      <a href="https://github.com/crozol/05-tda-finance#3--what-topology-can-see" target="_blank" rel="noopener"><span>Theory</span>Proposition, proof and surrogate check</a>
+      <a href="https://github.com/crozol/05-tda-finance#4--study-1--crisis-detection" target="_blank" rel="noopener"><span>Study 1</span>Design, calibration, result, diagnostics</a>
+      <a href="https://github.com/crozol/05-tda-finance#5--replication-of-gidea--katz-2018" target="_blank" rel="noopener"><span>Replication</span>Gidea &amp; Katz on 1992–2016</a>
+      <a href="https://github.com/crozol/05-tda-finance#6--study-2--early-warning" target="_blank" rel="noopener"><span>Study 2</span>Early warning, pre-registered</a>
+      <a href="https://github.com/crozol/05-tda-finance/blob/main/docs/analysis-plan.md" target="_blank" rel="noopener"><span>Plans</span>Amendments, all tables, record</a>
+    </div>
   </div>
 </section>
 
@@ -295,5 +185,7 @@
 </footer>
 
 <script src="../assets/portfolio.js"></script>
+<script src="https://cdn.plot.ly/plotly-basic-2.35.0.min.js" charset="utf-8"></script>
+<script src="../assets/charts/05-tda.js" defer></script>
 </body>
 </html>

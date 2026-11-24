@@ -13,7 +13,7 @@
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false})"></script>
 </head>
-<body class="text-balanced">
+<body class="text-balanced concise">
 
 <div class="bg-stage"></div>
 <div class="bg-grid"></div>
@@ -37,440 +37,111 @@
       <span class="badge domain">Deep learning · Dynamical systems</span>
       <span class="badge status-done">Completed</span>
     </div>
-    <h1 class="reveal"><span class="grad">Neural ODEs for dynamical systems</span></h1>
-    <p class="tagline reveal">A small MLP parametrises the right-hand side of an ODE and is integrated end-to-end with a differentiable Dormand-Prince solver. The network learns the vector field of a damped pendulum and a Lotka-Volterra system directly from short noisy trajectories, then is rolled forward beyond the training horizon to test extrapolation.</p>
+    <h1 class="reveal"><span class="grad">Neural ODEs for</span><br /><span class="grad">dynamical systems</span></h1>
+    <p class="tagline reveal">Neural networks that learn the vector field of an ODE from short noisy trajectories, and a controlled ablation of when a Hamiltonian prior helps them generalise to orbits they never saw.</p>
     <div class="cta-row reveal">
       <a href="#live-demo" class="btn btn-primary">Try the live demo ↓</a>
       <a href="https://github.com/crozol/02-neural-odes" class="btn btn-ghost" target="_blank" rel="noopener">Code on GitHub →</a>
       <a href="https://doi.org/10.5281/zenodo.24393852" class="btn btn-ghost" target="_blank" rel="noopener">Archived release (DOI) →</a>
-      <a href="#results" class="btn btn-ghost">See results</a>
     </div>
   </div>
 </header>
 
 <section class="content-section">
   <div class="container">
-    <div class="section-eyebrow reveal">// Overview</div>
-    <h2 class="reveal">About this project</h2>
-    <div class="two-col">
-      <div class="reveal">
-        <p>A classical neural network learns a discrete map \(x \mapsto F(x)\). A <strong style="color:var(--fg-0)">Neural ODE</strong> (Chen et al., NeurIPS 2018) learns the derivative \(dy/dt = f_\theta(y, t)\) instead and integrates it with a numerical solver, making the entire forward pass differentiable through the adjoint method or direct backprop through every solver step.</p>
-        <p>This project trains the model on a short noisy trajectory of two textbook 2D systems — a damped pendulum and a Lotka-Volterra predator-prey model — and then rolls the learned ODE forward <em>past</em> the time window it was trained on. The natural question is whether it still behaves like the real system, including derived quantities the network was never asked to match (mechanical energy, the Lotka-Volterra invariant <em>H</em>).</p>
-        <p>Everything runs in a single command: <code>python main.py</code> trains both systems back-to-back and writes all figures plus a JSON metrics summary.</p>
-      </div>
-      <div class="theory-card reveal">
-        <h3>Core formulas</h3>
-        <p style="margin-top: 0;">Neural ODE:</p>
-        <div class="formula">\[ \frac{dy}{dt} = f_\theta(y, t) \]</div>
-        <p>Solver-based forward pass:</p>
-        <div class="formula">\[ y(t_k) = y_0 + \int_0^{t_k} f_\theta\big(y(s), s\big)\, ds \]</div>
-        <p>Loss against observations:</p>
-        <div class="formula">\[ \mathcal{L}(\theta) = \frac{1}{K} \sum_k \big\| \hat{y}(t_k) - y_k^{\text{obs}} \big\|^2 \]</div>
-        <p>Damped pendulum (true system):</p>
-        <div class="formula">\[ \ddot{\theta} + \gamma \dot{\theta} + \omega_0^2 \sin\theta = 0 \]</div>
-        <p>Lotka-Volterra invariant:</p>
-        <div class="formula">\[ H = d\,x - c \ln x + b\,z - a \ln z \]</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="content-section">
-  <div class="container">
-    <div class="section-eyebrow reveal">// Components</div>
-    <h2 class="reveal">How it's built</h2>
-    <p class="section-intro reveal">Seven pieces connected end-to-end. Each lives in its own module with a dedicated responsibility.</p>
-
-    <div class="two-col">
-      <div class="info-card reveal">
-        <h3>1 · Reference systems</h3>
-        <p><strong style="color:var(--fg-0)">Goal:</strong> generate ground-truth trajectories with controllable observation noise.</p>
-        <p><strong style="color:var(--fg-0)">How:</strong> <code>scipy.integrate.odeint</code> (LSODA, <code>rtol=1e-8</code>, <code>atol=1e-10</code>) integrates the true ODEs from a chosen initial condition. i.i.d. Gaussian noise is added to the training half (\(\sigma = 0.005\) for the pendulum, \(0.03\) for Lotka-Volterra); the rest is held out clean for the extrapolation check.</p>
-      </div>
-      <div class="info-card reveal">
-        <h3>2 · Vector-field network \(f_\theta\)</h3>
-        <p><strong style="color:var(--fg-0)">Architecture:</strong> 3 hidden layers of width 96 with <code>Tanh</code> activations, output dim 2. <strong style="color:var(--fg-0)">19 106</strong> trainable parameters.</p>
-        <p><strong style="color:var(--fg-0)">Init trick:</strong> the final Linear is rescaled by <code>0.1</code> with zero bias, so the initial vector field is nearly zero everywhere — the very first solver call cannot diverge.</p>
-      </div>
-      <div class="info-card reveal">
-        <h3>3 · Differentiable solver</h3>
-        <p><strong style="color:var(--fg-0)">Backend:</strong> <code>torchdiffeq.odeint</code> with the Dormand-Prince adaptive RK45 method (<code>dopri5</code>, <code>rtol=1e-5</code>, <code>atol=1e-7</code>).</p>
-        <p>Every internal solver state is kept on the autograd graph, so <code>L.backward()</code> propagates gradients through all the steps the solver took.</p>
-        <p><strong style="color:var(--fg-0)">Adjoint alternative:</strong> keeping the whole trajectory on the graph costs \(O(L)\) memory in solver steps. The <em>adjoint method</em> (Pontryagin 1962; Chen et al. 2018) instead integrates a backward ODE for the gradient at \(O(1)\) memory — a drop-in <code>odeint_adjoint</code>. These 2D systems are small enough that plain <code>odeint</code> is faster and exact, so the adjoint is reserved for high-dimensional or long-horizon problems.</p>
-      </div>
-      <div class="info-card reveal">
-        <h3>4 · Curriculum-aware training loop</h3>
-        <p><strong style="color:var(--fg-0)">Optimiser:</strong> Adam with cosine-annealed LR (\(4\cdot10^{-3}\) for the pendulum, \(2\cdot10^{-3}\) for Lotka-Volterra), gradient clipped to \(\|\nabla\| \le 2\).</p>
-        <p><strong style="color:var(--fg-0)">Curriculum:</strong> the matching window starts at 20–30 samples and grows by the same step every 70–100 epochs until it covers the full training trajectory. This avoids the early-training divergence typical of long integrations.</p>
-      </div>
-      <div class="info-card reveal">
-        <h3>5 · Train / extrapolation split</h3>
-        <p>Once trained, the model is integrated over the full horizon \([0, T_{\text{full}}]\) and the MSE is computed separately on the training mask (\(t \le T_{\text{train}}\)) and the held-out extrapolation mask (\(t &gt; T_{\text{train}}\)).</p>
-        <p>The relative extrapolation error is normalised by the <em>peak</em> amplitude of the ground-truth trajectory, not its mean square — avoids blow-up when the system approaches equilibrium.</p>
-      </div>
-      <div class="info-card reveal">
-        <h3>6 · Physical invariants</h3>
-        <p>Two structural quantities are evaluated <em>on the predicted trajectory</em>: mechanical energy \(E = \tfrac{1}{2}\dot{\theta}^2 + \omega_0^2(1-\cos\theta)\) for the pendulum, and the Lotka-Volterra invariant \(H\) along the orbit.</p>
-        <p>The MLP is never told these exist. How well they are reproduced is a strict test of how much structure the network rediscovers from the data alone.</p>
-      </div>
-      <div class="info-card reveal">
-        <h3>7 · Final figures + JSON</h3>
-        <p>Seven PNGs auto-saved by <code>src/plots.py</code>: training loss, time series with extrapolation band, phase plane on top of the learned streamplot, and the energy decay panel for the pendulum. A <code>data/metrics.json</code> file collects every reported number for both systems.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="content-section">
-  <div class="container">
-    <div class="section-eyebrow reveal">// Skills demonstrated</div>
-    <h2 class="reveal">What skills it certifies</h2>
-    <p class="section-intro reveal">Each skill appears in a concrete piece of code, not as a generic claim.</p>
-
-    <div class="skill-matrix reveal" style="margin-bottom: 32px;">
-      <div class="skill-name">PyTorch</div>
-      <div class="skill-how"><code>nn.Module</code> for the vector field, training loop with Adam, cosine LR schedule, gradient clipping.</div>
-      <div class="skill-name">Differentiable integrators</div>
-      <div class="skill-how"><code>torchdiffeq.odeint</code> with Dormand-Prince and adaptive tolerances, autograd through every solver step.</div>
-      <div class="skill-name">Mathematical ML</div>
-      <div class="skill-how">Vector-field regression in \(\mathbb{R}^2\) — the target is continuous structure, not a label or a single number.</div>
-      <div class="skill-name">Synthetic data generation</div>
-      <div class="skill-how"><code>scipy.integrate.odeint</code> on the true ODE plus controllable Gaussian observation noise.</div>
-      <div class="skill-name">Training stability</div>
-      <div class="skill-how">Small final-layer init, gradient clipping, and a curriculum on the integration window — three independent tricks that together prevent early-training divergence.</div>
-      <div class="skill-name">Visualisation</div>
-      <div class="skill-how">Phase-plane orbits overlaid on the learned vector field as a streamplot coloured by local speed; loss curves with curriculum markers; energy-decay diagnostics.</div>
-      <div class="skill-name">Physical validation</div>
-      <div class="skill-how">Mechanical energy on the pendulum and the Lotka-Volterra invariant \(H\) evaluated on the predicted trajectory and compared against the ground truth.</div>
-      <div class="skill-name">Reproducibility</div>
-      <div class="skill-how"><code>python main.py</code> runs the full pipeline end-to-end and writes every figure plus a JSON metrics summary.</div>
-    </div>
-
-    <div class="skill-chip-row reveal">
-      <span class="skill-chip">PyTorch</span>
-      <span class="skill-chip">torchdiffeq</span>
-      <span class="skill-chip">NumPy</span>
-      <span class="skill-chip">SciPy</span>
-      <span class="skill-chip">Matplotlib</span>
-      <span class="skill-chip">Autograd</span>
-      <span class="skill-chip">ODEs</span>
-      <span class="skill-chip">Dormand-Prince</span>
-    </div>
-  </div>
-</section>
-
-<section class="content-section">
-  <div class="container">
-    <div class="section-eyebrow reveal">// Structure</div>
-    <h2 class="reveal">Project organization</h2>
-    <pre class="code-tree reveal"><span class="folder">02-neural-odes/</span>
-├── <span class="file">README.md</span>                  <span class="comment"># step-by-step walk-through with embedded figures</span>
-├── <span class="file">requirements.txt</span>
-├── <span class="file">main.py</span>                    <span class="comment"># end-to-end pipeline (both systems)</span>
-├── <span class="folder">src/</span>
-│   ├── <span class="file">systems.py</span>             <span class="comment"># pendulum + Lotka-Volterra, noise injection, invariants</span>
-│   ├── <span class="file">ode_net.py</span>             <span class="comment"># ODEFunc MLP + torchdiffeq integration</span>
-│   ├── <span class="file">train.py</span>               <span class="comment"># curriculum-aware training loop + evaluation</span>
-│   └── <span class="file">plots.py</span>               <span class="comment"># dark portfolio-styled figures</span>
-├── <span class="folder">figures/</span>                   <span class="comment"># tracked PNGs embedded in README</span>
-└── <span class="folder">data/</span>                      <span class="comment"># (gitignored) metrics.json summary</span></pre>
-  </div>
-</section>
-
-<section class="content-section">
-  <div class="container">
-    <div class="section-eyebrow reveal">// Roadmap</div>
-    <h2 class="reveal">Project status</h2>
-    <ul class="roadmap reveal">
-      <li class="done">Reference systems with controllable observation noise (damped pendulum, Lotka-Volterra)</li>
-      <li class="done"><code>ODEFunc</code> MLP (3 hidden layers · width 96 · Tanh) with small final-layer init for stable warm-up</li>
-      <li class="done">Curriculum-aware training loop with cosine LR, gradient clipping, and growing integration window</li>
-      <li class="done">Train / extrapolation MSE split + scale-aware relative error metric</li>
-      <li class="done">Physical invariants tracked on the predicted trajectory (mechanical energy, Lotka-Volterra \(H\))</li>
-      <li class="done">Phase-plane visualisations with the <em>learned</em> vector field as a streamplot</li>
-      <li class="done">End-to-end pipeline (<code>python main.py</code>) writes all figures and a JSON metrics summary</li>
-      <li class="done">README rewritten as a step-by-step walk-through with embedded figures</li>
+    <div class="section-eyebrow reveal">Background</div>
+    <h2 class="reveal">Learning the law, not the trajectory</h2>
+    <ul class="key-points reveal">
+      <li>A <strong>Neural ODE</strong> learns the right-hand side \(dy/dt = f_\theta(y)\) and integrates it with an adaptive solver, with gradients through the solver or the adjoint equation (Chen et al., 2018; Pontryagin, 1962).</li>
+      <li><strong>Physics priors</strong> build structure into \(f_\theta\): a Hamiltonian Neural Network learns a scalar \(H_\theta\) and moves along its symplectic gradient, so it conserves \(H_\theta\) by construction (Greydanus et al., 2019; also Cranmer et al., 2020; Zhong et al., 2020).</li>
+      <li><strong>Open question:</strong> when does the prior help? Comparisons often change the architecture and the coordinates at once, and test on the orbit the model was trained on.</li>
     </ul>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow reveal">Approach</div>
+    <h2 class="reveal">Two systems, one controlled ablation</h2>
+    <div class="two-col">
+      <ul class="key-points reveal" style="margin: 0;">
+        <li><strong>Systems:</strong> a damped pendulum and a Lotka–Volterra predator–prey model, observed with Gaussian noise over a short window, then extrapolated.</li>
+        <li><strong>Model:</strong> an MLP vector field (3 × 96, tanh, 19 106 parameters) integrated by Dormand–Prince (<code>torchdiffeq</code>), with a curriculum on the integration window.</li>
+        <li><strong>Ablation:</strong> the MLP, the same MLP in log-coordinates (the coordinate control) and an HNN of the same size; trained on 1 or 3 trajectories, 5 seeds each, scored on 5 orbits never seen.</li>
+        <li><strong>Loss:</strong> the exact likelihood of the observations for every model; the initial states are fitted jointly with the network.</li>
+      </ul>
+      <div class="result-figure reveal">
+        <img src="../assets/results/02-hnn-phase.png" alt="Phase plane of Lotka-Volterra: true orbit, MLP prediction and Hamiltonian neural network prediction" />
+        <div class="caption"><strong>Fig 1 · Lotka–Volterra phase plane:</strong> truth, MLP and HNN on the learned vector field.</div>
+      </div>
+    </div>
   </div>
 </section>
 
 <section class="content-section" id="results">
   <div class="container">
-    <div class="section-eyebrow reveal">// Results · damped pendulum</div>
-    <h2 class="reveal">Outputs and final metrics — pendulum</h2>
-    <p class="section-intro reveal">Trained on <code>t ∈ [0, 12]</code>, evaluated on the full <code>[0, 20]</code> horizon. Hover any chart for values, zoom with the toolbar, toggle traces in the legend.</p>
+    <div class="section-eyebrow reveal">Results</div>
+    <h2 class="reveal">Key results</h2>
 
-    <div class="results-grid reveal" style="margin-bottom: 28px;">
+    <div class="results-grid tiles-3 reveal" style="margin-bottom: 36px;">
       <div class="result-metric">
-        <div class="value">19 106</div>
-        <div class="label">trainable parameters in <code>f<sub>θ</sub></code> · 3 hidden layers × width 96</div>
+        <div class="value">4.7 % → 2.6 %</div>
+        <div class="label">error on five unseen orbits, trained on three trajectories · log-coordinate MLP → HNN, same size, 5 seeds</div>
       </div>
       <div class="result-metric">
-        <div class="value">3.0 · 10⁻⁴</div>
-        <div class="label">MSE on the clean training horizon · mean over 5 seeds (± 2.8 · 10⁻⁴), ≈ 12× the noise floor (0.005)²</div>
+        <div class="value">12.6 % → 6.0 %</div>
+        <div class="label">drift of the conserved quantity on the same orbits · every HNN seed better than every MLP seed (p = 0.008)</div>
       </div>
       <div class="result-metric">
-        <div class="value">8.3 ± 2.4 %</div>
-        <div class="label">relative extrapolation error (\(\sqrt{\text{MSE}} / \max|y|\)) on \(t &gt; 12\) · mean ± std over 5 seeds</div>
-      </div>
-      <div class="result-metric">
-        <div class="value">106 ± 41 %</div>
-        <div class="label">final-time energy drift |ΔE/E| at <code>t = 20</code> · mean ± std over 5 seeds, interpreted below</div>
+        <div class="value">14–17 %</div>
+        <div class="label">error of every model trained on one trajectory: one orbit does not determine the vector field</div>
       </div>
     </div>
 
+    <h3 class="reveal results-subhead">Ablation on unseen orbits</h3>
+    <div class="results-grid reveal" style="grid-template-columns: 1fr;">
+      <div class="result-figure">
+        <img src="../assets/results/02-hnn-ablation-ic.png" alt="Relative error and drift of H on unseen orbits for three models and two training regimes, with the predicted orbits" />
+        <div class="caption"><strong>Fig 2 · Error and drift on five unseen orbits</strong> (bars: means; dots: seeds) and the orbits predicted by the log-coordinate MLP and the HNN.</div>
+      </div>
+    </div>
+    <ul class="key-points reveal" style="margin-top: 22px;">
+      <li><strong>The prior pays off with enough data:</strong> trained on three trajectories, the HNN halves both error and drift on orbits it never saw; its orbits stay closed, the MLP's spiral.</li>
+      <li><strong>Not with one trajectory:</strong> the HNN's orbits still close (drift 12 % against 66–83 %), but they are the wrong orbits.</li>
+      <li><strong>The naive comparison was confounded:</strong> on the training orbit, most of the HNN's apparent gain came from measuring the loss in log-coordinates, not from the Hamiltonian structure.</li>
+      <li><strong>The residual drift is a fitting error:</strong> tightening the solver tolerance from \(10^{-5}\) to \(10^{-8}\) leaves it unchanged, while the HNN's own \(H_\theta\) is conserved to \(3 \cdot 10^{-5}\).</li>
+    </ul>
+
+    <h3 class="reveal results-subhead">Extrapolation past the training window</h3>
     <div class="chart-container reveal">
-      <div id="chart-pendulum-loss" style="width:100%; height:480px;">
-        <div class="chart-loading">Loading training loss…</div>
-      </div>
-      <div class="chart-caption"><strong>Fig 1 · Training loss.</strong> Log-scale MSE versus epoch. Amber dashed verticals mark each curriculum window growth — every event briefly raises the loss as new samples enter the integration, then the optimiser relaxes back. The final training MSE settles a few times the observation-noise variance, the floor an unconstrained MLP can be expected to reach.</div>
+      <div id="chart-lotka-traj" style="width:100%; height:520px;"><div class="chart-loading">Loading trajectories…</div></div>
+      <div class="chart-caption"><strong>Lotka–Volterra, MLP baseline:</strong> noisy training data, prediction and truth; the shaded band is extrapolation. Relative error 0.96 ± 0.57 % (5 seeds).</div>
     </div>
-
     <div class="chart-container reveal" style="margin-top: 24px;">
-      <div id="chart-pendulum-traj" style="width:100%; height:560px;">
-        <div class="chart-loading">Loading trajectory…</div>
-      </div>
-      <div class="chart-caption"><strong>Fig 2 · Reconstruction and extrapolation.</strong> Angle (top) and angular velocity (bottom). Cyan = ground truth, dashed purple = Neural ODE. Amber band = extrapolation region — the portion the network never saw. Oscillation frequency, phase and the slow envelope of friction decay all line up beyond the training window; the small late-time disagreement is the phase drift expected when the learned \(\omega_0\) and \(\gamma\) are slightly off the true values.</div>
+      <div id="chart-pendulum-energy" style="width:100%; height:440px;"><div class="chart-loading">Loading energy decay…</div></div>
+      <div class="chart-caption"><strong>Damped pendulum, energy:</strong> the learned dynamics stop dissipating past the training window. Relative extrapolation error 8.3 ± 2.4 % (5 seeds).</div>
     </div>
-
-    <div class="chart-container reveal" style="margin-top: 24px;">
-      <div id="chart-pendulum-phase" style="width:100%; height:600px;">
-        <div class="chart-loading">Loading phase plane…</div>
-      </div>
-      <div class="chart-caption"><strong>Fig 3 · Phase plane and learned vector field.</strong> The orbit (cyan = true, dashed purple = Neural ODE) sits on top of the learned vector field, with magnitude \(\|f_\theta\|\) shown as a magma heatmap and direction shown by overlaid arrows. The amber dot marks the initial state at \(t = 0\); the square / diamond mark the final position of the true / predicted orbit. Two features the network had to recover: the inward spiral towards \((0, 0)\) from energy dissipation, and the non-linear restoring term \(-\omega_0^2 \sin\theta\) visible as the almond shape of the orbit.</div>
-    </div>
-
-    <div class="chart-container reveal" style="margin-top: 24px;">
-      <div id="chart-pendulum-energy" style="width:100%; height:480px;">
-        <div class="chart-loading">Loading energy curve…</div>
-      </div>
-      <div class="chart-caption"><strong>Fig 4 · Mechanical energy decay.</strong> Pink shading = gap between predicted and true energy. Within the training window the predicted energy tracks the dissipation envelope tightly; in the extrapolation half the prediction <em>retains its oscillation amplitude</em> instead of continuing to decay — the network has not fully internalised the friction coefficient \(\gamma\). The 137 % drift of the seed shown (106 % ± 41 % over 5 seeds) is a single-point snapshot at \(t = 20\); the curve as a whole is the more honest summary.</div>
-    </div>
-
-    <noscript>
-      <div class="results-grid" style="grid-template-columns: 1fr; margin-top: 24px;">
-        <div class="result-figure">
-          <img src="../assets/results/02-pendulum-loss.png" alt="Training loss · pendulum" />
-          <div class="caption">Fig 1 · static fallback (enable JavaScript for interactive charts)</div>
-        </div>
-      </div>
-    </noscript>
   </div>
 </section>
 
 <section class="content-section">
   <div class="container">
-    <div class="section-eyebrow reveal">// Results · Lotka-Volterra</div>
-    <h2 class="reveal">Outputs and final metrics — Lotka-Volterra</h2>
-    <p class="section-intro reveal">Trained on <code>t ∈ [0, 12]</code>, evaluated on the full <code>[0, 22]</code> horizon. Closed orbits make this a strictly harder benchmark — small phase errors compound across each period, and the orbit must remain bounded despite never being told the dynamics are conservative.</p>
-
-    <div class="results-grid reveal" style="margin-bottom: 28px;">
-      <div class="result-metric">
-        <div class="value">19 106</div>
-        <div class="label">trainable parameters in <code>f<sub>θ</sub></code> · same architecture as the pendulum</div>
-      </div>
-      <div class="result-metric">
-        <div class="value">5.6 · 10⁻³</div>
-        <div class="label">MSE on the clean training horizon · amplitudes are an order of magnitude larger than for the pendulum</div>
-      </div>
-      <div class="result-metric">
-        <div class="value">0.96 ± 0.57 %</div>
-        <div class="label">relative extrapolation error on <code>t &gt; 12</code> · mean ± std over 5 seeds</div>
-      </div>
-      <div class="result-metric">
-        <div class="value">9.0 ± 3.3 %</div>
-        <div class="label">drift of the conserved quantity \(H\) for the unconstrained baseline · mean ± std over 5 seeds</div>
-      </div>
-    </div>
-
-    <div class="chart-container reveal">
-      <div id="chart-lotka-loss" style="width:100%; height:480px;">
-        <div class="chart-loading">Loading training loss…</div>
-      </div>
-      <div class="chart-caption"><strong>Fig 5 · Training loss.</strong> Same curriculum-induced bumps as for the pendulum. The plateau is higher because species amplitudes are an order of magnitude larger — absolute MSE scales with \(\|y\|^2\), not with the dimensionless quality of the fit. The relative extrapolation error (1.6 % for this seed, 0.96 % ± 0.57 % over 5 seeds) is the scale-free version.</div>
-    </div>
-
-    <div class="chart-container reveal" style="margin-top: 24px;">
-      <div id="chart-lotka-traj" style="width:100%; height:560px;">
-        <div class="chart-loading">Loading trajectory…</div>
-      </div>
-      <div class="chart-caption"><strong>Fig 6 · Prey and predator over time.</strong> Prey (top) and predator (bottom). Cyan = ground truth, dashed purple = Neural ODE, amber band = extrapolation. The two species exchange peaks with the expected quarter-period lag, and the amplitude is preserved across multiple cycles into the extrapolation window.</div>
-    </div>
-
-    <div class="chart-container reveal" style="margin-top: 24px;">
-      <div id="chart-lotka-phase" style="width:100%; height:600px;">
-        <div class="chart-loading">Loading phase plane…</div>
-      </div>
-      <div class="chart-caption"><strong>Fig 7 · Closed orbit and learned field.</strong> The orbit traces the ground-truth loop almost exactly within the training horizon and remains close on the extrapolation half. A correct fit produces a single closed loop that does not spiral; any ratio mismatch between the four \((a, b, c, d)\) parameters of the true system would manifest as a slow inward or outward drift — quantified by the 7.9 % standard deviation (this seed; 9.0 % ± 3.3 % over 5 seeds) of \(H\) along the predicted trajectory.</div>
-    </div>
-
-    <noscript>
-      <div class="results-grid" style="grid-template-columns: 1fr; margin-top: 24px;">
-        <div class="result-figure">
-          <img src="../assets/results/02-lotka-phase.png" alt="Phase plane · Lotka-Volterra" />
-          <div class="caption">Fig 7 · static fallback (enable JavaScript for interactive charts)</div>
-        </div>
-      </div>
-    </noscript>
-  </div>
-</section>
-
-<section class="content-section" id="ablation">
-  <div class="container">
-    <div class="section-eyebrow reveal">// Ablation · physics-informed prior</div>
-    <h2 class="reveal">Hamiltonian prior: what it buys, and when</h2>
-    <p class="section-intro reveal">The unconstrained MLP keeps the Lotka-Volterra orbit closed only to within ≈ 9 % drift in the conserved quantity \(H\). Two questions follow: does <em>encoding</em> the Hamiltonian structure into the architecture shrink that drift, and does it help the model generalise beyond the one orbit it was trained on? Lotka-Volterra is canonically Hamiltonian in log-coordinates \((q, p) = (\ln x, \ln z)\) with \(H(q, p) = b\,e^{p} + d\,e^{q} - a\,p - c\,q\); an HNN parametrises a scalar \(H_\theta\) and computes the dynamics as the symplectic gradient via autograd, so every predicted orbit preserves \(H_\theta\) by construction.</p>
-
-    <div class="two-col">
-      <div class="info-card reveal">
-        <h3>Setup</h3>
-        <p>Same width and depth as the baseline MLP — 3 hidden layers · width 96 · <code>Tanh</code> — but output dimension 1 (the scalar Hamiltonian). <strong style="color:var(--fg-0)">19 009</strong> trainable parameters, essentially the same budget as the baseline (19 106).</p>
-        <p>Same training schedule: 2 000 epochs, Adam with cosine-annealed <code>lr</code> starting at <code>2·10⁻³</code>, gradient clipped at <code>2.0</code>, curriculum window growing every 80 epochs from 30 samples up to 300.</p>
-      </div>
-      <div class="info-card reveal">
-        <h3>Loss in canonical coordinates</h3>
-        <p>The training signal is MSE on the noisy log-coordinate observations \((\ln x, \ln z)\). At evaluation time the predicted log-trajectory is exponentiated back to \((x, z)\) for an honest comparison against the same ground truth used by the MLP — so train MSE values are not directly comparable across the two models, but extrapolation error and invariant drift are.</p>
-      </div>
-    </div>
-
-    <h3 class="reveal" style="margin-top: 32px;">First comparison: one orbit, one HNN run</h3>
-    <p class="reveal" style="color: var(--fg-1); max-width: 820px;">The HNN trained on the same single trajectory as the MLP, scored on the forward extrapolation of that orbit.</p>
-    <table class="analysis-table reveal" style="margin-top: 16px;">
-      <thead>
-        <tr>
-          <th>Quantity</th>
-          <th>unconstrained MLP</th>
-          <th>Hamiltonian NN (single run)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Trainable parameters</td>
-          <td>19 106</td>
-          <td>19 009</td></tr>
-        <tr>
-          <td>Relative extrapolation error  \(\sqrt{\text{MSE}} / \max|y|\)</td>
-          <td>0.96 % ± 0.57 % (5 seeds)</td>
-          <td><span data-metric="hnn_rel_err">_filled by run_</span></td>
-        </tr>
-        <tr>
-          <td class="highlight">Drift of \(H\) along orbit  \(\operatorname{std}(H)/\langle H \rangle\)</td>
-          <td>8.99 % ± 3.30 % (5 seeds)</td>
-          <td class="highlight"><span data-metric="hnn_h_drift">_filled by run_</span></td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="chart-container reveal" style="margin-top: 28px;">
-      <div id="chart-hnn-loss" style="width:100%; height:480px;">
-        <div class="chart-loading">Loading HNN training loss…</div>
-      </div>
-      <div class="chart-caption"><strong>Fig 8 · HNN training loss.</strong> Loss curve for the HNN run on the same axes as the baseline. The HNN optimiser sees a different objective (MSE in log coordinates rather than absolute amplitudes) so the absolute level is not directly comparable, but the curriculum bumps and the cosine LR decay are visible in the same shape.</div>
-    </div>
-
-    <div class="chart-container reveal" style="margin-top: 24px;">
-      <div id="chart-hnn-phase" style="width:100%; height:600px;">
-        <div class="chart-loading">Loading phase comparison…</div>
-      </div>
-      <div class="chart-caption"><strong>Fig 9 · Phase plane: truth · MLP · HNN.</strong> The three orbits are overlaid on the <em>MLP-learned</em> vector field — keeping the speed colormap identical to Fig 7 makes the visible difference purely in the orbit shape. The HNN orbit closes on itself almost exactly; the MLP orbit accumulates a small drift across cycles.</div>
-    </div>
-
-    <div class="chart-container reveal" style="margin-top: 24px;">
-      <div id="chart-hnn-invariant" style="width:100%; height:480px;">
-        <div class="chart-loading">Loading invariant drift…</div>
-      </div>
-      <div class="chart-caption"><strong>Fig 10 · Conserved quantity along the predicted trajectory.</strong> \(H\) evaluated point-by-point on each predicted trajectory. The ground truth is flat (cyan reference). The MLP wobbles around it (≈ 7.9 % relative std for this seed); the HNN is almost flat. Its residual 2.4 % is not solver error: it is unchanged when the tolerance is tightened from \(10^{-5}\) to \(10^{-8}\), while the network's own \(H_\theta\) is conserved to \(3 \cdot 10^{-5}\). It measures how far the learned \(H_\theta\) is from the true \(H\).</div>
-    </div>
-
-    <div class="analysis-callout reveal" style="margin-top: 24px;">
-      <h4>Three weaknesses of this comparison</h4>
-      <p>The HNN was trained once; it changes the architecture <em>and</em> the coordinates at the same time (the MLP works in \((x, z)\), the HNN in \((\ln x, \ln z)\)); and it only tests the orbit the models were trained on, which cannot tell whether a model learned the vector field or one closed curve. The controlled ablation below addresses all three.</p>
-    </div>
-
-    <h3 class="reveal" style="margin-top: 40px;">Controlled ablation on unseen orbits</h3>
-    <p class="reveal" style="color: var(--fg-1); max-width: 820px;">Three models with the same width, depth and schedule — the MLP in \((x, z)\), <strong style="color:var(--fg-0)">the same MLP in \((\ln x, \ln z)\)</strong> as a coordinate control, and the HNN — trained on one trajectory or on three, with the initial state of each training trajectory fitted jointly with the network. Each is scored on five orbits it never saw, over \(t \in [0, 22]\). Five seeds per configuration; the \(H\) drift is normalised by the height of each orbit above the fixed point. The loss is measured in \((x, z)\), where the noise is added, so that it is the exact likelihood of the observations for all three models; the first comparison measured it in log-coordinates, which weights the bottom of an orbit up to 7 500× more.</p>
-
-    <table class="analysis-table reveal" style="margin-top: 16px;">
-      <thead>
-        <tr>
-          <th>Training</th>
-          <th>Model</th>
-          <th>Unseen orbits · rel. error</th>
-          <th>Unseen orbits · \(H\) drift</th>
-          <th>Training orbit · \(H\) drift</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>1 trajectory</td><td>MLP \((x, z)\)</td><td>16.6 % ± 1.9 %</td><td>82.7 % ± 15.7 %</td><td>6.45 % ± 1.51 %</td></tr>
-        <tr><td>1 trajectory</td><td>MLP \((\ln x, \ln z)\)</td><td>14.5 % ± 0.7 %</td><td>65.9 % ± 3.5 %</td><td>5.12 % ± 0.54 %</td></tr>
-        <tr><td>1 trajectory</td><td>HNN</td><td>13.7 % ± 3.0 %</td><td>12.1 % ± 0.7 %</td><td class="highlight">4.72 % ± 0.84 %</td></tr>
-        <tr><td>3 trajectories</td><td>MLP \((x, z)\)</td><td>5.35 % ± 0.37 %</td><td>32.5 % ± 1.3 %</td><td>12.8 % ± 1.4 %</td></tr>
-        <tr><td>3 trajectories</td><td>MLP \((\ln x, \ln z)\)</td><td>4.65 % ± 0.45 %</td><td>12.6 % ± 1.8 %</td><td>8.19 % ± 0.68 %</td></tr>
-        <tr><td>3 trajectories</td><td>HNN</td><td class="highlight">2.57 % ± 0.94 %</td><td class="highlight">6.03 % ± 1.01 %</td><td>3.31 % ± 0.41 %</td></tr>
-      </tbody>
-    </table>
-
-    <div class="results-grid reveal" style="grid-template-columns: 1fr; margin-top: 24px;">
-      <div class="result-figure">
-        <img src="../assets/results/02-hnn-ablation-ic.png" alt="Relative error and H drift on unseen orbits for three models and two training regimes, and the predicted unseen orbits" />
-        <div class="caption"><strong>Fig 11 · Ablation on unseen orbits.</strong> (a) Relative error and (b) drift of the true \(H\), averaged over the five unseen orbits; bars are means, dots are seeds. (c) The unseen orbits predicted by the log-coordinate MLP (dashed) and the HNN (solid), both trained on three trajectories (thin grey), against the truth (cyan). Loss in \((x, z)\) for every model.</div>
-      </div>
-    </div>
-
-    <p class="reveal" style="color: var(--fg-1); max-width: 820px; margin-top: 24px;">The same models with the loss measured in either coordinate system:</p>
-    <table class="analysis-table reveal" style="margin-top: 16px;">
-      <thead>
-        <tr>
-          <th>Model</th>
-          <th>Loss in</th>
-          <th>3 trajectories · unseen: rel. error</th>
-          <th>3 trajectories · unseen: \(H\) drift</th>
-          <th>1 trajectory · training orbit: rel. error</th>
-          <th>1 trajectory · training orbit: \(H\) drift</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>MLP \((x, z)\)</td><td>\((x, z)\) = likelihood</td><td>5.35 % ± 0.37 %</td><td>32.5 % ± 1.3 %</td><td>1.73 % ± 0.39 %</td><td>6.45 % ± 1.51 %</td></tr>
-        <tr><td>MLP \((x, z)\)</td><td>\((\ln x, \ln z)\)</td><td>6.77 % ± 0.26 %</td><td>23.6 % ± 4.5 %</td><td>1.68 % ± 0.34 %</td><td>3.66 % ± 0.39 %</td></tr>
-        <tr><td>MLP \((\ln x, \ln z)\)</td><td>\((x, z)\) = likelihood</td><td>4.65 % ± 0.45 %</td><td>12.6 % ± 1.8 %</td><td>0.42 % ± 0.03 %</td><td>5.12 % ± 0.54 %</td></tr>
-        <tr><td>MLP \((\ln x, \ln z)\)</td><td>\((\ln x, \ln z)\)</td><td>5.03 % ± 0.23 %</td><td>8.60 % ± 0.33 %</td><td>0.43 % ± 0.14 %</td><td>2.14 % ± 0.30 %</td></tr>
-        <tr><td>HNN</td><td>\((x, z)\) = likelihood</td><td>2.57 % ± 0.94 %</td><td>6.03 % ± 1.01 %</td><td>0.71 % ± 0.33 %</td><td>4.72 % ± 0.84 %</td></tr>
-        <tr><td>HNN</td><td>\((\ln x, \ln z)\)</td><td>2.38 % ± 0.41 %</td><td>2.18 % ± 0.32 %</td><td>3.06 % ± 1.12 %</td><td>2.36 % ± 0.29 %</td></tr>
-      </tbody>
-    </table>
-
-    <div class="analysis-callout reveal" style="margin-top: 24px;">
-      <h4>1 · On the training orbit, the coordinates make the fit track the orbit; the loss does most of the conserving</h4>
-      <p>With one trajectory, moving the MLP to log-coordinates cuts its error on the training orbit from 1.7 % to 0.4 % with either loss. Its \(H\) drift falls mostly with the loss instead: measuring the residuals in log-coordinates lowers it from 6.5 % to 3.7 % for the MLP in \((x, z)\) and from 5.1 % to 2.1 % for the MLP in \((\ln x, \ln z)\), while the change of coordinates under the exact likelihood lowers it only from 6.5 % to 5.1 %. The reason is in \(H = d x - c \ln x + b z - a \ln z\): its logarithmic terms make it most sensitive where the populations are small, the region a loss in log-coordinates over-weights. The lower drift in the first comparison came mostly from the loss, not from the Hamiltonian structure.</p>
-    </div>
-    <div class="analysis-callout reveal">
-      <h4>2 · One trajectory does not determine the vector field</h4>
-      <p>Trained on a single orbit, all three models miss unseen orbits by 14–17 %, the HNN included. The HNN's orbits still close (\(H\) drift 12.1 % against 66–83 %), but they are the wrong orbits: an \(H_\theta\) that is accurate along one curve need not be accurate anywhere else.</p>
-    </div>
-    <div class="analysis-callout reveal">
-      <h4>3 · With three trajectories, the prior pays off</h4>
-      <p>On unseen orbits the HNN's error is 1.8 times lower than that of the log-coordinate MLP (2.57 % vs 4.65 %) and its \(H\) drift 2.1 times lower (6.03 % vs 12.6 %), with every seed better than every MLP seed on both metrics (Mann-Whitney, two-sided p = 0.008, the smallest five seeds against five can give; paired by seed, 5/5, sign test p = 0.06). With the loss in log-coordinates the gap is wider (2.38 % and 2.18 % against 5.03 % and 8.60 %). The MLP's orbits spiral slowly in or out; the HNN's stay closed near the true ones, including the two orbits above the training range. The HNN remains applicable only to systems known to be Hamiltonian, in known canonical coordinates; for the damped pendulum the natural extension is a dissipation-aware split flow (Sosanya &amp; Greydanus, 2022).</p>
-    </div>
-
-    <noscript>
-      <div class="results-grid" style="grid-template-columns: 1fr; margin-top: 24px;">
-        <div class="result-figure">
-          <img src="../assets/results/02-hnn-phase.png" alt="Phase plane · MLP vs HNN · Lotka-Volterra" />
-          <div class="caption">Fig 9 · static fallback (enable JavaScript for interactive charts)</div>
-        </div>
-      </div>
-    </noscript>
+    <div class="section-eyebrow reveal">Limits</div>
+    <h2 class="reveal">What the results do not show</h2>
+    <ul class="key-points reveal">
+      <li>The HNN applies only to systems known to be Hamiltonian, in known canonical coordinates; the dissipative pendulum needs a split flow (Sosanya &amp; Greydanus, 2022).</li>
+      <li>Five seeds and five test orbits: the HNN's advantage is clear in ranks (p = 0.008), not a precise effect size.</li>
+    </ul>
   </div>
 </section>
 
 <section class="content-section" id="live-demo">
   <div class="container">
-    <div class="section-eyebrow reveal">// Live demo</div>
+    <div class="section-eyebrow reveal">Live demo</div>
     <h2 class="reveal">Run the comparison in your browser</h2>
-    <p class="section-intro reveal">The ablation above, made interactive: a Streamlit app on Hugging Face Spaces running live inference from the trained checkpoints. In the single-orbit views (<strong style="color:var(--fg-0)">Lotka-Volterra</strong> or the simple harmonic oscillator), drag the <strong style="color:var(--fg-0)">horizon</strong> slider and watch the conserved quantity \(H\) along the training orbit. In <strong style="color:var(--fg-0)">Lotka-Volterra · unseen orbits</strong>, choose one or three training trajectories and an orbit none of the three models saw, and compare the MLP, the log-coordinate MLP and the HNN directly.</p>
+    <p class="section-intro reveal">Pre-trained MLP and HNN checkpoints integrated live on Hugging Face Spaces: change the horizon, pick an unseen orbit and compare the predicted orbits and their conserved quantity.</p>
     <div class="cta-row reveal" style="margin: 12px 0 24px;">
       <a href="https://huggingface.co/spaces/crozol/neural-odes-hnn-demo" class="btn btn-primary" target="_blank" rel="noopener">Open in new tab ↗</a>
-      <a href="https://github.com/crozol/02-neural-odes" class="btn btn-ghost" target="_blank" rel="noopener">Source code →</a>
     </div>
     <div class="reveal" style="border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg-1);">
       <iframe
@@ -484,146 +155,20 @@
         allow="fullscreen"
       ></iframe>
     </div>
-    <p class="caption reveal" style="margin-top: 12px;">First load can take 20–40 s while the Hugging Face Space cold-starts; subsequent interactions are instant. If the iframe is blocked by your browser, use the <a href="https://huggingface.co/spaces/crozol/neural-odes-hnn-demo" target="_blank" rel="noopener">Open in new tab</a> link above.</p>
-
-    <noscript>
-      <div class="results-grid" style="grid-template-columns: 1fr; margin-top: 24px;">
-        <div class="result-figure">
-          <img src="../assets/results/02-hnn-phase.png" alt="HNN vs MLP — static preview" />
-          <div class="caption">Static fallback: phase-plane orbits, truth · MLP · HNN. Enable JavaScript and iframes for the interactive version.</div>
-        </div>
-      </div>
-    </noscript>
+    <p class="caption reveal" style="margin-top: 12px;">First load can take 20–40 s while the Space starts.</p>
   </div>
 </section>
 
-<section class="content-section" id="analysis">
+<section class="content-section">
   <div class="container">
-    <div class="section-eyebrow reveal">// Analysis</div>
-    <h2 class="reveal">Results analysis</h2>
-    <p class="section-intro reveal">Why accuracy or a confusion matrix isn't the right metric here, which numbers <em>do</em> apply, and what the headline figures actually mean.</p>
-
-    <h3 class="reveal" style="margin-top: 12px;">What type of problem is this?</h3>
-    <p class="reveal" style="color: var(--fg-1); max-width: 820px;">This is not classification, and it is not the usual flat regression either. The output of the model is a continuous function of state — the <strong style="color:var(--fg-0)">vector field</strong> of an ODE — and the training signal is a whole trajectory, not a label per sample. The relevant question is no longer "how often is it right" but "does integrating the learned field reproduce the right dynamics, including outside the training window?".</p>
-
-    <table class="analysis-table reveal">
-      <thead>
-        <tr>
-          <th>Problem type</th>
-          <th>Output</th>
-          <th>Typical metrics</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Classification</td>
-          <td>discrete class label</td>
-          <td>accuracy, precision, recall, F1, ROC-AUC, confusion matrix</td>
-        </tr>
-        <tr>
-          <td>Pointwise regression</td>
-          <td>continuous number per sample</td>
-          <td>MSE, MAE, R², RMSE</td>
-        </tr>
-        <tr>
-          <td class="highlight">Vector-field regression (this project)</td>
-          <td>continuous function — the RHS of an ODE</td>
-          <td>train/extrapolation MSE, scale-free relative error, structural-invariant drift</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h3 class="reveal" style="margin-top: 40px;">Evaluation methodology</h3>
-    <p class="reveal" style="color: var(--fg-1); max-width: 820px;">Three layers stacked together — each answers a different question.</p>
-
-    <div class="two-col" style="margin-top: 16px;">
-      <div class="info-card reveal">
-        <h3>① Training-horizon fit</h3>
-        <p>MSE on the held-out clean trajectory restricted to \(t \le T_{\text{train}}\). A floor of about the observation-noise variance is the best an unconstrained MLP can be expected to reach.</p>
-      </div>
-      <div class="info-card reveal">
-        <h3>② Extrapolation horizon</h3>
-        <p>Same MSE on the held-out window \(t &gt; T_{\text{train}}\) — the part the network was never shown. Reported both as raw MSE and as a scale-free relative error \(\sqrt{\text{MSE}} / \max|y|\) so amplitudes don't dominate the comparison between systems.</p>
-      </div>
-      <div class="info-card reveal">
-        <h3>③ Structural invariants</h3>
-        <p>Mechanical energy on the pendulum and the Lotka-Volterra invariant \(H\) along the predicted orbit. The MLP is never told these exist — drift in either is a direct measure of how much physics the network rediscovered from data alone.</p>
-      </div>
-      <div class="info-card reveal">
-        <h3>④ Visual inspection</h3>
-        <p>Phase plane with the learned vector field overlaid as a streamplot. A correct fit produces orbits that close on themselves (Lotka-Volterra) or spiral cleanly to the equilibrium (pendulum) — qualitative failures show up here long before they do in scalar metrics.</p>
-      </div>
+    <div class="section-eyebrow reveal">Full analysis</div>
+    <h2 class="reveal">On GitHub</h2>
+    <div class="readme-links reveal">
+      <a href="https://github.com/crozol/02-neural-odes#3--background-what-is-a-neural-ode" target="_blank" rel="noopener"><span>Background</span>Neural ODEs and the adjoint method</a>
+      <a href="https://github.com/crozol/02-neural-odes#6--results--damped-pendulum" target="_blank" rel="noopener"><span>Pendulum</span>Fit, extrapolation, energy</a>
+      <a href="https://github.com/crozol/02-neural-odes#7--results--lotka-volterra" target="_blank" rel="noopener"><span>Lotka–Volterra</span>Fit and conserved quantity</a>
+      <a href="https://github.com/crozol/02-neural-odes#8--ablation-hamiltonian-prior--what-it-buys-and-when" target="_blank" rel="noopener"><span>Ablation</span>Hamiltonian prior: what it buys, and when</a>
     </div>
-
-    <h3 class="reveal" style="margin-top: 40px;">Metrics achieved vs. thresholds</h3>
-    <table class="analysis-table reveal">
-      <thead>
-        <tr>
-          <th>Metric</th>
-          <th>What it measures</th>
-          <th>Threshold</th>
-          <th>Result</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Pendulum · train MSE</td>
-          <td>fit on the noisy training horizon</td>
-          <td>≲ noise² · 10 = 2.5·10⁻⁴</td>
-          <td class="check">3.0·10⁻⁴ ± 2.8·10⁻⁴ · 4/5 seeds ✓</td>
-        </tr>
-        <tr>
-          <td>Pendulum · rel-err extrap</td>
-          <td>scale-free error past \(T_{\text{train}}\)</td>
-          <td>≤ 10 %</td>
-          <td class="warn">8.3 % ± 2.4 % · 3/5 seeds (two at 10.4 % and 10.8 %)</td>
-        </tr>
-        <tr>
-          <td>Pendulum · final |ΔE/E|</td>
-          <td>energy drift at \(t = T_{\text{full}}\)</td>
-          <td>&lt; 5 % (ideal) · &gt; 100 % (failure)</td>
-          <td class="warn">106 % ± 41 % · 4/5 seeds above 100 % — see below</td>
-        </tr>
-        <tr>
-          <td>Lotka · train MSE</td>
-          <td>fit on the noisy training horizon</td>
-          <td>≲ noise² · 10 = 9·10⁻³</td>
-          <td class="check">6.3·10⁻³ ± 2.3·10⁻³ · 5/5 seeds ✓</td>
-        </tr>
-        <tr>
-          <td>Lotka · rel-err extrap</td>
-          <td>scale-free error past \(T_{\text{train}}\)</td>
-          <td>≤ 5 %</td>
-          <td class="check">0.96 % ± 0.57 % · 5/5 seeds ✓</td>
-        </tr>
-        <tr>
-          <td>Lotka · drift in \(H\)</td>
-          <td>structural-invariant deviation along orbit</td>
-          <td>≤ 10 %</td>
-          <td class="warn">9.0 % ± 3.3 % · 4/5 seeds (one at 14.6 %)</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h3 class="reveal" style="margin-top: 40px;">Interpretation</h3>
-    <p class="reveal" style="color: var(--fg-1); max-width: 820px;">Three observations, in order of how informative the discrepancy is.</p>
-
-    <div class="analysis-callout reveal">
-      <h4>1 · Both systems extrapolate within a few percent of the trajectory amplitude</h4>
-      <p>Relative extrapolation error of 8.3 % ± 2.4 % for the pendulum and 0.96 % ± 0.57 % for Lotka-Volterra (5 seeds). Closed orbits make Lotka strictly harder per period, but the amplitude is preserved across multiple cycles into the held-out window — the orbit stays bounded despite the network never being told the dynamics are conservative.</p>
-    </div>
-
-    <div class="analysis-callout reveal">
-      <h4>2 · The pendulum doesn't fully internalise friction</h4>
-      <p>Inside the training window the predicted energy tracks the true dissipation envelope. Past it, the predicted oscillation keeps its amplitude instead of continuing to decay — the network learns the period and phase but only an approximate \(\gamma\). The final-time drift of 106 % ± 41 % (individual seeds from 37 % to 137 %) is the snapshot consequence; the qualitative summary is "the envelope is right, the late-time decay rate is not".</p>
-      <p>The architectural fix is not more training — it is encoding the structure. A <em>Hamiltonian Neural Network</em> (Greydanus et al., 2019) conserves its learned \(H_\theta\) by construction; it is the right prior for conservative systems and is tested on Lotka-Volterra above. The pendulum is dissipative, so the matching prior is a Hamiltonian-plus-dissipation model such as Dissipative SymODEN (Zhong et al., 2020) — the natural next step.</p>
-    </div>
-
-    <div class="analysis-callout reveal">
-      <h4>3 · The unconstrained MLP is a baseline, not a solution</h4>
-      <p>The headline numbers are what an MLP <em>without</em> physics priors achieves on these two systems. They establish the bar against which any inductive-bias improvement (Hamiltonian, Lagrangian, Symplectic ODE-Net) must show a measurable benefit. The follow-ups in the README close that gap by encoding invariants instead of letting the network rediscover them.</p>
-    </div>
-
   </div>
 </section>
 

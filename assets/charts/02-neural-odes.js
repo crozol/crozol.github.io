@@ -4,6 +4,19 @@
 (function () {
   "use strict";
 
+  // render only the charts present on the page
+  function guarded(P) {
+    return {
+      newPlot: (id, ...a) => {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        el.querySelectorAll(".chart-loading").forEach((n) => n.remove());   // the placeholder
+        return P.newPlot(id, ...a);
+      },
+    };
+  }
+
+
   const DATA_URL = "../assets/data/02-neural-odes.json";
 
   const COLORS = {
@@ -752,6 +765,7 @@
           return r.json();
         })
         .then((data) => {
+          Plotly = guarded(Plotly);
           const pendulum = Object.assign({}, data.pendulum,
             { metrics: data.metrics.damped_pendulum });
           const lotka = Object.assign({}, data.lotka,

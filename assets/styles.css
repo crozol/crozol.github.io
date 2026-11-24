@@ -947,3 +947,44 @@ footer .footer-sub {
   background: linear-gradient(120deg, #1d4ed8, #2563eb);
   box-shadow: 0 14px 42px rgba(37, 99, 235, 0.55);
 }
+
+/* Concise project pages: short bullet lists, result sub-heads, metric tiles in threes,
+   and links to the sections of the full analysis on GitHub */
+.content-section ul.key-points { list-style: none; padding-left: 0; max-width: 860px; }
+.content-section ul.key-points li {
+  position: relative; padding-left: 24px; margin-bottom: 12px; line-height: 1.65;
+}
+.content-section ul.key-points li::before {
+  content: ""; position: absolute; left: 0; top: 0.62em; width: 8px; height: 8px; border-radius: 2px;
+  background: linear-gradient(120deg, var(--accent-2), var(--accent-1));
+}
+.content-section ul.key-points strong { color: var(--fg-0); }
+.results-subhead {
+  font-family: var(--font-mono); font-size: 0.95rem; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--accent-2); margin: 52px 0 18px;
+}
+.results-grid.tiles-3 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 800px) { .results-grid.tiles-3 { grid-template-columns: 1fr; } }
+.readme-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+.readme-links a {
+  display: block; padding: 18px 20px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--glass); color: var(--fg-1); font-size: 13.5px; line-height: 1.5; text-decoration: none;
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+.readme-links a:hover { border-color: rgba(124, 92, 255, 0.45); transform: translateY(-2px); }
+.readme-links a span {
+  display: block; font-family: var(--font-mono); font-size: 12px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--accent-2); margin-bottom: 6px;
+}
+/* concise pages: one column width for every section, so headings and bullets line up */
+body.text-balanced.concise .content-section > .container { width: min(1040px, 92%); }
+/* project cards: three key figures under the two-sentence summary */
+.project-figures { display: flex; flex-wrap: wrap; gap: 10px; margin: 2px 0 16px; }
+.project-figures span {
+  display: flex; flex-direction: column; gap: 2px; padding: 8px 12px; border-radius: 10px;
+  border: 1px solid var(--border); background: rgba(255,255,255,0.03);
+  font-size: 11.5px; color: var(--fg-1); line-height: 1.3;
+}
+.project-figures b {
+  font-family: var(--font-mono); font-size: 13.5px; font-weight: 600; color: var(--fg-0);
+}

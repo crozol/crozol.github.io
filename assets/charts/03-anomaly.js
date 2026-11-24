@@ -4,6 +4,19 @@
 (function () {
   "use strict";
 
+  // render only the charts present on the page
+  function guarded(P) {
+    return {
+      newPlot: (id, ...a) => {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        el.querySelectorAll(".chart-loading").forEach((n) => n.remove());   // the placeholder
+        return P.newPlot(id, ...a);
+      },
+    };
+  }
+
+
   const DATA_URL = "../assets/data/03-anomaly.json";
 
   const COLORS = {
@@ -258,6 +271,7 @@
   }
 
   function renderAll(Plotly, payload) {
+    Plotly = guarded(Plotly);
     renderLoss(Plotly, payload);
     renderHistograms(Plotly, payload);
     renderRoc(Plotly, payload);

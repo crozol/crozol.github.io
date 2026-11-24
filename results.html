@@ -47,7 +47,7 @@
       <span class="badge domain">Headline numbers · 5 completed projects</span>
     </div>
     <h1 class="reveal"><span class="grad">Key results</span></h1>
-    <p class="tagline reveal">The headline numbers from each completed project, side by side with the exact benchmark it was validated against. Every figure here matches the project's repository; click through for the full method, interactive figures and the live demo.</p>
+    <p class="tagline reveal">The headline numbers of each project, next to the benchmark it was checked against. Every figure matches the project's repository.</p>
   </div>
 </header>
 
@@ -55,20 +55,20 @@
   <div class="container">
     <div class="section-eyebrow reveal">01 · Statistical mechanics · Bayesian</div>
     <h2 class="reveal">Bayesian inference on the 2D Ising model</h2>
-    <p class="section-intro reveal">Simulate a lattice of spins with Metropolis Monte Carlo, then infer the critical temperature and exponents with MCMC by finite-size scaling of Wolff cluster data — benchmarked against the exact Onsager (1944) solution.</p>
+    <p class="section-intro reveal">Monte Carlo simulation and Bayesian finite-size scaling, checked against Onsager's exact solution.</p>
 
-    <div class="results-grid reveal" style="margin-bottom: 22px;">
+    <div class="results-grid tiles-3 reveal" style="margin-bottom: 22px;">
       <div class="result-metric">
         <div class="value">Tc = 2.2691</div>
-        <div class="label">critical temperature · finite-size scaling, L = 32–128 · 2.2691(1)(1) · Onsager exact 2.26919</div>
+        <div class="label">2.2691(1)(1) · Onsager 2.26919</div>
       </div>
       <div class="result-metric">
         <div class="value">β = 0.122</div>
-        <div class="label">critical exponent · 0.1220(15)(24), exact 1/8; ν = 0.981(10)(20), exact 1</div>
+        <div class="label">0.1220(15)(24), exact 1/8 · ν = 0.981(10)(20), exact 1</div>
       </div>
       <div class="result-metric">
         <div class="value">Tc = 2.37</div>
-        <div class="label">a power-law fit to a single 32×32 lattice misses Tc by 0.1 and cannot pin β — the reason for finite-size scaling</div>
+        <div class="label">single 32×32 lattice: the power-law fit misses by 0.1, the reason for finite-size scaling</div>
       </div>
     </div>
 
@@ -84,20 +84,20 @@
   <div class="container">
     <div class="section-eyebrow reveal">02 · Deep learning · Dynamical systems</div>
     <h2 class="reveal">Neural ODEs with a Hamiltonian prior</h2>
-    <p class="section-intro reveal">Learn the right-hand side of conservative ODEs from short noisy trajectories. A Hamiltonian Neural Network builds the symplectic structure into the architecture. A controlled ablation on Lotka-Volterra (5 seeds, with a coordinate control) shows when that helps: on orbits the models never saw, once the training data cover more than one orbit.</p>
+    <p class="section-intro reveal">Vector fields learned from short noisy trajectories, and when a Hamiltonian prior helps on orbits never seen.</p>
 
-    <div class="results-grid reveal" style="margin-bottom: 22px;">
+    <div class="results-grid tiles-3 reveal" style="margin-bottom: 22px;">
       <div class="result-metric">
         <div class="value">4.7 % → 2.6 %</div>
-        <div class="label">relative error on five unseen Lotka-Volterra orbits, trained on three trajectories with the exact likelihood · MLP in log-coordinates → Hamiltonian NN, same parameter budget (5 seeds)</div>
+        <div class="label">error on five unseen orbits · log-coordinate MLP → HNN of the same size, 5 seeds</div>
       </div>
       <div class="result-metric">
         <div class="value">12.6 % → 6.0 %</div>
-        <div class="label">drift of the conserved <code>H</code> on the same unseen orbits; with a single training trajectory no model generalises (14–17 % error)</div>
+        <div class="label">drift of the conserved H on the same orbits · p = 0.008</div>
       </div>
       <div class="result-metric">
         <div class="value">8.3 ± 2.4 %</div>
-        <div class="label">relative extrapolation error on the damped pendulum (baseline)</div>
+        <div class="label">extrapolation error on the damped pendulum, MLP baseline</div>
       </div>
     </div>
 
@@ -113,20 +113,20 @@
   <div class="container">
     <div class="section-eyebrow reveal">03 · Deep learning · MLOps</div>
     <h2 class="reveal">Reconstruction-based anomaly detection · CMAPSS</h2>
-    <p class="section-intro reveal">An LSTM autoencoder trained on healthy turbofan windows from NASA CMAPSS FD001; the reconstruction error becomes the anomaly score, with the threshold fixed as the 99th-percentile of the healthy validation error. Served as a typed FastAPI service, a Streamlit demo and a two-service Docker stack.</p>
+    <p class="section-intro reveal">An LSTM autoencoder on healthy turbofan data, against simpler detectors, served as an API, a demo and a Docker stack.</p>
 
-    <div class="results-grid reveal" style="margin-bottom: 22px;">
+    <div class="results-grid tiles-3 reveal" style="margin-bottom: 22px;">
       <div class="result-metric">
         <div class="value">ROC-AUC 0.969</div>
-        <div class="label">95% CI [0.954, 0.985], bootstrap over 20 test engines · cycle-count baseline 0.839 · Isolation Forest 0.970</div>
+        <div class="label">[0.954, 0.985] over 20 test engines · Isolation Forest 0.970</div>
       </div>
       <div class="result-metric">
         <div class="value">F1 0.738</div>
-        <div class="label">at the calibrated threshold · recall 0.937 at precision 0.608</div>
+        <div class="label">recall 0.937 at precision 0.608, calibrated threshold</div>
       </div>
       <div class="result-metric">
         <div class="value">44 cycles</div>
-        <div class="label">median warning before failure with a causal alarm (3 consecutive windows above the q99 threshold) · all 20 test engines flagged · average precision 0.882 · at equal false-alarm rates no score dominates: a One-Class SVM ranks slightly worse but, with no healthy false alarm, warns a median 2.5 cycles earlier per engine</div>
+        <div class="label">median warning before failure · all 20 test engines flagged</div>
       </div>
     </div>
 
@@ -142,20 +142,20 @@
   <div class="container">
     <div class="section-eyebrow reveal">04 · ML for science · PDEs</div>
     <h2 class="reveal">Physics-informed neural networks</h2>
-    <p class="section-intro reveal">The PDE residual, computed by autodifferentiating the network's own output, becomes part of the loss — so the model is trained to satisfy the heat and Burgers equations directly, without a mesh and without solved-PDE training data.</p>
+    <p class="section-intro reveal">Networks trained to satisfy the heat and Burgers equations, and a 40-run reproduction of the original benchmark.</p>
 
-    <div class="results-grid reveal" style="margin-bottom: 22px;">
+    <div class="results-grid tiles-3 reveal" style="margin-bottom: 22px;">
       <div class="result-metric">
         <div class="value">0.14 ± 0.05%</div>
-        <div class="label">heat equation · relative L2 error vs. the closed-form solution, global over t ∈ [0, 1] (5 seeds); per time slice it exceeds 10% after t ≈ 0.6</div>
+        <div class="label">heat · relative L² error against the closed form, 5 seeds</div>
       </div>
       <div class="result-metric">
         <div class="value">1.66 ± 0.49%</div>
-        <div class="label">Burgers equation · relative L2 error vs. the exact Cole-Hopf solution, after L-BFGS fine-tuning (5 seeds)</div>
+        <div class="label">Burgers · against the exact solution, 5 seeds</div>
       </div>
       <div class="result-metric">
-        <div class="value">~8.8% → 1.78%</div>
-        <div class="label">Burgers, seed 0 · Adam alone plateaus above target; L-BFGS on a fixed point batch gets it there</div>
+        <div class="value">0 / 20</div>
+        <div class="label">float32 runs of the paper's recipe reaching its 6.7 × 10⁻⁴ · 4 / 20 in float64</div>
       </div>
     </div>
 
@@ -170,20 +170,20 @@
   <div class="container">
     <div class="section-eyebrow reveal">05 · Applied topology · Finance</div>
     <h2 class="reveal">TDA on financial time series</h2>
-    <p class="section-intro reveal">Persistent homology over sliding windows of daily returns, tested against realised volatility and the eigenvalues of the correlation matrix on leakage-free folds; the analysis plan, with its success criterion, was fixed before any result and run once on market data.</p>
+    <p class="section-intro reveal">Persistent homology of market returns against volatility and correlation, with pre-registered, leakage-free tests.</p>
 
-    <div class="results-grid reveal" style="margin-bottom: 22px;">
+    <div class="results-grid tiles-3 reveal" style="margin-bottom: 22px;">
       <div class="result-metric">
-        <div class="value">Not met</div>
-        <div class="label">pre-registered criterion · the combined model wins in 2 of 5 held-out crises under leave-one-crisis-out (4 needed) and in 3 of 4 under the walk-forward (3 needed)</div>
+        <div class="value">2 of 5</div>
+        <div class="label">Study 1 · held-out crises where topology helps (4 needed): criterion not met</div>
       </div>
       <div class="result-metric">
-        <div class="value">0.45–0.58</div>
-        <div class="label">ROC-AUC of the baselines inside four of the five held-out crises · every feature compared ignores the sign of the returns, the drawdown label does not: the result is inconclusive</div>
+        <div class="value">τ 0.89 · 0.99</div>
+        <div class="label">replication of Gidea &amp; Katz · rise before Lehman of the norms and of volatility alone</div>
       </div>
       <div class="result-metric">
-        <div class="value">p ≥ 0.96</div>
-        <div class="label">tests added after the result · Holm-adjusted p on market data of the four statistics with power: no evidence, with power of 4–7 in 20 on synthetic crises far easier to see</div>
+        <div class="value">Running</div>
+        <div class="label">Study 2 · early warning, pre-registered on 2026-11-24</div>
       </div>
     </div>
 

@@ -4,6 +4,19 @@
 (function () {
   "use strict";
 
+  // render only the charts present on the page
+  function guarded(P) {
+    return {
+      newPlot: (id, ...a) => {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        el.querySelectorAll(".chart-loading").forEach((n) => n.remove());   // the placeholder
+        return P.newPlot(id, ...a);
+      },
+    };
+  }
+
+
   const DATA_URL = "../assets/data/04-pinns.json";
 
   const COLORS = {
@@ -180,6 +193,7 @@
   }
 
   function renderAll(Plotly, payload) {
+    Plotly = guarded(Plotly);
     renderHeatmap(Plotly, "chart-heat-field", "Heat equation", payload.heat);
     renderSlices(Plotly, "chart-heat-slices", "Heat equation", payload.heat.slices);
     renderHeatmap(Plotly, "chart-burgers-field", "Burgers equation", payload.burgers);

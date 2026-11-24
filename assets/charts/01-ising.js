@@ -472,9 +472,11 @@
           return r.json();
         })
         .then((data) => {
-          renderMagnetization(Plotly, data);
-          renderPosteriors(Plotly, data);
-          renderTrace(Plotly, data);
+          // render only the charts present on the page, without their loading placeholders
+          document.querySelectorAll("[id^=chart-] .chart-loading").forEach((n) => n.remove());
+          if (document.getElementById("chart-magnetization")) renderMagnetization(Plotly, data);
+          if (document.getElementById("chart-posteriors")) renderPosteriors(Plotly, data);
+          if (document.getElementById("chart-trace")) renderTrace(Plotly, data);
         })
     )
     .catch((err) => {
